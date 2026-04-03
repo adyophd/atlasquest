@@ -1,11 +1,13 @@
 # AtlasQuest
 
-Geography learning and quiz game. Single HTML file, deployed via Netlify.
+Geography learning and quiz game. Static site deployed via Netlify.
 
 ## Project Structure
 
-- `practice.html` — the entire app (HTML, CSS, JS in one file)
-- `deploy.sh` — deploys to Netlify staging or production
+- `index.html` — landing page (Practice / Challenge buttons)
+- `practice.html` — practice mode (choose country & difficulty)
+- `challenge.html` — daily challenge mode (5 seeded random world cities)
+- `deploy.sh` — deploys to Netlify staging or production via ZIP API
 
 ## Deployment
 
