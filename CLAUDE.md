@@ -7,7 +7,7 @@ Geography learning and quiz game. Static site deployed via Netlify.
 - `index.html` — landing page (Practice / Challenge buttons)
 - `practice.html` — practice mode (choose country & difficulty)
 - `challenge.html` — daily challenge mode (5 seeded random world cities)
-- `deploy.sh` — deploys to Netlify staging or production via ZIP API
+- `deploy.sh` — deploys to Netlify production via ZIP API (`./deploy.sh prod`)
 
 ## Deployment
 
@@ -22,8 +22,8 @@ Use `/sync` to deploy staging to prod, commit, and push to GitHub in one step.
 
 | Environment | URL | Netlify Site ID |
 |---|---|---|
-| Production | atlasquest.io | d097be82-9a5e-4260-8b05-42687b30434a |
-| Staging | staging--adamyoungphd.netlify.app | branch deploy — free |
+| Production | atlasquest.io | Netlify site ID: d097be82-9a5e-4260-8b05-42687b30434a |
+| Staging | staging--adamyoungphd.netlify.app | free branch deploy — no site ID |
 
 DNS is managed via Netlify DNS (nameservers: dns1-4.p03.nsone.net).
 Domain purchased on Namecheap.
