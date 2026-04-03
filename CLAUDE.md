@@ -12,8 +12,8 @@ Geography learning and quiz game. Static site deployed via Netlify.
 ## Deployment
 
 ```bash
-./deploy.sh staging   # → staging.atlasquest.io
-./deploy.sh prod      # → atlasquest.io
+git push origin staging   # → staging--adamyoungphd.netlify.app (free branch deploy)
+./deploy.sh prod          # → atlasquest.io (15 credits)
 ```
 
 Use `/sync` to deploy staging to prod, commit, and push to GitHub in one step.
@@ -23,7 +23,7 @@ Use `/sync` to deploy staging to prod, commit, and push to GitHub in one step.
 | Environment | URL | Netlify Site ID |
 |---|---|---|
 | Production | atlasquest.io | d097be82-9a5e-4260-8b05-42687b30434a |
-| Staging | staging.atlasquest.io | 5aed47ac-f35a-4249-92e4-e7aa2be1ba3c |
+| Staging | staging--adamyoungphd.netlify.app | branch deploy — free |
 
 DNS is managed via Netlify DNS (nameservers: dns1-4.p03.nsone.net).
 Domain purchased on Namecheap.
