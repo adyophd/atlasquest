@@ -69,3 +69,4 @@ A+ <40, A <80, A- <120, B+ <160, B <200, B- <240, C+ <280, C <320, C- <360, D+ <
 - Portland disambiguated as "Portland (ME)" and "Portland (OR)" in USA data
 - Inspect button on quiz feedback collapses the modal so the map is visible with guess/answer markers still showing
 - `adamyoungphd.com` is decommissioned — serves a blank page via a separate Netlify site (adamyoungphd-decommissioned)
+
