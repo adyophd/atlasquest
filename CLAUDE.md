@@ -28,8 +28,8 @@ Domain purchased on Namecheap.
 
 ## GitHub
 
-Repo: https://github.com/adyophd/maplearn (name not yet updated)
-Branch: `staging` (main working branch — push here)
+Repo: https://github.com/adyophd/atlasquest
+Branch: `staging` (main working branch — push here); `main` = production
 
 ## App Architecture
 
