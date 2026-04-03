@@ -28,8 +28,8 @@ mkdir -p "$DEPLOY_DIR"
 cp "$SOURCE_DIR/index.html"         "$DEPLOY_DIR/index.html"
 cp "$SOURCE_DIR/practice.html"      "$DEPLOY_DIR/practice.html"
 cp "$SOURCE_DIR/challenge.html"     "$DEPLOY_DIR/challenge.html"
-printf "/*\n  Content-Type: text/html; charset=UTF-8\n" > "$DEPLOY_DIR/_headers"
-cd "$DEPLOY_DIR" && zip -q -r deploy.zip index.html practice.html challenge.html _headers
+cp "$SOURCE_DIR/netlify.toml"       "$DEPLOY_DIR/netlify.toml"
+cd "$DEPLOY_DIR" && zip -q -r deploy.zip index.html practice.html challenge.html netlify.toml
 
 RESULT=$(curl -s -X POST \
   -H "Authorization: Bearer $TOKEN" \
