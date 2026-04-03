@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AtlasQuest</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+    * { -webkit-tap-highlight-color: transparent; }
+    button { touch-action: manipulation; }
+
+    /* ── Header ── */
+    #header {
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.55);
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    #title { font-size: 1rem; letter-spacing: 2px; color: #888; white-space: nowrap; }
+    #game-brand { color: #f5c842; font-weight: 700; letter-spacing: 3px; }
+
+    /* ── Mode nav buttons ── */
+    #mode-nav {
+      display: none;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .mode-nav-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #ccc;
+      padding: 11px 18px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+    .mode-nav-btn:hover { border-color: #aaa; color: #fff; }
+    .mode-nav-btn.primary {
+      background: rgba(245,200,66,0.12);
+      border-color: #f5c842;
+      color: #f5c842;
+    }
+    .mode-nav-btn.primary:hover { background: rgba(245,200,66,0.2); }
+
+    /* ── Quiz prompt (quiz mode only) ── */
+    #quiz-bar {
+      display: none;
+      padding: 8px 20px;
+      background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #2a2a4a;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    #prompt-box {
+      display: inline-block;
+      background: rgba(245,200,66,0.1);
+      border: 1.5px solid #f5c842;
+      border-radius: 10px;
+      padding: 6px 28px;
+    }
+    #prompt-label { font-size: 0.65rem; color: #aaa; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1px; }
+    #city-prompt  { font-size: 1.5rem; font-weight: 700; color: #f5c842; letter-spacing: 2px; }
+    #progress { margin-top: 6px; font-size: 0.75rem; color: #666; }
+    #progress span { color: #bbb; font-weight: bold; }
+
+    /* ── Learn mode hint ── */
+    #learn-hint {
+      display: none;
+      text-align: center;
+      padding: 5px;
+      font-size: 0.75rem;
+      color: #555;
+      background: rgba(0,0,0,0.3);
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
+    }
+
+    #map { flex: 1; }
+
+    /* ── Feedback (quiz) ── */
+    #feedback-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 8000;
+      pointer-events: none;
+    }
+    #feedback-banner {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: #1a1a2e;
+      border-radius: 14px;
+      padding: 20px 36px;
+      text-align: center;
+      min-width: 290px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    }
+    #feedback-banner.correct  { border: 2px solid #7effa0; }
+    #feedback-banner.wrong    { border: 2px solid #ff6b6b; }
+    #feedback-banner.distance { border: 2px solid #f5c842; }
+    #feedback-banner.distance #feedback-result { color: #f5c842; }
+    #map.quiz-mode { cursor: crosshair; }
+    #feedback-result { font-size: 1.4rem; font-weight: bold; margin-bottom: 6px; }
+    #feedback-banner.correct #feedback-result { color: #7effa0; }
+    #feedback-banner.wrong   #feedback-result { color: #ff6b6b; }
+    #feedback-grade {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    #feedback-grade.grade-a  { color: #7effa0; }
+    #feedback-grade.grade-b  { color: #b8f542; }
+    #feedback-grade.grade-c  { color: #f5c842; }
+    #feedback-grade.grade-d  { color: #ff9a3c; }
+    #feedback-grade.grade-f  { color: #ff6b6b; }
+    #feedback-detail { font-size: 0.95rem; color: #bbb; margin-bottom: 16px; }
+    #feedback-btns { display: flex; gap: 10px; justify-content: center; }
+    #next-btn {
+      background: #f5c842; color: #1a1a2e; border: none; border-radius: 8px;
+      padding: 12px 30px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 1px; pointer-events: all;
+    }
+    #next-btn:hover { background: #ffe066; }
+    #inspect-btn {
+      background: transparent; color: #aaa; border: 1px solid #555; border-radius: 8px;
+      padding: 12px 20px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 1px; pointer-events: all;
+    }
+    #inspect-btn:hover { color: #fff; border-color: #aaa; }
+    #feedback-banner.inspect-mode {
+      padding: 10px 16px;
+      min-width: 0;
+      bottom: 20px;
+      left: auto;
+      right: 20px;
+      transform: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #feedback-banner.inspect-mode #feedback-result,
+    #feedback-banner.inspect-mode #feedback-detail,
+    #feedback-banner.inspect-mode #inspect-btn { display: none; }
+    #feedback-banner.inspect-mode #feedback-grade { font-size: 1.6rem; margin: 0; }
+    #feedback-banner.inspect-mode #feedback-btns { margin: 0; }
+    #feedback-banner.inspect-mode #next-btn { padding: 8px 18px; font-size: 0.9rem; }
+
+    /* ── Learn mode reset button ── */
+    #learn-reset {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: #f5c842; color: #1a1a2e; border: none; border-radius: 8px;
+      padding: 12px 22px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 1px; box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+    #learn-reset:hover { background: #ffe066; }
+
+    /* ── Learn mode counter ── */
+    #learn-counter {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 9999;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 11px 18px;
+      font-size: 1rem; color: #aaa;
+    }
+    #learn-counter span { color: #7effa0; font-weight: bold; }
+
+    /* ── End screen ── */
+    #end-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 10000;
+      background: rgba(10,10,30,0.93);
+      align-items: flex-start; justify-content: center;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 0 16px;
+    }
+    #end-inner {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; text-align: center;
+      width: 100%; max-width: 420px;
+      margin: auto;
+      padding: 28px 0;
+    }
+    #end-screen h2    { font-size: 1.8rem; color: #f5c842; letter-spacing: 2px; }
+    #end-screen p     { font-size: 0.95rem; color: #ccc; }
+    #end-screen .big-score { font-size: 3rem; font-weight: bold; color: #7effa0; }
+    #play-again-btn {
+      margin-top: 6px; background: transparent; color: #666; border: 1.5px solid #333;
+      border-radius: 8px; padding: 8px 24px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; letter-spacing: 1px; font-family: inherit;
+    }
+    #play-again-btn:hover { border-color: #666; color: #aaa; }
+
+    /* ── Name entry ── */
+    #name-entry { display: flex; gap: 8px; align-items: center; }
+    #player-name {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid #444; border-radius: 6px;
+      color: #eee; padding: 8px 12px; font-size: 0.9rem;
+      outline: none; width: 170px;
+      font-family: inherit;
+    }
+    #player-name:focus { border-color: #f5c842; }
+    #player-name::placeholder { color: #555; }
+    #save-score-btn {
+      background: #f5c842; color: #1a1a2e; border: none; border-radius: 8px;
+      padding: 12px 24px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 0.5px; font-family: inherit;
+    }
+    #save-score-btn:hover { background: #ffe066; }
+    #save-score-btn:disabled { background: #444; color: #666; cursor: default; }
+
+    /* ── Leaderboard ── */
+    #leaderboard { width: 100%; }
+    #lb-title {
+      font-size: 0.72rem; letter-spacing: 3px; color: #555;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    #scores-table {
+      width: 100%; border-collapse: collapse; font-size: 0.82rem;
+    }
+    #scores-table th {
+      color: #555; font-size: 0.68rem; letter-spacing: 1px;
+      text-transform: uppercase; padding: 4px 8px;
+      border-bottom: 1px solid #2a2a2a; text-align: left;
+    }
+    #scores-table td { padding: 7px 8px; border-bottom: 1px solid #1e1e2e; color: #aaa; }
+    #scores-table tr.lb-new td { color: #f5c842; font-weight: 600; }
+    #scores-table td:nth-child(1) { color: #555; width: 28px; }
+    #scores-table td:nth-child(3) { color: #7effa0; }
+    #scores-table tr.lb-new td:nth-child(3) { color: #f5c842; }
+
+    /* ── Stars ── */
+    .star-wrap {
+      cursor: pointer; font-size: 22px; line-height: 1;
+      transition: transform 0.15s; user-select: none; display: inline-block;
+    }
+    .star-wrap:hover { transform: scale(1.35); }
+    .star-wrap.no-hover:hover { transform: none; cursor: default; }
+
+    .s-default { color: #f5c842; filter: drop-shadow(0 0 5px rgba(245,200,66,0.8)); }
+    .s-revealed { color: #7effa0; filter: drop-shadow(0 0 7px rgba(126,255,160,0.9)); }
+    .s-correct  { color: #7effa0; filter: drop-shadow(0 0 8px rgba(126,255,160,1)); }
+    .s-wrong    { color: #ff6b6b; filter: drop-shadow(0 0 8px rgba(255,107,107,1)); }
+    .s-answer   { color: #7effa0; filter: drop-shadow(0 0 10px rgba(126,255,160,1)); animation: pulse 0.6s ease-in-out infinite alternate; }
+    .s-label    { color: #f5c842; filter: drop-shadow(0 0 5px rgba(245,200,66,0.8)); }
+
+    @keyframes pulse {
+      from { filter: drop-shadow(0 0 6px rgba(126,255,160,0.6)); }
+      to   { filter: drop-shadow(0 0 18px rgba(126,255,160,1)); }
+    }
+
+    /* city name label next to star (show-names mode) */
+    .city-label-div {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .city-label-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #f5f0c8;
+      text-shadow: 0 0 4px #000, 1px 1px 0 #000, -1px -1px 0 #000;
+      pointer-events: none;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Difficulty selector ── */
+    #difficulty-selector {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 19000;
+      background: #1a1a2e;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #diff-flag { font-size: 3.5rem; margin-bottom: 10px; }
+    #diff-country-name {
+      font-size: 1rem; letter-spacing: 3px; color: #888;
+      text-transform: uppercase; margin-bottom: 40px; text-align: center;
+    }
+    #diff-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 280px;
+    }
+    .diff-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid #333;
+      border-radius: 12px;
+      padding: 18px 28px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.15s, background 0.15s;
+      font-family: inherit;
+      color: #eee;
+    }
+    .diff-btn:hover {
+      border-color: #f5c842;
+      background: rgba(245,200,66,0.07);
+    }
+    .diff-btn-name { font-size: 1.05rem; font-weight: 700; letter-spacing: 1px; }
+    .diff-btn-desc { font-size: 0.78rem; color: #666; letter-spacing: 0.5px; }
+    #diff-back-btn {
+      margin-top: 24px;
+      background: transparent;
+      border: none;
+      color: #555;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      font-family: inherit;
+      text-transform: uppercase;
+    }
+    #diff-back-btn:hover { color: #aaa; }
+    @media (max-width: 600px) {
+      #diff-buttons { width: calc(100% - 48px); }
+      #diff-flag { font-size: 2.8rem; }
+    }
+
+    /* ── Country selector ── */
+    #country-selector {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 20000;
+      background: #1a1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #brand-title {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: 6px;
+      color: #f5c842;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    #selector-title {
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: #f5c842;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    #selector-subtitle {
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      color: #555;
+      margin-bottom: 50px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    #flag-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .flag-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid #333;
+      border-radius: 16px;
+      padding: 30px 44px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    }
+    .flag-btn:hover {
+      border-color: #f5c842;
+      background: rgba(245,200,66,0.07);
+      transform: translateY(-4px);
+    }
+    .flag-emoji { font-size: 4.5rem; line-height: 1; }
+    .flag-name  { font-size: 0.85rem; letter-spacing: 2px; color: #bbb; font-weight: 600; text-transform: uppercase; }
+    #title { cursor: pointer; }
+    #title:hover { color: #bbb; }
+
+    /* ── Confirm banner ── */
+    #confirm-banner {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: #1a1a2e;
+      border: 2px solid #60b4ff;
+      border-radius: 14px;
+      padding: 20px 36px;
+      text-align: center;
+      min-width: 290px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+      pointer-events: all;
+    }
+    #confirm-question {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #60b4ff;
+      margin-bottom: 16px;
+    }
+    #confirm-btns { display: flex; gap: 12px; justify-content: center; }
+    #confirm-back-btn {
+      background: transparent;
+      border: 1.5px solid #555;
+      border-radius: 8px;
+      color: #999;
+      padding: 11px 26px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #confirm-back-btn:hover { border-color: #aaa; color: #ccc; }
+    #confirm-yes-btn {
+      background: #60b4ff;
+      border: none;
+      border-radius: 8px;
+      color: #1a1a2e;
+      padding: 11px 26px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #confirm-yes-btn:hover { background: #88caff; }
+
+    /* ── Leaflet tile seam fix ── */
+    .leaflet-tile-pane {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    .leaflet-tile {
+      box-shadow: none !important;
+      outline: 1px solid transparent !important;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      #header {
+        flex-direction: column;
+        padding: 8px 12px;
+        gap: 6px;
+        align-items: stretch;
+      }
+      #title { text-align: center; font-size: 0.82rem; letter-spacing: 1px; }
+      #mode-nav { width: 100%; }
+      .mode-nav-btn { flex: 1; padding: 12px 6px; font-size: 0.82rem; }
+
+      #selector-title { font-size: 1.4rem; letter-spacing: 2px; }
+      #selector-subtitle { margin-bottom: 36px; }
+      #flag-buttons { gap: 16px; }
+      .flag-btn { padding: 20px 24px; }
+      .flag-emoji { font-size: 3.5rem; }
+      .flag-btn:hover { transform: none; } /* disable stuck-hover on iOS */
+
+      .star-wrap { font-size: 30px; } /* larger touch target */
+
+      #feedback-banner {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        width: calc(100% - 32px);
+        min-width: unset;
+        padding: 14px 16px;
+      }
+      #next-btn { padding: 11px 28px; font-size: 0.95rem; }
+
+      #learn-counter {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        font-size: 0.78rem;
+      }
+      #learn-reset {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        font-size: 0.78rem;
+        padding: 10px 16px;
+      }
+
+      #end-screen h2 { font-size: 1.4rem; }
+      #end-screen .big-score { font-size: 2.4rem; }
+      #play-again-btn { padding: 8px 20px; font-size: 0.82rem; }
+      #player-name { width: 140px; }
+      #scores-table { font-size: 0.78rem; }
+      #feedback-banner, #confirm-banner {
+        width: calc(100% - 32px);
+        min-width: unset;
+        padding: 18px 16px;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      }
+
+      #quiz-bar { padding: 8px 12px; }
+      #city-prompt { font-size: 1.3rem; }
+    }
+
+    /* ── City info panel (learn mode) ── */
+    #info-panel {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: #1a1a2e;
+      border: 1.5px solid #7effa0;
+      border-radius: 14px;
+      padding: 16px 20px 14px;
+      width: calc(100% - 40px);
+      max-width: 500px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+    }
+    #info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #info-city-title {
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      color: #7effa0;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    #info-close-btn {
+      background: none; border: none; color: #555;
+      font-size: 1.4rem; cursor: pointer; line-height: 1;
+      padding: 0 2px; font-family: inherit;
+    }
+    #info-close-btn:hover { color: #aaa; }
+    #info-card-text {
+      font-size: 0.88rem; color: #ccc; line-height: 1.6;
+      min-height: 64px; margin-bottom: 14px;
+    }
+    @media (max-width: 600px) {
+      #info-panel {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        width: calc(100% - 32px);
+      }
+      #info-card-text { font-size: 0.82rem; }
+    }
+
+    /* Leaflet popup */
+    .leaflet-popup-content-wrapper {
+      background: #1a1a2e; border: 1.5px solid #f5c842; border-radius: 8px;
+      color: #f5c842; font-size: 0.95rem; font-weight: bold;
+      letter-spacing: 1px; box-shadow: 0 0 14px rgba(245,200,66,0.3);
+    }
+    .leaflet-popup-tip { background: #f5c842; }
+    .leaflet-popup-close-button { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- Country selector -->
+<div id="country-selector">
+  <div>
+    <div id="brand-title">AtlasQuest</div>
+    <div id="selector-subtitle">Choose a country to learn</div>
+    <div id="flag-buttons">
+      <button class="flag-btn" data-country="france">
+        <span class="flag-emoji">🇫🇷</span>
+        <span class="flag-name">France</span>
+      </button>
+      <button class="flag-btn" data-country="germany">
+        <span class="flag-emoji">🇩🇪</span>
+        <span class="flag-name">Germany</span>
+      </button>
+      <button class="flag-btn" data-country="russia">
+        <span class="flag-emoji">🇷🇺</span>
+        <span class="flag-name">Russia</span>
+      </button>
+      <button class="flag-btn" data-country="japan">
+        <span class="flag-emoji">🇯🇵</span>
+        <span class="flag-name">Japan</span>
+      </button>
+      <button class="flag-btn" data-country="canada">
+        <span class="flag-emoji">🇨🇦</span>
+        <span class="flag-name">Canada</span>
+      </button>
+      <button class="flag-btn" data-country="india">
+        <span class="flag-emoji">🇮🇳</span>
+        <span class="flag-name">India</span>
+      </button>
+      <button class="flag-btn" data-country="usa">
+        <span class="flag-emoji">🇺🇸</span>
+        <span class="flag-name">USA</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Difficulty selector -->
+<div id="difficulty-selector">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <div id="diff-flag"></div>
+    <div id="diff-country-name"></div>
+    <div id="diff-buttons">
+      <button class="diff-btn" data-difficulty="easy">
+        <span class="diff-btn-name">Easy</span>
+        <span class="diff-btn-desc">Top 5 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="medium">
+        <span class="diff-btn-name">Medium</span>
+        <span class="diff-btn-desc">Top 10 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="hard">
+        <span class="diff-btn-name">Hard</span>
+        <span class="diff-btn-desc">Top 15 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="veryhard">
+        <span class="diff-btn-name">Very Hard</span>
+        <span class="diff-btn-desc">Top 20 cities</span>
+      </button>
+    </div>
+    <button id="diff-back-btn">← Back</button>
+  </div>
+</div>
+
+<div id="header">
+  <div id="title" title="Back to country select"><span id="game-brand">AtlasQuest</span></div>
+  <div id="mode-nav">
+    <button class="mode-nav-btn" id="nav-learn">Learn Mode</button>
+    <button class="mode-nav-btn" id="nav-names">Show Names</button>
+    <button class="mode-nav-btn primary" id="nav-quiz">Start Quiz</button>
+  </div>
+</div>
+
+<!-- Learn mode sub-bar -->
+<div id="learn-hint">Tap a star to reveal the city name</div>
+
+<!-- Quiz mode prompt bar -->
+<div id="quiz-bar">
+  <div id="prompt-box">
+    <div id="prompt-label">Tap the map to place your guess</div>
+    <div id="city-prompt">—</div>
+  </div>
+  <div id="progress">Question <span id="q-num">1</span> of <span id="q-total">20</span> &nbsp;|&nbsp; Avg: <span id="score">—</span></div>
+</div>
+
+<div id="map"></div>
+
+<!-- Quiz confirmation -->
+<div id="confirm-banner">
+  <div id="confirm-question">Final Answer?</div>
+  <div id="confirm-btns">
+    <button id="confirm-back-btn">← Back</button>
+    <button id="confirm-yes-btn">Yes ✓</button>
+  </div>
+</div>
+
+<!-- Quiz feedback -->
+<div id="feedback-overlay"></div>
+<div id="feedback-banner">
+  <div id="feedback-result"></div>
+  <div id="feedback-grade"></div>
+  <div id="feedback-detail"></div>
+  <div id="feedback-btns">
+    <button id="inspect-btn">Inspect</button>
+    <button id="next-btn">Next &rarr;</button>
+  </div>
+</div>
+
+<!-- Learn mode UI -->
+<div id="learn-counter">Revealed: <span id="rev-count">0</span> / <span id="city-total">20</span></div>
+<button id="learn-reset">Reset</button>
+
+<!-- City info panel (learn mode) -->
+<div id="info-panel">
+  <div id="info-header">
+    <span id="info-city-title"></span>
+    <button id="info-close-btn">&#x2715;</button>
+  </div>
+  <div id="info-card-text"></div>
+</div>
+
+<!-- End screen -->
+<div id="end-screen">
+  <div id="end-inner">
+    <h2>Round Complete!</h2>
+    <p style="font-size:0.8rem;color:#888;letter-spacing:1px;margin:0">AVERAGE DISTANCE</p>
+    <div class="big-score" id="final-score"></div>
+    <p id="final-label"></p>
+    <div id="name-entry">
+      <input id="player-name" type="text" placeholder="Your name" maxlength="20" autocomplete="off" />
+      <button id="save-score-btn">Save Score</button>
+    </div>
+    <div id="leaderboard" style="display:none">
+      <div id="lb-title">Leaderboard</div>
+      <table id="scores-table"></table>
+    </div>
+    <button id="play-again-btn">← Choose Country</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── City data ──
+const allCities = {
+  france: [
+    { name: "Paris",            lat: 48.8566,  lng:  2.3522 },
+    { name: "Marseille",        lat: 43.2965,  lng:  5.3698 },
+    { name: "Lyon",             lat: 45.7640,  lng:  4.8357 },
+    { name: "Toulouse",         lat: 43.6047,  lng:  1.4442 },
+    { name: "Nice",             lat: 43.7102,  lng:  7.2620 },
+    { name: "Nantes",           lat: 47.2184,  lng: -1.5536 },
+    { name: "Montpellier",      lat: 43.6119,  lng:  3.8772 },
+    { name: "Strasbourg",       lat: 48.5734,  lng:  7.7521 },
+    { name: "Bordeaux",         lat: 44.8378,  lng: -0.5792 },
+    { name: "Lille",            lat: 50.6292,  lng:  3.0573 },
+    { name: "Rennes",           lat: 48.1173,  lng: -1.6778 },
+    { name: "Reims",            lat: 49.2583,  lng:  4.0317 },
+    { name: "Le Havre",         lat: 49.4944,  lng:  0.1079 },
+    { name: "Saint-Étienne",    lat: 45.4397,  lng:  4.3872 },
+    { name: "Toulon",           lat: 43.1242,  lng:  5.9280 },
+    { name: "Grenoble",         lat: 45.1885,  lng:  5.7245 },
+    { name: "Dijon",            lat: 47.3220,  lng:  5.0415 },
+    { name: "Angers",           lat: 47.4784,  lng: -0.5632 },
+    { name: "Nîmes",            lat: 43.8367,  lng:  4.3601 },
+    { name: "Clermont-Ferrand", lat: 45.7772,  lng:  3.0870 },
+  ],
+  japan: [
+    { name: "Tokyo",       lat: 35.6762,  lng: 139.6503 }, // 1  ~13.9M
+    { name: "Yokohama",    lat: 35.4437,  lng: 139.6380 }, // 2  ~3.7M
+    { name: "Osaka",       lat: 34.6937,  lng: 135.5023 }, // 3  ~2.7M
+    { name: "Nagoya",      lat: 35.1815,  lng: 136.9066 }, // 4  ~2.3M
+    { name: "Sapporo",     lat: 43.0618,  lng: 141.3545 }, // 5  ~2.0M
+    { name: "Fukuoka",     lat: 33.5904,  lng: 130.4017 }, // 6  ~1.6M
+    { name: "Kobe",        lat: 34.6901,  lng: 135.1956 }, // 7  ~1.5M
+    { name: "Kawasaki",    lat: 35.5308,  lng: 139.7030 }, // 8  ~1.5M
+    { name: "Kyoto",       lat: 35.0116,  lng: 135.7681 }, // 9  ~1.5M
+    { name: "Saitama",     lat: 35.8617,  lng: 139.6455 }, // 10 ~1.3M
+    { name: "Hiroshima",   lat: 34.3853,  lng: 132.4553 }, // 11 ~1.2M
+    { name: "Sendai",      lat: 38.2688,  lng: 140.8721 }, // 12 ~1.1M
+    { name: "Chiba",       lat: 35.6073,  lng: 140.1063 }, // 13 ~0.98M
+    { name: "Kitakyushu",  lat: 33.8834,  lng: 130.8751 }, // 14 ~0.93M
+    { name: "Sakai",       lat: 34.5733,  lng: 135.4830 }, // 15 ~0.83M
+    { name: "Niigata",     lat: 37.9161,  lng: 139.0364 }, // 16 ~0.79M
+    { name: "Hamamatsu",   lat: 34.7108,  lng: 137.7261 }, // 17 ~0.79M
+    { name: "Kumamoto",    lat: 32.8031,  lng: 130.7079 }, // 18 ~0.74M
+    { name: "Sagamihara",  lat: 35.5667,  lng: 139.3667 }, // 19 ~0.72M
+    { name: "Shizuoka",    lat: 34.9769,  lng: 138.3831 }, // 20 ~0.70M
+  ],
+  russia: [
+    { name: "Moscow",           lat: 55.7558,  lng:  37.6173 }, // 1  ~12.5M
+    { name: "St. Petersburg",   lat: 59.9343,  lng:  30.3351 }, // 2  ~5.4M
+    { name: "Novosibirsk",      lat: 54.9833,  lng:  82.8964 }, // 3  ~1.6M
+    { name: "Yekaterinburg",    lat: 56.8389,  lng:  60.6057 }, // 4  ~1.5M
+    { name: "Kazan",            lat: 55.7879,  lng:  49.1233 }, // 5  ~1.3M
+    { name: "Nizhny Novgorod",  lat: 56.3269,  lng:  44.0059 }, // 6  ~1.2M
+    { name: "Chelyabinsk",      lat: 55.1644,  lng:  61.4368 }, // 7  ~1.2M
+    { name: "Samara",           lat: 53.2028,  lng:  50.1408 }, // 8  ~1.1M
+    { name: "Ufa",              lat: 54.7388,  lng:  55.9721 }, // 9  ~1.1M
+    { name: "Rostov-on-Don",    lat: 47.2357,  lng:  39.7015 }, // 10 ~1.1M
+    { name: "Omsk",             lat: 54.9885,  lng:  73.3242 }, // 11 ~1.1M
+    { name: "Krasnoyarsk",      lat: 56.0153,  lng:  92.8932 }, // 12 ~1.1M
+    { name: "Voronezh",         lat: 51.6755,  lng:  39.2088 }, // 13 ~1.0M
+    { name: "Perm",             lat: 58.0105,  lng:  56.2502 }, // 14 ~1.0M
+    { name: "Volgograd",        lat: 48.7080,  lng:  44.5133 }, // 15 ~1.0M
+    { name: "Krasnodar",        lat: 45.0448,  lng:  38.9760 }, // 16 ~0.9M
+    { name: "Saratov",          lat: 51.5924,  lng:  46.0348 }, // 17 ~0.8M
+    { name: "Tyumen",           lat: 57.1553,  lng:  68.9685 }, // 18 ~0.8M
+    { name: "Tolyatti",         lat: 53.5303,  lng:  49.3461 }, // 19 ~0.7M
+    { name: "Izhevsk",          lat: 56.8526,  lng:  53.2114 }, // 20 ~0.65M
+  ],
+  germany: [
+    { name: "Berlin",      lat: 52.5200,  lng: 13.4050 }, // 1  ~3.7M
+    { name: "Hamburg",     lat: 53.5511,  lng:  9.9937 }, // 2  ~1.8M
+    { name: "München",     lat: 48.1351,  lng: 11.5820 }, // 3  ~1.5M
+    { name: "Köln",        lat: 50.9333,  lng:  6.9503 }, // 4  ~1.1M
+    { name: "Frankfurt",   lat: 50.1109,  lng:  8.6821 }, // 5  ~750K
+    { name: "Stuttgart",   lat: 48.7758,  lng:  9.1829 }, // 6  ~635K
+    { name: "Düsseldorf",  lat: 51.2217,  lng:  6.7762 }, // 7  ~620K
+    { name: "Leipzig",     lat: 51.3397,  lng: 12.3731 }, // 8  ~600K
+    { name: "Dortmund",    lat: 51.5136,  lng:  7.4653 }, // 9  ~590K
+    { name: "Bremen",      lat: 53.0793,  lng:  8.8017 }, // 10 ~565K
+    { name: "Dresden",     lat: 51.0504,  lng: 13.7373 }, // 11 ~555K
+    { name: "Hannover",    lat: 52.3759,  lng:  9.7320 }, // 12 ~540K
+    { name: "Nürnberg",    lat: 49.4521,  lng: 11.0767 }, // 13 ~515K
+    { name: "Bonn",        lat: 50.7374,  lng:  7.0982 }, // 14 ~330K
+    { name: "Münster",     lat: 51.9607,  lng:  7.6261 }, // 15 ~315K
+    { name: "Karlsruhe",   lat: 49.0069,  lng:  8.4037 }, // 16 ~310K
+    { name: "Augsburg",    lat: 48.3705,  lng: 10.8978 }, // 17 ~296K
+    { name: "Kiel",        lat: 54.3233,  lng: 10.1228 }, // 18 ~246K
+    { name: "Freiburg",    lat: 47.9990,  lng:  7.8421 }, // 19 ~230K
+    { name: "Rostock",     lat: 54.0887,  lng: 12.1400 }, // 20 ~210K
+  ],
+  canada: [
+    { name: "Toronto",      lat: 43.6532,  lng: -79.3832 }, // 1  ~2.79M
+    { name: "Montréal",     lat: 45.5017,  lng: -73.5673 }, // 2  ~2.12M
+    { name: "Calgary",      lat: 51.0447,  lng: -114.0719}, // 3  ~1.34M
+    { name: "Ottawa",       lat: 45.4215,  lng: -75.6972 }, // 4  ~1.02M
+    { name: "Edmonton",     lat: 53.5461,  lng: -113.4938}, // 5  ~1.01M
+    { name: "Winnipeg",     lat: 49.8951,  lng: -97.1384 }, // 6  ~0.75M
+    { name: "Mississauga",  lat: 43.5890,  lng: -79.6441 }, // 7  ~0.72M
+    { name: "Vancouver",    lat: 49.2827,  lng: -123.1207}, // 8  ~0.66M
+    { name: "Brampton",     lat: 43.7315,  lng: -79.7624 }, // 9  ~0.66M
+    { name: "Hamilton",     lat: 43.2557,  lng: -79.8711 }, // 10 ~0.57M
+    { name: "Surrey",       lat: 49.1913,  lng: -122.8490}, // 11 ~0.57M
+    { name: "Québec City",  lat: 46.8139,  lng: -71.2080 }, // 12 ~0.55M
+    { name: "Laval",        lat: 45.5662,  lng: -73.6952 }, // 13 ~0.44M
+    { name: "Halifax",      lat: 44.6488,  lng: -63.5752 }, // 14 ~0.44M
+    { name: "London",       lat: 42.9849,  lng: -81.2453 }, // 15 ~0.42M
+    { name: "Markham",      lat: 43.8561,  lng: -79.3370 }, // 16 ~0.34M
+    { name: "Vaughan",      lat: 43.8361,  lng: -79.4985 }, // 17 ~0.32M
+    { name: "Gatineau",     lat: 45.4765,  lng: -75.7013 }, // 18 ~0.29M
+    { name: "Burnaby",      lat: 49.2488,  lng: -122.9805}, // 19 ~0.25M
+    { name: "Longueuil",      lat: 45.5312,  lng: -73.5185 }, // 20 ~0.24M
+  ],
+  india: [
+    { name: "Mumbai",         lat: 19.0760,  lng:  72.8777 }, // 1  ~12.4M
+    { name: "Delhi",          lat: 28.6139,  lng:  77.2090 }, // 2  ~11.0M
+    { name: "Bengaluru",      lat: 12.9716,  lng:  77.5946 }, // 3  ~8.4M
+    { name: "Hyderabad",      lat: 17.3850,  lng:  78.4867 }, // 4  ~6.8M
+    { name: "Ahmedabad",      lat: 23.0225,  lng:  72.5714 }, // 5  ~5.5M
+    { name: "Chennai",        lat: 13.0827,  lng:  80.2707 }, // 6  ~7.1M
+    { name: "Kolkata",        lat: 22.5726,  lng:  88.3639 }, // 7  ~4.5M
+    { name: "Surat",          lat: 21.1702,  lng:  72.8311 }, // 8  ~4.5M
+    { name: "Pune",           lat: 18.5204,  lng:  73.8567 }, // 9  ~3.1M
+    { name: "Jaipur",         lat: 26.9124,  lng:  75.7873 }, // 10 ~3.0M
+    { name: "Lucknow",        lat: 26.8467,  lng:  80.9462 }, // 11 ~2.8M
+    { name: "Kanpur",         lat: 26.4499,  lng:  80.3319 }, // 12 ~2.7M
+    { name: "Nagpur",         lat: 21.1458,  lng:  79.0882 }, // 13 ~2.4M
+    { name: "Indore",         lat: 22.7196,  lng:  75.8577 }, // 14 ~1.9M
+    { name: "Thane",          lat: 19.2183,  lng:  72.9781 }, // 15 ~1.8M
+    { name: "Bhopal",         lat: 23.2599,  lng:  77.4126 }, // 16 ~1.8M
+    { name: "Visakhapatnam",  lat: 17.6868,  lng:  83.2185 }, // 17 ~1.7M
+    { name: "Patna",          lat: 25.5941,  lng:  85.1376 }, // 18 ~1.6M
+    { name: "Vadodara",       lat: 22.3072,  lng:  73.1812 }, // 19 ~1.6M
+    { name: "Ghaziabad",      lat: 28.6692,  lng:  77.4538 }, // 20 ~1.6M
+  ],
+
+  usa: [
+    // ── State Capitals (capital: true) ──
+    { name: "Montgomery",    lat: 32.3617,  lng: -86.2792,  capital: true },  // AL
+    { name: "Juneau",        lat: 58.3005,  lng: -134.4197, capital: true },  // AK
+    { name: "Phoenix",       lat: 33.4484,  lng: -112.0740, capital: true },  // AZ
+    { name: "Little Rock",   lat: 34.7465,  lng: -92.2896,  capital: true },  // AR
+    { name: "Sacramento",    lat: 38.5816,  lng: -121.4944, capital: true },  // CA
+    { name: "Denver",        lat: 39.7392,  lng: -104.9903, capital: true },  // CO
+    { name: "Hartford",      lat: 41.7658,  lng: -72.6851,  capital: true },  // CT
+    { name: "Dover",         lat: 39.1582,  lng: -75.5244,  capital: true },  // DE
+    { name: "Tallahassee",   lat: 30.4383,  lng: -84.2807,  capital: true },  // FL
+    { name: "Atlanta",       lat: 33.7490,  lng: -84.3880,  capital: true },  // GA
+    { name: "Honolulu",      lat: 21.3069,  lng: -157.8583, capital: true },  // HI
+    { name: "Boise",         lat: 43.6150,  lng: -116.2023, capital: true },  // ID
+    { name: "Springfield",   lat: 39.7817,  lng: -89.6501,  capital: true },  // IL
+    { name: "Indianapolis",  lat: 39.7684,  lng: -86.1581,  capital: true },  // IN
+    { name: "Des Moines",    lat: 41.5868,  lng: -93.6250,  capital: true },  // IA
+    { name: "Topeka",        lat: 39.0489,  lng: -95.6780,  capital: true },  // KS
+    { name: "Frankfort",     lat: 38.2009,  lng: -84.8733,  capital: true },  // KY
+    { name: "Baton Rouge",   lat: 30.4515,  lng: -91.1871,  capital: true },  // LA
+    { name: "Augusta",       lat: 44.3106,  lng: -69.7795,  capital: true },  // ME
+    { name: "Annapolis",     lat: 38.9784,  lng: -76.4922,  capital: true },  // MD
+    { name: "Boston",        lat: 42.3601,  lng: -71.0589,  capital: true },  // MA
+    { name: "Lansing",       lat: 42.7325,  lng: -84.5555,  capital: true },  // MI
+    { name: "St. Paul",      lat: 44.9537,  lng: -93.0900,  capital: true },  // MN
+    { name: "Jackson",       lat: 32.2988,  lng: -90.1848,  capital: true },  // MS
+    { name: "Jefferson City",lat: 38.5767,  lng: -92.1735,  capital: true },  // MO
+    { name: "Helena",        lat: 46.5958,  lng: -112.0270, capital: true },  // MT
+    { name: "Lincoln",       lat: 40.8136,  lng: -96.7026,  capital: true },  // NE
+    { name: "Carson City",   lat: 39.1638,  lng: -119.7674, capital: true },  // NV
+    { name: "Concord",       lat: 43.2081,  lng: -71.5376,  capital: true },  // NH
+    { name: "Trenton",       lat: 40.2171,  lng: -74.7429,  capital: true },  // NJ
+    { name: "Santa Fe",      lat: 35.6870,  lng: -105.9378, capital: true },  // NM
+    { name: "Albany",        lat: 42.6526,  lng: -73.7562,  capital: true },  // NY
+    { name: "Raleigh",       lat: 35.7796,  lng: -78.6382,  capital: true },  // NC
+    { name: "Bismarck",      lat: 46.8083,  lng: -100.7837, capital: true },  // ND
+    { name: "Columbus",      lat: 39.9612,  lng: -82.9988,  capital: true },  // OH
+    { name: "Oklahoma City", lat: 35.4676,  lng: -97.5164,  capital: true },  // OK
+    { name: "Salem",         lat: 44.9429,  lng: -123.0351, capital: true },  // OR
+    { name: "Harrisburg",    lat: 40.2732,  lng: -76.8867,  capital: true },  // PA
+    { name: "Providence",    lat: 41.8240,  lng: -71.4128,  capital: true },  // RI
+    { name: "Columbia",      lat: 34.0007,  lng: -81.0348,  capital: true },  // SC
+    { name: "Pierre",        lat: 44.3683,  lng: -100.3510, capital: true },  // SD
+    { name: "Nashville",     lat: 36.1627,  lng: -86.7816,  capital: true },  // TN
+    { name: "Austin",        lat: 30.2672,  lng: -97.7431,  capital: true },  // TX
+    { name: "Salt Lake City",lat: 40.7608,  lng: -111.8910, capital: true },  // UT
+    { name: "Montpelier",    lat: 44.2601,  lng: -72.5754,  capital: true },  // VT
+    { name: "Richmond",      lat: 37.5407,  lng: -77.4360,  capital: true },  // VA
+    { name: "Olympia",       lat: 47.0379,  lng: -122.9007, capital: true },  // WA
+    { name: "Charleston",    lat: 38.3498,  lng: -81.6326,  capital: true },  // WV
+    { name: "Madison",       lat: 43.0731,  lng: -89.4012,  capital: true },  // WI
+    { name: "Cheyenne",      lat: 41.1400,  lng: -104.8202, capital: true },  // WY
+    // ── Non-capital largest cities (Capitals Plus only) ──
+    { name: "Birmingham",    lat: 33.5186,  lng: -86.8104  },  // AL largest
+    { name: "Anchorage",     lat: 61.2181,  lng: -149.9003 },  // AK largest
+    { name: "Los Angeles",   lat: 34.0522,  lng: -118.2437 },  // CA largest
+    { name: "Bridgeport",    lat: 41.1865,  lng: -73.1952  },  // CT largest
+    { name: "Wilmington",    lat: 39.7447,  lng: -75.5484  },  // DE largest
+    { name: "Jacksonville",  lat: 30.3322,  lng: -81.6557  },  // FL largest
+    { name: "Chicago",       lat: 41.8781,  lng: -87.6298  },  // IL largest
+    { name: "Wichita",       lat: 37.6872,  lng: -97.3301  },  // KS largest
+    { name: "Louisville",    lat: 38.2527,  lng: -85.7585  },  // KY largest
+    { name: "New Orleans",   lat: 29.9511,  lng: -90.0715  },  // LA largest
+    { name: "Portland (ME)", lat: 43.6591,  lng: -70.2568  },  // ME largest
+    { name: "Baltimore",     lat: 39.2904,  lng: -76.6122  },  // MD largest
+    { name: "Detroit",       lat: 42.3314,  lng: -83.0458  },  // MI largest
+    { name: "Minneapolis",   lat: 44.9778,  lng: -93.2650  },  // MN largest
+    { name: "Kansas City",   lat: 39.0997,  lng: -94.5786  },  // MO largest
+    { name: "Billings",      lat: 45.7833,  lng: -108.5007 },  // MT largest
+    { name: "Omaha",         lat: 41.2565,  lng: -95.9345  },  // NE largest
+    { name: "Las Vegas",     lat: 36.1699,  lng: -115.1398 },  // NV largest
+    { name: "Manchester",    lat: 42.9956,  lng: -71.4548  },  // NH largest
+    { name: "Newark",        lat: 40.7357,  lng: -74.1724  },  // NJ largest
+    { name: "Albuquerque",   lat: 35.0844,  lng: -106.6504 },  // NM largest
+    { name: "New York City", lat: 40.7128,  lng: -74.0060  },  // NY largest
+    { name: "Charlotte",     lat: 35.2271,  lng: -80.8431  },  // NC largest
+    { name: "Fargo",         lat: 46.8772,  lng: -96.7898  },  // ND largest
+    { name: "Portland (OR)", lat: 45.5051,  lng: -122.6750 },  // OR largest
+    { name: "Philadelphia",  lat: 39.9526,  lng: -75.1652  },  // PA largest
+    { name: "Sioux Falls",   lat: 43.5446,  lng: -96.7311  },  // SD largest
+    { name: "Houston",       lat: 29.7604,  lng: -95.3698  },  // TX largest
+    { name: "Burlington",    lat: 44.4759,  lng: -73.2121  },  // VT largest
+    { name: "Virginia Beach",lat: 36.8529,  lng: -76.0082  },  // VA largest
+    { name: "Seattle",       lat: 47.6062,  lng: -122.3321 },  // WA largest
+    { name: "Milwaukee",     lat: 43.0389,  lng: -87.9065  },  // WI largest
+  ],
+};
+
+const mapSettings = {
+  france:  { center: [46.8,  2.3], zoom: 6, label: 'FRANCE'  },
+  germany: { center: [51.2, 10.5], zoom: 6, label: 'GERMANY' },
+  russia:  { center: [58.0, 60.0], zoom: 4, label: 'RUSSIA'  },
+  japan:   { center: [36.5, 137.5], zoom: 5, label: 'JAPAN'   },
+  canada:  { center: [54.0, -96.0], zoom: 4, label: 'CANADA'  },
+  india:   { center: [22.0,  78.0], zoom: 5, label: 'INDIA'   },
+  usa:     { center: [39.5, -98.5], zoom: 4, label: 'USA'     },
+};
+
+// ── City facts (learn mode info panel) ──
+// Consistency notes: Nagoya = Japan's busiest port by trade volume (unique claim).
+// Marseille = France's principal Mediterranean port. Hamburg = Germany's greatest port.
+// No two cities share the same superlative within the same domain.
+const cityFacts = {
+
+  // ── France ──
+  "Paris": ["Hitler ordered Paris burned in 1944. His own general, Dietrich von Choltitz, refused and surrendered instead. One act of disobedience saved the Louvre, Notre-Dame, and every monument in the city."],
+  "Marseille": ["Zinedine Zidane — arguably history's greatest footballer — was born here. At the 2006 World Cup Final, he headbutted an opponent on live TV in front of 700 million viewers."],
+  "Lyon": ["The Lumière brothers invented cinema in Lyon. On December 28, 1895, they showed the world's first paying audience a motion picture here. Every film ever made traces back to this city."],
+  "Toulouse": ["Every Airbus A380 ever built was assembled exclusively in Toulouse. All 251 of the world's largest passenger jets took their first flight from this city's single runway."],
+  "Nice": ["Nice was Italian until 1860. Napoleon III purchased it from Sardinia in exchange for military support. Garibaldi, the Italian nationalist hero born here, was furious about losing his own birthplace."],
+  "Nantes": ["Jules Verne was born in Nantes, watching ships leave its harbor. He spent his life writing about voyages those ships could never take — to Earth's core, the ocean floor, the Moon."],
+  "Montpellier": ["Montpellier is the only major French city that was purchased. In 1349, the King of Majorca sold it to France for 120,000 gold écus — not a conquest, not a marriage, just a cash sale."],
+  "Strasbourg": ["Gutenberg developed his earliest printing press experiments in Strasbourg in the 1430s — the technology that ended the Middle Ages — before returning to Mainz to complete and deploy it."],
+  "Bordeaux": ["'Claret' — the English term for Bordeaux red wine — is a relic of 300 years of English rule over this French city, from 1154 to 1453. The English left; the wine stayed famous."],
+  "Lille": ["Charles de Gaulle — the general who refused France's surrender to Hitler — was born in Lille. Without him, France's postwar constitution, its nuclear arsenal, and its NATO exit might not exist."],
+  "Rennes": ["The Dreyfus Affair's 1899 retrial ended in Rennes with Dreyfus still wrongly convicted. The verdict exposing France's institutional antisemitism shocked the world and inspired Herzl to found Zionism."],
+  "Reims": ["Every King of France for nearly 1,000 years was crowned in Reims Cathedral — 25 coronations in one building. In 1429, Joan of Arc escorted Charles VII through enemy lines to claim his crown here."],
+  "Le Havre": ["Monet grew up in Le Havre and painted Impression, Sunrise here in 1872. A critic used the title mockingly to name the movement. Impressionism was accidentally named after this harbor."],
+  "Saint-Étienne": ["Saint-Étienne built one of Europe's first railways in 1827, connecting its coalfields to the Loire — before France had a national railway policy. The city that armed Napoleon built France's first rail line."],
+  "Toulon": ["Napoleon first came to national attention at age 24, commanding artillery at the 1793 Siege of Toulon. Within weeks he went from unknown captain to brigadier general. Toulon made Napoleon."],
+  "Grenoble": ["The French Revolution's first violence was in Grenoble, not Paris. In June 1788, citizens threw roof tiles at royal troops — the 'Day of Tiles' — a full year before the Bastille fell."],
+  "Dijon": ["Gustave Eiffel — designer of the world's most visited monument — was born in Dijon. The iron tower that defines Paris was conceived by a man from Burgundy who spent his career building bridges."],
+  "Angers": ["Angers Castle contains the Apocalypse Tapestry — 103 meters long, completed around 1382, depicting the Book of Revelation. It is the largest surviving medieval tapestry on Earth."],
+  "Nîmes": ["'Denim' comes from 'de Nîmes' — fabric from this city. Exported to Genoa and America, it became the material of blue jeans. The fashion that defines casual American dress was named after a French town."],
+  "Clermont-Ferrand": ["The First Crusade — two centuries of holy war between Christian Europe and the Muslim world — was launched with a single speech by Pope Urban II in Clermont-Ferrand in 1095."],
+
+  // ── Germany ──
+  "Berlin": ["Einstein lived in Berlin from 1914–1933 and published General Relativity here. When the Nazis rose to power, he was on a US lecture tour and never returned — abandoning his Berlin apartment forever."],
+  "Hamburg": ["The Beatles played marathon sets — up to eight hours a night — in Hamburg's clubs from 1960–62, before they were famous. By the time they left, they had more live performance hours than most bands ever accumulate."],
+  "München": ["Hitler launched his first coup in a Munich beer hall in November 1923, failed, and dictated Mein Kampf in prison. The same city later hosted the 1938 deal that handed Czechoslovakia to him without a shot."],
+  "Köln": ["Cologne Cathedral took 632 years to build (1248–1880). During WWII, Allied bombers deliberately spared it as a navigation landmark — using its twin spires to guide raids on everything around it."],
+  "Frankfurt": ["Goethe — to German literature what Shakespeare is to English — was born in Frankfurt. His childhood home still stands in the city center and is Germany's most visited literary museum."],
+  "Stuttgart": ["Both Mercedes-Benz and Porsche were born in Stuttgart — the only city on Earth to produce two of the world's most iconic car brands. The modern automobile was invented on these streets."],
+  "Düsseldorf": ["Heine, born in Düsseldorf, wrote Die Lorelei — a poem so beloved it appeared in Nazi textbooks listed as 'author unknown,' because Heine was Jewish and couldn't be credited."],
+  "Leipzig": ["In 1989, 70,000 people marched peacefully through Leipzig demanding reform. Their Monday Demonstrations toppled East Germany — weeks later the Berlin Wall fell. Leipzig started the revolution, not Berlin."],
+  "Dortmund": ["Borussia Dortmund's Yellow Wall — over 24,000 fans on a single curved terrace — is the largest standing section in world football. No other stadium in Europe generates this much noise from one section."],
+  "Bremen": ["Ludwig Roselius, born in Bremen, invented commercially viable decaffeinated coffee in 1903, selling it as Kaffee HAG in Europe and Sanka in America. The world's decaf habit was created by one man from this city."],
+  "Dresden": ["Allied bombing in February 1945 destroyed Dresden's entire baroque center in a firestorm. The attack remains controversial — Dresden had minimal military value, and Germany surrendered just 12 weeks later."],
+  "Hannover": ["From 1714 to 1837, the Kings of Britain were simultaneously rulers of Hannover. When Elector Georg Ludwig became George I of Britain, the British royal family was, in effect, German."],
+  "Nürnberg": ["The Nuremberg Trials (1945–46) established that 'following orders' is not a legal defense for war crimes — a principle every subsequent war crimes tribunal has applied. It was history's first such precedent."],
+  "Bonn": ["Beethoven was born in Bonn and composed his first works here before leaving at 21 to study in Vienna — and never returning. The man who defined classical music for all time grew up in this small Rhine city."],
+  "Münster": ["The Peace of Westphalia (1648) — signed in Münster — ended the Thirty Years' War and created the modern concept of national sovereignty. International law was effectively written here."],
+  "Karlsruhe": ["Karl Drais invented the first bicycle in Karlsruhe in 1817 — a pedal-less 'running machine' pushed with your feet. Every bicycle, motorcycle, and automobile traces its lineage to this city."],
+  "Augsburg": ["The Fugger family of Augsburg were the wealthiest people in 16th-century Europe. In 1516 they built the Fuggerei — the world's first social housing project, still occupied today at €0.88/year rent."],
+  "Kiel": ["In October 1918, sailors in Kiel refused a suicidal final battle order against the British Navy — triggering the German Revolution that toppled the Kaiser and ended WWI. A mutiny here ended the war."],
+  "Freiburg": ["Freiburg's Bächle — stone water channels threading every medieval street — were built in the 12th century. Local tradition says if you accidentally step in one, you will marry a person from Freiburg."],
+  "Rostock": ["Rostock's university was founded in 1419 — before the Reformation, the printing press, and Columbus. When Columbus reached America in 1492, Rostock had been a university city for 73 years already."],
+
+  // ── Russia ──
+  "Moscow": ["Napoleon marched into Moscow in 1812 to find it abandoned and burning — set ablaze by its own citizens. He waited 5 weeks for a surrender that never came, then retreated into winter. Moscow burned itself."],
+  "St. Petersburg": ["Peter the Great built St. Petersburg on a deadly swamp — tens of thousands of workers died. He forced nobles to relocate from Moscow at gunpoint to populate Russia's most European city, built on bones."],
+  "Novosibirsk": ["Novosibirsk barely existed in 1890. A Trans-Siberian Railway camp appeared in 1893. By the 1960s it had over a million people. From nothing to metropolis in a single human lifetime."],
+  "Yekaterinburg": ["Tsar Nicholas II, his wife, five children, and four servants were shot in a Yekaterinburg basement in July 1918, ending 300 years of Romanov rule. Their remains weren't confirmed until DNA testing in 1991."],
+  "Kazan": ["Kazan's Kremlin contains both an Orthodox cathedral and a functioning mosque within the same fortress walls — the only Kremlin on Earth where both landmarks share a single citadel."],
+  "Nizhny Novgorod": ["Andrei Sakharov — who built the Soviet hydrogen bomb, then became its most prominent critic — was internally exiled here from 1980–86 under KGB surveillance. This city was his open-air prison."],
+  "Chelyabinsk": ["A meteor exploded above Chelyabinsk in February 2013 with the force of 30 Hiroshima bombs — the largest airburst since Tunguska in 1908. Nearly 1,500 people were injured, almost all caught on dashcam."],
+  "Samara": ["Stalin built a secret bunker 37 meters underground in Samara in 1942, in case Moscow fell. His personal rooms remain intact — the bunker was classified until 1990 and is now open for public tours."],
+  "Ufa": ["Rudolf Nureyev — widely considered the greatest male ballet dancer of the 20th century — grew up in Ufa, then defected to the West in Paris in 1961 in one of the Cold War's most dramatic public escapes."],
+  "Rostov-on-Don": ["In August 1942, German forces murdered tens of thousands of Jewish residents at the Zmievskaya Balka ravine near Rostov-on-Don — one of the Holocaust's largest massacres and one of its least known."],
+  "Omsk": ["Dostoevsky spent four years at hard labor in Omsk's prison fortress (1849–54) — chained, forbidden to read or write. He called it 'hell on earth.' The trauma fed directly into Crime and Punishment."],
+  "Krasnoyarsk": ["Lenin was exiled to the Krasnoyarsk region from 1897–1900, spending three years in Siberian isolation studying and writing. He described it as formative — the remoteness helped shape the man who reshaped the 20th century."],
+  "Voronezh": ["Peter the Great built Russia's first navy in Voronezh in 1696 — constructing an entire fleet on the Don River to attack an Ottoman fortress. Russia became a naval, then world, power because of this city."],
+  "Perm": ["The Permian period — 252–299 million years ago, when 96% of marine species vanished in the Great Dying — is named after Perm, where geologists first studied the defining fossil strata in the 1840s."],
+  "Volgograd": ["The Battle of Stalingrad (now Volgograd) killed more people than any battle in human history — up to 2 million over 200 days. Germany's Field Marshal Paulus became the first ever to surrender in captivity here."],
+  "Krasnodar": ["Krasnodar was founded as Yekaterinodar — 'Catherine's gift' — granted to the Kuban Cossack Host by Catherine the Great in 1793 as a reward for military service. Their descendants still hold annual ceremonies here."],
+  "Saratov": ["Gagarin's capsule landed near Saratov in 1961 — the first human back from space came down near the city where he'd learned to fly. A local farmer found him in his orange spacesuit and barely believed it."],
+  "Tyumen": ["Rasputin — the mystic who made the Russian royal family dependent on him and proved nearly impossible to kill — was born in a village in Tyumen Oblast. The most bizarre figure in Romanov history came from Siberia."],
+  "Tolyatti": ["Tolyatti is named after an Italian Communist leader who never visited it. Built from scratch in 1966 around the AvtoVAZ factory, it produced the Lada — the Soviet Union's most mass-produced car — for decades."],
+  "Izhevsk": ["Mikhail Kalashnikov designed the AK-47 at the Izhevsk arms plant in 1947. About 100 million AK-pattern rifles have been made since — more than any other firearm in history. An AK-47 appears on Mozambique's flag."],
+
+  // ── Japan ──
+  "Tokyo": ["Tokyo has more Michelin-starred restaurants than Paris and New York combined. The world's most decorated food city is not in France or the USA — it's Japan, and specifically this one city."],
+  "Yokohama": ["In 1859, Yokohama was a fishing village of under 100 houses. Within a decade it had Japan's first railway, first telegraph, and first racetrack. The transformation from village to city took ten years."],
+  "Osaka": ["Osaka residents greet each other with 'Moukari makka?' — 'Making any money?' — instead of 'How are you?' In a country famous for formality, Osaka's bluntly commercial culture feels like a different nation."],
+  "Nagoya": ["Tokugawa Ieyasu — who unified Japan and founded the dynasty that ruled it for 265 years of deliberate isolation — was born in Nagoya. The man who sealed Japan from the world for two centuries was from here."],
+  "Sapporo": ["Sapporo was designed from scratch in 1869 on a perfect American-style grid — the only major Japanese city built to a street plan. Every other Japanese city grew organically; Sapporo was engineered on blank terrain."],
+  "Fukuoka": ["Kublai Khan launched two massive Mongol invasions of Japan (1274 and 1281), both landing near Fukuoka. Both fleets were destroyed by defenders and typhoons the Japanese called kamikaze — 'divine wind.'"],
+  "Kobe": ["The 1995 Kobe earthquake (M6.9) killed 6,434 people and toppled an elevated highway — photographed lying on its side. The image of the collapsed Hanshin Expressway became the disaster's global icon."],
+  "Kawasaki": ["Kawasaki's Kanamara Matsuri — the Festival of the Steel Phallus — features giant phallic statues paraded through the streets each spring. What began as a Shinto fertility prayer became Japan's most internationally photographed festival."],
+  "Kyoto": ["Kyoto was removed from the atomic bomb target list because US Secretary of War Henry Stimson had visited and fought personally for its preservation — arguing for its removal. Hiroshima was bombed instead."],
+  "Saitama": ["Saitama's Omiya Bonsai Village is the world capital of bonsai — home to 30+ specialist nurseries and Earth's only public bonsai art museum. The ancient art of miniature trees peaks in a Tokyo suburb."],
+  "Hiroshima": ["On August 6, 1945, one bomb killed an estimated 70,000–80,000 people instantly, making Hiroshima the first city destroyed by a nuclear weapon. The city was rebuilt and is now larger than before the bombing."],
+  "Sendai": ["The 2011 Tōhoku earthquake (M9.1) devastated Sendai's coast, killing nearly 16,000 people, and triggered the Fukushima nuclear meltdown 100km south. Sendai became the face of Japan's worst postwar disaster."],
+  "Chiba": ["Tokyo Disneyland is not in Tokyo — it's in Chiba, just across the city border. The park opened in 1983 using the 'Tokyo' brand while sitting on cheaper Chiba land. Millions visit without knowing they've left Tokyo."],
+  "Kitakyushu": ["Kokura — now part of Kitakyushu — was the primary target for the second atomic bomb. Cloud cover hid the city from the bombardier. The plane diverted to its backup: Nagasaki. Kitakyushu was saved by clouds."],
+  "Sakai": ["Sakai is Japan's knife-making capital — its blades have been internationally prized since the 15th century. Professional chefs worldwide order Sakai knives the way musicians order Stradivarius instruments."],
+  "Niigata": ["Niigata has more sake breweries per capita than anywhere else in Japan — a result of its legendary snowfall producing the pure cold meltwater essential for premium sake. Its sake wins national competitions consistently."],
+  "Hamamatsu": ["Both Yamaha and Honda were founded in Hamamatsu — the only city to give birth to two globally iconic brands in music and motorcycles. Soichiro Honda built his first motorcycle in a Hamamatsu workshop."],
+  "Kumamoto": ["Miyamoto Musashi — Japan's most legendary swordsman, undefeated in over 60 duels — spent his final years in a cave near Kumamoto writing The Book of Five Rings. He completed it days before his death in 1645."],
+  "Sagamihara": ["JAXA's Sagamihara campus controlled the Hayabusa probe — the spacecraft that landed on an asteroid hundreds of millions of kilometers away, collected samples, and successfully returned them to Earth."],
+  "Shizuoka": ["Shizuoka is squeezed between Mt. Fuji to the north and the Pacific to the south — farmers grow wasabi in cold mountain streams and tea on volcanic slopes simultaneously. That combination exists nowhere else on Earth."],
+
+  // ── Canada ──
+  "Toronto": ["American forces burned Toronto in 1813, destroying its Parliament Buildings. The British retaliated by burning Washington D.C., including the White House. Toronto's burning triggered one of American history's most famous moments."],
+  "Montréal": ["The 1976 Montreal Olympics left the city so deeply in debt that residents finished paying it off in 2006 — thirty years after the closing ceremony. The stadium was nicknamed 'the Big Owe.' The most financially ruinous Olympics ever."],
+  "Calgary": ["The 1988 Calgary Winter Olympics are remembered almost entirely for Eddie 'The Eagle' Edwards — a British plasterer who finished last in ski jumping and became the most-watched athlete at the Games."],
+  "Ottawa": ["Queen Victoria chose Ottawa as Canada's capital in 1857. It was a remote logging town. She reportedly selected its inland location because it would be harder for Americans to invade. Ottawa became a capital through strategic paranoia."],
+  "Edmonton": ["Wayne Gretzky holds 61 NHL records — including one so extreme that his career assists alone would beat every other player in NHL history on total points. He played his prime years in Edmonton."],
+  "Winnipeg": ["Winnie-the-Pooh is named after Winnipeg. A soldier brought a bear cub named Winnie to England in WWI; A.A. Milne's son loved it at the zoo. The world's most beloved bear takes its name from this city."],
+  "Mississauga": ["A 1979 train derailment forced 218,000 Mississauga residents to evacuate — the largest peacetime evacuation in North American history at the time. It was completed with zero fatalities."],
+  "Vancouver": ["Greenpeace was founded in Vancouver in 1971 — a small group sailing to protest US nuclear testing in Alaska. It became the world's most influential environmental organization. The modern environmental movement was born here."],
+  "Brampton": ["Over 60% of Brampton's residents were born outside Canada — among the highest foreign-born proportions of any major city on Earth. It receives more new immigrants per year than many entire countries."],
+  "Hamilton": ["Hamilton has over 100 waterfalls within city limits — more than any other city in the world — because the Niagara Escarpment cuts directly through it. Most Canadians don't know their 'Steel City' is the waterfall capital of Earth."],
+  "Surrey": ["The Peace Arch on Surrey's US border, built in 1921, straddles both countries simultaneously — half in Canada, half in the United States — a physical monument to the longest undefended border in the world."],
+  "Québec City": ["The Battle of the Plains of Abraham lasted just 15 minutes. Britain's 1759 victory outside Québec City ended French colonial rule in Canada. Fifteen minutes of battle changed the fate of a continent."],
+  "Laval": ["Laval was created in 1965 by forcibly merging 14 separate municipalities. Many residents refused to call themselves 'Lavalois' for years afterward. Some still don't."],
+  "Halifax": ["When the Titanic sank in 1912, Halifax was the closest major port. Ships from Halifax recovered 328 bodies; 150 are still buried in Halifax cemeteries. The city became the Titanic's de facto resting place."],
+  "London": ["Guy Lombardo, born in London, Ontario, hosted New York's Times Square New Year's Eve broadcast for so many decades that his Auld Lang Syne became the definitive midnight soundtrack for millions. He was Canadian."],
+  "Markham": ["Markham hosts the Canadian HQs of IBM, AMD, Apple, and dozens of other global tech giants — the densest concentration of tech offices in Canada outside a major downtown. Silicon Valley quietly moved to a Toronto suburb."],
+  "Vaughan": ["Bianca Andreescu, raised in Vaughan, became the first Canadian to win a Grand Slam singles title in 50 years when she beat Serena Williams at the 2019 US Open — ranked outside the top 150 when she entered."],
+  "Gatineau": ["Canada's most visited museum — the Canadian Museum of History — has sat in Gatineau since 1989, across the river from Ottawa, yet most people assume it's in the capital. It's quietly misattributed every year."],
+  "Burnaby": ["Michael J. Fox — star of Back to the Future and the world's most prominent Parkinson's disease advocate — grew up in Burnaby, British Columbia. He is Canada's most beloved Hollywood export."],
+  "Longueuil": ["Pratt & Whitney Canada, headquartered in Longueuil, makes the engines powering the majority of the world's regional jets and turboprops. More short-haul flights run on engines built here than anywhere else on Earth."],
+
+  // ── India ──
+  "Mumbai": ["Bollywood — the world's most prolific film industry — is based in Mumbai, producing over 1,000 films per year, roughly twice Hollywood's output. More people watch Indian films annually than films from any other country."],
+  "Delhi": ["Delhi has been destroyed and rebuilt at least eight times over 3,000 years — sacked by Timur, Nadir Shah, the Mughals, and the British. No other capital city on Earth has been so repeatedly demolished and resurrected."],
+  "Bengaluru": ["Bengaluru is India's Silicon Valley — home to Google, Microsoft, Apple, and Amazon campuses, plus hundreds of homegrown tech unicorns. More software is written here than in any city outside the United States."],
+  "Hyderabad": ["The Kohinoor diamond — the 105-carat stone now in the British Crown Jewels — was mined near Hyderabad. It passed through Persia and Afghanistan before the British took it. Its origin is this one city."],
+  "Ahmedabad": ["Gandhi's Sabarmati Ashram in Ahmedabad was the launching point for the 1930 Salt March — when he walked 240 miles to the sea to challenge British rule. The act that changed India began on the outskirts of this city."],
+  "Chennai": ["Chennai's Marina Beach is the world's second-longest urban beach, stretching 13km along the Bay of Bengal. It functions simultaneously as a public square, fish market, cricket pitch, and sleeping ground for millions."],
+  "Kolkata": ["Mother Teresa spent 45 years in Kolkata founding her Missionaries of Charity. She is buried here. The city became the global face of humanitarian care because of one Albanian nun who arrived in 1929."],
+  "Surat": ["Surat processes approximately 90% of the world's diamonds — most rough diamonds, no matter where mined, are shipped here to be cut and polished. The diamond on an engagement ring was almost certainly cut in Surat."],
+  "Pune": ["The Bhagwan Rajneesh (Osho) commune in Pune in the 1970s later inspired an Oregon commune where followers committed the first bioterrorist attack in US history. It all started with a guru in this city."],
+  "Jaipur": ["In 1876, the Maharaja of Jaipur painted the entire old city pink to welcome the Prince of Wales. By law, all buildings in the old city must remain pink to this day. The color became permanent by royal decree."],
+  "Lucknow": ["The 1857 Indian Rebellion's most dramatic crisis was in Lucknow, where a British garrison was besieged for 87 days. The Residency ruins — still pockmarked by cannon fire — stand unrenovated today as a deliberate monument."],
+  "Kanpur": ["During the 1857 Indian Rebellion, the Kanpur garrison surrendered under a promise of safe passage, then was massacred. The 'Cawnpore Massacre' became the defining British atrocity narrative, used to justify brutal reprisals."],
+  "Nagpur": ["Nagpur is the geographical center of India — a zero milestone marks the exact centroid, from which all national highway distances are officially measured. The city at India's heart is almost never mentioned."],
+  "Indore": ["Indore has been ranked India's cleanest city for seven consecutive years — transformed from one of India's dirtiest to its cleanest in under a decade. The reversal is now studied internationally as a governance model."],
+  "Thane": ["Thane sits on the narrow creek separating Mumbai from the mainland — the geographic chokepoint through which every train leaving India's financial capital must pass. All rail out of Mumbai goes through Thane."],
+  "Bhopal": ["The 1984 Bhopal gas disaster — a Union Carbide plant leaked overnight — killed at least 3,787 people immediately and injured over 500,000. It remains the world's worst industrial accident. The plant was never fully cleaned up."],
+  "Visakhapatnam": ["In 1914, the German cruiser SMS Emden bombarded Visakhapatnam — the only Indian city directly attacked by a foreign power during WWI. The shelling destroyed oil storage and disrupted British war logistics."],
+  "Patna": ["Patna was the ancient Pataliputra — capital of Ashoka's Maurya Empire in the 3rd century BC and the largest city on Earth at the time. The city now struggling with poverty and flooding was once the capital of the ancient world."],
+  "Vadodara": ["Vadodara's Maharaja Sayaji Rao III personally funded B.R. Ambedkar's education abroad — enabling the man who wrote India's constitution to earn his degrees. One ruler's patronage shaped a nation's founding document."],
+  "Ghaziabad": ["Ghaziabad grew from a small town to 1.6 million in 30 years — driven entirely by people priced out of Delhi. It is the quintessential Indian boomtown: built by proximity to another city, not by any identity of its own."],
+
+  // ── USA ──
+  "Montgomery": ["Rosa Parks refused to give up her seat on a Montgomery bus in December 1955, sparking the 381-day boycott that launched the Civil Rights Movement and made Martin Luther King Jr. a national figure."],
+  "Juneau": ["Juneau is the only U.S. state capital that cannot be reached by road. Mountains and ocean make a highway impossible — the only way in is by plane or boat, making it more remote than many Alaskan villages."],
+  "Phoenix": ["Phoenix sits in the Sonoran Desert with under 8 inches of rain per year, yet is America's fifth-largest city — sustained entirely by water pumped hundreds of miles away. It's also the only state capital with over a million residents."],
+  "Little Rock": ["Little Rock Central High School was the site of the 1957 desegregation crisis, when Eisenhower sent 101st Airborne soldiers to escort nine Black students through the doors — the first time federal troops enforced school integration."],
+  "Sacramento": ["The Gold Rush was born 50 miles from Sacramento. When gold was found in January 1848, Sacramento's population exploded from a handful to 10,000 in under two years. It became the gateway to the California goldfields overnight."],
+  "Denver": ["Denver sits exactly one mile above sea level. The altitude measurably affects athletic performance — NFL teams consistently play worse in their first game here. The Mile High marker is embedded in the capitol steps."],
+  "Hartford": ["Mark Twain and Harriet Beecher Stowe were neighbors in Hartford. Stowe wrote Uncle Tom's Cabin — the novel Lincoln said started the Civil War — two doors from where Twain wrote Huckleberry Finn."],
+  "Dover": ["Delaware was the first state to ratify the U.S. Constitution on December 7, 1787 — earning it 'The First State.' Dover Air Force Base is also the nation's sole military mortuary for every service member killed overseas."],
+  "Tallahassee": ["Tallahassee was chosen as Florida's capital in 1824 as a compromise between Pensacola and St. Augustine, which were too far apart to travel between. A site was scouted through wilderness and selected."],
+  "Atlanta": ["Sherman burned Atlanta to the ground in November 1864. Within two years it had rebuilt and was already growing — a story enshrined in its official seal: a phoenix rising with the word 'Resurgens' (Rising Again)."],
+  "Honolulu": ["Pearl Harbor — whose bombing pulled the U.S. into WWII on December 7, 1941 — is in Honolulu. The USS Arizona still lies on the harbor floor, leaking a quart of oil per day. A rainbow slick marks where 1,177 men are entombed."],
+  "Boise": ["Boise's name comes from the French 'La rivière boisée' (the wooded river), named by French-Canadian trappers. Despite sitting in high desert, Boise receives more sunny days per year than Miami."],
+  "Springfield": ["Lincoln lived in Springfield for 24 years — longer than anywhere else. He practiced law here, married here, raised his children here, and gave his Farewell Address from the train station before leaving for Washington."],
+  "Indianapolis": ["The Indianapolis Motor Speedway seats 257,000 spectators — the largest sporting venue in the world by capacity. The Indy 500 has run almost every May since 1911, the longest-running major motorsports event in American history."],
+  "Des Moines": ["Iowa holds the first presidential caucuses of every election cycle, making Des Moines the most politically important small city in America every four years. Candidates have been known to shake hands in nearly every diner in the state."],
+  "Topeka": ["Brown v. Board of Education — the Supreme Court ruling that ended school segregation — was named for a Topeka case. In 1954, Oliver Brown's suit against Topeka's school board produced the unanimous decision that changed America."],
+  "Frankfort": ["Kentucky produces over 95% of the world's bourbon whiskey — more barrels age in the state than there are people living in it. Frankfort sits at the heart of bourbon country, surrounded by distilleries operating for centuries."],
+  "Baton Rouge": ["Baton Rouge means 'red stick' in French — named for a boundary pole between two Native American tribal territories. French explorers recorded the pole in 1699. The name has endured for over 325 years without interruption."],
+  "Augusta": ["Augusta is the second-least-populous state capital in the United States, with about 19,000 residents. Only Montpelier is smaller. Maine's capital is smaller than most American suburbs, yet it has governed the state since 1832."],
+  "Annapolis": ["Annapolis served as the U.S. capital from 1783–1784, where Congress ratified the Treaty of Paris ending the Revolutionary War. It's also home to the Naval Academy, training Navy officers since 1845."],
+  "Boston": ["Boston was the epicenter of the American Revolution — the Massacre, the Tea Party, Paul Revere's Ride, and the first shots at Lexington all happened within miles of its center. No other city triggered so many founding events."],
+  "Lansing": ["In 1847, a legislator jokingly proposed moving Michigan's capital to the remote wilderness settlement of Lansing — and the motion passed. Lawmakers arrived to find little more than a log cabin. The joke became the capital."],
+  "St. Paul": ["St. Paul and Minneapolis sit directly across the Mississippi River from each other. St. Paul is the capital; Minneapolis is larger. They have been rivals for two centuries while sharing one metro area — and one airport."],
+  "Jackson": ["NAACP leader Medgar Evers was shot in his own driveway in Jackson in 1963 — a murder that shocked the nation and accelerated the passage of the Civil Rights Act. The city is named for Andrew Jackson, who would have been appalled."],
+  "Jefferson City": ["Missouri's position between North and South made it the only state to have two competing governments simultaneously recognized during the Civil War — one Confederate, one Union — both legitimate, neither in full control."],
+  "Helena": ["Helena was built on a gold strike in 1864 called 'Last Chance Gulch' — miners who were about to give up made one final attempt and found gold. The original gulch is now Helena's main street, still called Last Chance Gulch."],
+  "Lincoln": ["Lincoln is named for Abraham Lincoln, who was assassinated just before Nebraska became a state in 1867. The state honored him by naming its new capital after him. He never visited Nebraska while alive."],
+  "Carson City": ["The silver discovery that created Nevada happened near Carson City in 1859, and the city rose almost overnight. With 55,000 residents today, it governs a state of 3 million people almost entirely concentrated in Las Vegas."],
+  "Concord": ["New Hampshire named its capital after Concord, Massachusetts — where the first battle of the American Revolution was fought. The name carries a founding moment at the heart of what New Hampshire wanted its capital to commemorate."],
+  "Trenton": ["'Trenton Makes, the World Takes' reads a bridge inscription over the Delaware River. George Washington crossed that same river on Christmas night 1776 and defeated the Hessians here — one of the Revolution's most desperate gambles."],
+  "Santa Fe": ["Santa Fe is the oldest state capital in the United States, founded in 1610 — 166 years before the Declaration of Independence. It served as the capital of Spanish New Mexico, then Mexican New Mexico, then the U.S. territory and state."],
+  "Albany": ["Albany is the second-oldest continuously chartered city in the United States, chartered in 1686. It sits on the Hudson River, the main artery connecting New York City to the continent's interior — Albany was America's gateway west."],
+  "Raleigh": ["Raleigh is named for Sir Walter Raleigh, who organized the Lost Colony of Roanoke in 1587 — the first English settlement in North America. The colony vanished, leaving only 'CROATOAN' carved on a post. The mystery was never solved."],
+  "Bismarck": ["Bismarck was renamed in 1872 to attract German investment in the Northern Pacific Railway — named for Chancellor Otto von Bismarck. The strategy worked: German capital helped finance the railroad that opened the Great Plains."],
+  "Columbus": ["Ohio State University in Columbus is one of the largest campuses in the United States by enrollment — over 60,000 students. Columbus was purpose-built as a state capital in 1816 on a barely inhabited stretch of the Scioto River."],
+  "Oklahoma City": ["Oklahoma City was literally created in a single day. On April 22, 1889, 10,000 people staked claims within hours of the land opening — 'boomers' who arrived on the first day built a city of tents overnight."],
+  "Salem": ["Salem, Oregon was named by Methodist missionaries in 1841, likely from the Hebrew 'Shalom' (peace). Oregon's capital sits in the Willamette Valley, surrounded by some of the most productive farmland in the Pacific Northwest."],
+  "Harrisburg": ["The Three Mile Island nuclear accident — the worst in U.S. history — happened 10 miles from Harrisburg in 1979. A partial meltdown forced 140,000 to evacuate and permanently shifted American nuclear energy policy."],
+  "Providence": ["Roger Williams founded Providence in 1636 after being banished from Massachusetts for his religious views. He named it Providence out of gratitude for survival. Rhode Island was the first colony to declare independence from Britain."],
+  "Columbia": ["Sherman's troops burned much of Columbia in February 1865. South Carolina had been the first state to secede and fired the first shot at Fort Sumter — making its capital a symbolic target and the climax of the March to the Sea."],
+  "Pierre": ["Pierre (pronounced 'Peer') is the second-least-populous state capital in the U.S. with about 14,000 residents. It sits at the geographic center of South Dakota on the Missouri River, which divides the state into eastern and western halves."],
+  "Nashville": ["Nashville is the country music capital of the world. The Grand Ole Opry has broadcast live country radio since 1925, and more music is recorded here than in any other American city. It produces more music per capita than anywhere on Earth."],
+  "Austin": ["Michael Dell founded Dell Technologies from his University of Texas dorm room in Austin in 1984 with $1,000. The city transformed from a college town into a technology hub called 'Silicon Hills' in the 1990s and 2000s."],
+  "Salt Lake City": ["Brigham Young founded Salt Lake City in 1847 after Mormon pioneers walked 1,300 miles from Illinois to escape persecution. Young arrived, surveyed the valley, declared 'This is the right place,' and laid out the city grid that same day."],
+  "Montpelier": ["Montpelier is the least-populous state capital in the United States, with just 8,000 residents. It is the only U.S. state capital without a McDonald's — a distinction its residents cite with genuine civic pride."],
+  "Richmond": ["Richmond served as the capital of the Confederacy from 1861–1865. When Union forces captured it on April 3, 1865, the war effectively ended — Lee surrendered at Appomattox, just 90 miles away, six days later."],
+  "Olympia": ["Olympia sits at the southernmost tip of Puget Sound, named for the Olympic Mountains visible across the water. Washington State's nickname 'the Evergreen State' came from the dense, seemingly impenetrable forests surrounding it."],
+  "Charleston": ["West Virginia is the only state that formed by seceding from another state — it broke away from Virginia in 1863 rather than leave the Union. Charleston became its capital. The entire state is younger than the Civil War."],
+  "Madison": ["Madison is built on an isthmus between two lakes — Mendota and Monona. The University of Wisconsin sits on Lake Mendota's shore, and the state capital sits on the other end. The entire city is a narrow strip between water."],
+  "Cheyenne": ["Cheyenne became a city almost overnight when the Union Pacific Railroad arrived in 1867. Within months it had thousands of gamblers, cowboys, and outlaws and was nicknamed 'the Magic City of the Plains.'"],
+  // ── USA: Non-capital largest cities ──
+  "Birmingham": ["In 1963, police violence against civil rights protesters in Birmingham was broadcast live on national television. The footage shocked the world and directly accelerated passage of the Civil Rights Act. Its streets changed history."],
+  "Anchorage": ["Anchorage is home to 40% of Alaska's entire population — one of the most disproportionate concentrations of any U.S. state. Moose regularly wander through its streets and school grounds year-round."],
+  "Los Angeles": ["Hollywood — the world's most influential entertainment industry — is based in Los Angeles. The city also has the third-largest urban economy on Earth and more Fortune 500 HQs than any U.S. city except New York."],
+  "Bridgeport": ["P.T. Barnum — who gave the world the circus ring — served as Bridgeport's mayor in 1875. The showman who ran the world's greatest spectacle spent years trying to transform Bridgeport into a model industrial city."],
+  "Wilmington": ["More than 60% of Fortune 500 companies are incorporated in Delaware — and Wilmington handles most of the legal work. The state's corporate-friendly laws have made Wilmington the legal home of American business."],
+  "Jacksonville": ["Jacksonville is the largest city by land area in the contiguous United States, covering 874 square miles — larger than Rhode Island. It became this large in 1968 when the city and Duval County merged into a single government."],
+  "Chicago": ["Chicago rebuilt after the Great Fire of 1871 and invented the modern skyscraper. The Home Insurance Building, completed here in 1885, was the first to use a steel skeleton — every skyscraper on Earth traces its lineage to this city."],
+  "Wichita": ["More aircraft have been built in Wichita than anywhere else on Earth. Boeing, Cessna, Learjet, Beechcraft, and Spirit AeroSystems all originated or manufacture here. Wichita is the undisputed Air Capital of the World."],
+  "Louisville": ["Muhammad Ali was born in Louisville. The city also hosts the Kentucky Derby — the oldest continuously held major sporting event in the United States, run every first Saturday in May since 1875."],
+  "New Orleans": ["Jazz — one of America's most consequential cultural exports — was born in New Orleans around 1900. Founded by France in 1718, the city passed through Spain and back before the U.S. purchased it in 1803."],
+  "Portland (ME)": ["Portland, Maine was almost entirely destroyed in the Great Fire of 1866 — 1,800 buildings burned on Independence Day after a firecracker ignited a boat shop. The city rebuilt in brick and granite, which is why its downtown still stands."],
+  "Baltimore": ["Francis Scott Key watched the 25-hour British bombardment of Fort McHenry from a ship in 1814 and wrote the poem that became The Star-Spangled Banner — the American national anthem, born in this harbor."],
+  "Detroit": ["Henry Ford opened his first factory in Detroit in 1903, and for decades the city produced more than half the world's cars. At its peak in 1950, Detroit was the fourth-largest city in the United States."],
+  "Minneapolis": ["Minneapolis has more miles of enclosed skyway than any city in the world — over 8 miles of second-floor bridges connecting downtown buildings. You can traverse the entire city center without stepping outside, even at −30°F."],
+  "Kansas City": ["Kansas City has more public fountains than any city except Rome — over 200 — and more miles of boulevard than Paris. The city was deliberately beautified in the early 20th century by a civic movement that transformed its landscape."],
+  "Billings": ["Billings is the largest city in Montana and the economic hub of an area covering parts of Montana, Wyoming, and the Dakotas. It serves such a vast, sparsely populated region that it's called the 'capital of the High Plains.'"],
+  "Omaha": ["Warren Buffett — one of the wealthiest people in history — was born in Omaha and still runs Berkshire Hathaway here. Every year, 40,000 shareholders travel to Omaha for what's known as 'the Woodstock of Capitalism.'"],
+  "Las Vegas": ["Las Vegas was empty desert as recently as 1941 and became the fastest-growing American city in history. The Strip — 4.2 miles of hotels and casinos — is so bright it's visible from orbit. The city generates more gambling revenue than anywhere on Earth."],
+  "Manchester": ["Manchester's Amoskeag Mills along the Merrimack River was once the world's largest textile factory complex, employing 17,000 people at its 1910s peak. The city's entire economy was built on a single set of buildings."],
+  "Newark": ["Whitney Houston — one of the best-selling music artists in history and holder of the best-selling single of all time — was born and raised in Newark. The city is also one of the oldest chartered in North America, dating to 1666."],
+  "Albuquerque": ["Route 66 — the original Main Street of America — ran directly through Albuquerque's downtown. The city has one of the best-preserved Route 66 corridors in the country and sits on the Rio Grande, a Southwest crossroads for centuries."],
+  "New York City": ["New York City generates more economic output than all but 12 countries on Earth. Its subway operates 24 hours a day, 365 days a year — one of the only metro systems in the world that never closes. Its residents speak over 800 languages."],
+  "Charlotte": ["Charlotte grew from a small tobacco town to the second-largest banking center in the United States in fewer than 40 years. Bank of America and Wells Fargo's East Coast headquarters are both based here."],
+  "Fargo": ["The Coen Brothers' film Fargo is named for this city and set here, though most of it was filmed in Minnesota. Fargo sits on the Red River — one of the few rivers in North America that flows northward, into Canada."],
+  "Portland (OR)": ["Portland, Oregon has more craft breweries per capita than any other U.S. city. Its bridges are so defining that the city's nickname is 'Bridgetown.' A local political party named itself after them."],
+  "Philadelphia": ["Philadelphia was the U.S. capital from 1790–1800 while Washington D.C. was built. Both the Declaration of Independence and the Constitution were written and signed here — more founding documents than any other American city."],
+  "Sioux Falls": ["Sioux Falls is named for a series of pink quartzite waterfalls running through the city center. It is South Dakota's largest and fastest-growing city, serving as the economic hub of a four-state region known as 'Siouxland.'"],
+  "Houston": ["Houston is the most ethnically diverse major city in the United States — no single group is a majority, and over 145 languages are spoken. It is also the energy capital of the world: more oil and gas companies are headquartered here than anywhere else."],
+  "Burlington": ["Bernie Sanders served as Burlington's mayor from 1981 to 1989 — launching the political career that led to two presidential campaigns. Burlington is Vermont's largest city and the smallest 'largest city' of any U.S. state, with just 45,000 people."],
+  "Virginia Beach": ["Virginia Beach has the longest pleasure beach in the world — 35 miles of Atlantic Ocean shoreline. Just across the harbor sits Naval Station Norfolk — one of the world's largest naval complexes, home to dozens of warships, carriers, and submarines."],
+  "Seattle": ["Seattle is the birthplace of Amazon, Boeing, Starbucks, and Nirvana — more iconic companies and cultural exports per capita than almost any other American city. It sits between Puget Sound and Lake Washington with Mount Rainier visible on clear days."],
+  "Milwaukee": ["German immigrants so dominated Milwaukee that Pabst, Schlitz, Miller, and Blatz were all founded here, making it America's beer capital. The city's beer barons built the grand parks and neighborhoods that still define Milwaukee today."],
+
+}
+
+// ── Haversine distance in miles ──
+function haversineMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ── Map ──
+const map = L.map('map', { center: [46.8, 2.3], zoom: 6, zoomControl: true });
+L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { attribution: 'Tiles &copy; Esri', maxZoom: 19, detectRetina: true }
+).addTo(map);
+
+// ── Shared state ──
+let currentMode = 'quiz';
+let currentCountry = '';
+let cities  = [];
+let markers = [];
+
+// ── Icon factory ──
+function makeIcon(style, cityName, showLabel) {
+  const noHover = (style !== 'default') ? ' no-hover' : '';
+  if (showLabel) {
+    return L.divIcon({
+      className: '',
+      html: `<div class="city-label-div">
+               <div class="star-wrap no-hover s-label">&#9733;</div>
+               <div class="city-label-text">${cityName}</div>
+             </div>`,
+      iconSize: null,
+      iconAnchor: [11, 14],
+      popupAnchor: [0, -18],
+    });
+  }
+  return L.divIcon({
+    className: '',
+    html: `<div class="star-wrap${noHover} s-${style}">&#9733;</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -18],
+  });
+}
+
+function setMarkerIcon(idx, style, showLabel) {
+  markers[idx].setIcon(makeIcon(style, cities[idx].name, showLabel));
+}
+
+// ── LEARN mode state ──
+let learnRevealed = [];
+
+function learnReset() {
+  learnRevealed = new Array(cities.length).fill(false);
+  document.getElementById('rev-count').textContent = 0;
+  markers.forEach((m, i) => { setMarkerIcon(i, 'default', false); m.closePopup(); });
+}
+
+// ── City info panel ──
+let infoPanelIndex = 0;
+
+function showInfoPanel(cityName) {
+  const facts = cityFacts[cityName];
+  if (!facts || !facts.length) return;
+  infoPanelIndex = 0;
+  document.getElementById('info-city-title').textContent = cityName;
+  document.getElementById('learn-counter').style.display = 'none';
+  document.getElementById('learn-reset').style.display   = 'none';
+  updateInfoCard();
+  document.getElementById('info-panel').style.display = 'block';
+}
+
+function updateInfoCard() {
+  const facts = cityFacts[document.getElementById('info-city-title').textContent];
+  if (!facts) return;
+  document.getElementById('info-card-text').textContent    = facts[infoPanelIndex];
+  document.getElementById('info-card-text').textContent = facts[0];
+}
+
+function hideInfoPanel() {
+  document.getElementById('info-panel').style.display = 'none';
+  if (currentMode === 'learn') {
+    document.getElementById('learn-counter').style.display = 'block';
+    document.getElementById('learn-reset').style.display   = 'block';
+  }
+}
+
+// ── QUIZ mode state ──
+let quizQueue         = [];
+let quizIndex         = 0;
+let quizTotalDist     = 0;
+let quizAnswered      = false;
+let quizGuessMarker   = null;
+let quizAnswerMarker  = null;
+let quizLine          = null;
+let quizPendingMarker = null;
+let quizPendingCoords = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function clearPending() {
+  if (quizPendingMarker) { map.removeLayer(quizPendingMarker); quizPendingMarker = null; }
+  quizPendingCoords = null;
+  document.getElementById('confirm-banner').style.display  = 'none';
+  document.getElementById('feedback-overlay').style.display = 'none';
+}
+
+function clearQuizOverlays() {
+  clearPending();
+  if (quizGuessMarker)  { map.removeLayer(quizGuessMarker);  quizGuessMarker  = null; }
+  if (quizAnswerMarker) { map.removeLayer(quizAnswerMarker); quizAnswerMarker = null; }
+  if (quizLine)         { map.removeLayer(quizLine);         quizLine         = null; }
+}
+
+function startQuiz() {
+  clearQuizOverlays();
+  quizQueue     = shuffle(cities.map((_, i) => i));
+  quizIndex     = 0;
+  quizTotalDist = 0;
+  quizAnswered  = false;
+  document.getElementById('end-screen').style.display = 'none';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  quizAnswered = false;
+  clearQuizOverlays();
+  map.closePopup();
+
+  const ci = quizQueue[quizIndex];
+  document.getElementById('city-prompt').textContent = cities[ci].name;
+  document.getElementById('q-num').textContent       = quizIndex + 1;
+  document.getElementById('q-total').textContent     = quizQueue.length;
+  document.getElementById('score').textContent       = quizIndex > 0
+    ? Math.round(quizTotalDist / quizIndex) + ' mi' : '—';
+
+  document.getElementById('feedback-banner').style.display  = 'none';
+  document.getElementById('feedback-overlay').style.display = 'none';
+  document.getElementById('feedback-grade').textContent     = '';
+  document.getElementById('feedback-grade').className       = '';
+}
+
+function showPendingGuess(lat, lng) {
+  // Replace any existing pending marker
+  if (quizPendingMarker) map.removeLayer(quizPendingMarker);
+  quizPendingCoords = { lat, lng };
+  quizPendingMarker = L.circleMarker([lat, lng], {
+    radius: 10, color: '#fff', fillColor: '#60b4ff', fillOpacity: 0.85, weight: 2.5
+  }).addTo(map);
+  document.getElementById('confirm-banner').style.display   = 'block';
+  document.getElementById('feedback-overlay').style.display = 'block';
+}
+
+function distGrade(dist) {
+  if (dist <  40) return { label: 'A+', cls: 'grade-a' };
+  if (dist <  80) return { label: 'A',  cls: 'grade-a' };
+  if (dist < 120) return { label: 'A-', cls: 'grade-a' };
+  if (dist < 160) return { label: 'B+', cls: 'grade-b' };
+  if (dist < 200) return { label: 'B',  cls: 'grade-b' };
+  if (dist < 240) return { label: 'B-', cls: 'grade-b' };
+  if (dist < 280) return { label: 'C+', cls: 'grade-c' };
+  if (dist < 320) return { label: 'C',  cls: 'grade-c' };
+  if (dist < 360) return { label: 'C-', cls: 'grade-c' };
+  if (dist < 400) return { label: 'D+', cls: 'grade-d' };
+  if (dist < 440) return { label: 'D',  cls: 'grade-d' };
+  if (dist < 480) return { label: 'D-', cls: 'grade-d' };
+  return { label: 'F', cls: 'grade-f' };
+}
+
+function handleQuizClick(guessLat, guessLng) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  // Remove pending marker — guess marker replaces it
+  if (quizPendingMarker) { map.removeLayer(quizPendingMarker); quizPendingMarker = null; }
+  document.getElementById('confirm-banner').style.display = 'none';
+
+  const ci   = quizQueue[quizIndex];
+  const city = cities[ci];
+  const dist = haversineMiles(guessLat, guessLng, city.lat, city.lng);
+  quizTotalDist += dist;
+
+  // Guess marker — red dot
+  quizGuessMarker = L.circleMarker([guessLat, guessLng], {
+    radius: 8, color: '#ff6b6b', fillColor: '#ff6b6b', fillOpacity: 0.85, weight: 2
+  }).addTo(map);
+
+  // True location — glowing star with popup
+  quizAnswerMarker = L.marker([city.lat, city.lng], { icon: makeIcon('answer', city.name, false) }).addTo(map);
+  quizAnswerMarker
+    .bindPopup(`<div style="padding:2px 10px">${city.name}</div>`, { closeButton: false, autoClose: false })
+    .openPopup();
+
+  // Dashed line between guess and true location
+  quizLine = L.polyline([[guessLat, guessLng], [city.lat, city.lng]], {
+    color: '#aaa', weight: 1.5, dashArray: '6,5', opacity: 0.6
+  }).addTo(map);
+
+  // Update running average
+  const avg = quizTotalDist / (quizIndex + 1);
+  document.getElementById('score').textContent = Math.round(avg) + ' mi';
+
+  // Feedback banner
+  const distDisplay = dist < 10 ? dist.toFixed(1) : Math.round(dist);
+  const grade = distGrade(dist);
+  const banner = document.getElementById('feedback-banner');
+  banner.className = 'distance';
+  document.getElementById('feedback-result').textContent = city.name;
+  const gradeEl = document.getElementById('feedback-grade');
+  gradeEl.textContent  = grade.label;
+  gradeEl.className    = grade.cls;
+  document.getElementById('feedback-detail').textContent = `${distDisplay} miles off`;
+  banner.style.display  = 'block';
+  document.getElementById('feedback-overlay').style.display = 'block';
+}
+
+// ── Leaderboard (localStorage) ──
+const SCORES_KEY = 'geo_quiz_scores';
+
+function getScores() {
+  try { return JSON.parse(localStorage.getItem(SCORES_KEY)) || []; }
+  catch { return []; }
+}
+
+function saveScoreEntry(name, avgDist, country) {
+  const scores = getScores();
+  const ts = Date.now();
+  scores.push({
+    name: name.trim() || 'Anonymous',
+    avgDist: Math.round(avgDist),
+    country,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    ts,
+  });
+  localStorage.setItem(SCORES_KEY, JSON.stringify(scores));
+  return ts;
+}
+
+function renderLeaderboard(country, highlightTs) {
+  const sorted = getScores()
+    .filter(s => s.country === country)
+    .sort((a, b) => a.avgDist - b.avgDist)
+    .slice(0, 15);
+
+  const rows = sorted.length
+    ? sorted.map((s, i) => `
+        <tr ${s.ts === highlightTs ? 'class="lb-new"' : ''}>
+          <td>${i + 1}</td>
+          <td>${s.name}</td>
+          <td>${s.avgDist} mi</td>
+          <td>${s.date}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="4" style="color:#444;padding:12px">No scores yet</td></tr>';
+
+  document.getElementById('scores-table').innerHTML =
+    `<tr><th>#</th><th>Name</th><th>Avg</th><th>Date</th></tr>${rows}`;
+  document.getElementById('leaderboard').style.display = 'block';
+}
+
+function showEndScreen() {
+  document.getElementById('feedback-banner').style.display  = 'none';
+  document.getElementById('feedback-overlay').style.display = 'none';
+  clearQuizOverlays();
+
+  const avg = quizTotalDist / quizQueue.length;
+  document.getElementById('final-score').textContent = Math.round(avg) + ' mi';
+  document.getElementById('final-label').textContent =
+    avg < 30  ? 'Incredible — perfect geography!' :
+    avg < 80  ? 'Great geography skills!' :
+    avg < 150 ? 'Not bad — keep exploring!' : 'Keep practicing!';
+
+  document.getElementById('player-name').value = '';
+  document.getElementById('save-score-btn').disabled = false;
+  document.getElementById('name-entry').style.display = 'flex';
+
+  renderLeaderboard(currentCountry, null);
+
+  document.getElementById('end-screen').style.display = 'flex';
+  document.getElementById('end-screen').scrollTop = 0;
+}
+
+// ── Unified marker click handler ──
+function onMarkerClick(idx) {
+  if (currentMode === 'learn') {
+    markers[idx].openPopup();
+    if (!learnRevealed[idx]) {
+      learnRevealed[idx] = true;
+      setMarkerIcon(idx, 'revealed', false);
+      const count = learnRevealed.filter(Boolean).length;
+      document.getElementById('rev-count').textContent = count;
+    }
+    showInfoPanel(cities[idx].name);
+  }
+}
+
+// ── Mode switching ──
+function applyMode(mode) {
+  currentMode = mode;
+  map.closePopup();
+  clearQuizOverlays();
+  document.getElementById('feedback-banner').style.display  = 'none';
+  document.getElementById('feedback-overlay').style.display = 'none';
+  document.getElementById('end-screen').style.display       = 'none';
+  document.getElementById('info-panel').style.display       = 'none';
+  updateModeNav();
+
+  const isLearn = mode === 'learn';
+  const isNames = mode === 'names';
+  const isQuiz  = mode === 'quiz';
+
+  document.getElementById('learn-hint').style.display    = isLearn ? 'block' : 'none';
+  document.getElementById('learn-counter').style.display = isLearn ? 'block' : 'none';
+  document.getElementById('learn-reset').style.display   = isLearn ? 'block' : 'none';
+  document.getElementById('quiz-bar').style.display      = isQuiz  ? 'block' : 'none';
+  document.getElementById('map').classList.toggle('quiz-mode', isQuiz);
+
+  if (isLearn) {
+    markers.forEach(m => { if (!map.hasLayer(m)) m.addTo(map); });
+    learnReset();
+  } else if (isNames) {
+    markers.forEach((m, i) => { if (!map.hasLayer(m)) m.addTo(map); setMarkerIcon(i, 'label', true); m.closePopup(); });
+  } else if (isQuiz) {
+    markers.forEach(m => { if (map.hasLayer(m)) map.removeLayer(m); });
+    startQuiz();
+  }
+}
+
+function updateModeNav() {
+  const nav = document.getElementById('mode-nav');
+  nav.style.display = 'flex';
+  document.getElementById('nav-learn').style.display = currentMode === 'learn' ? 'none' : '';
+  document.getElementById('nav-quiz').style.display  = currentMode === 'quiz'  ? 'none' : '';
+  document.getElementById('nav-names').style.display = currentMode === 'names' ? 'none' : '';
+  // "Start Quiz" label only from Learn/Names; in quiz it says "Learn Mode" label on nav-learn
+  document.getElementById('nav-quiz').textContent = 'Start Quiz';
+}
+
+// ── Country selection ──
+const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸' };
+
+function startCountry(country) {
+  currentCountry = country;
+  const settings = mapSettings[country];
+  document.getElementById('diff-flag').textContent         = countryFlags[country];
+  document.getElementById('diff-country-name').textContent = settings.label;
+
+  const diffButtons = document.getElementById('diff-buttons');
+  if (country === 'usa') {
+    diffButtons.innerHTML = `
+      <button class="diff-btn" data-difficulty="capitals">
+        <span class="diff-btn-name">Capitals</span>
+        <span class="diff-btn-desc">All 50 state capitals</span>
+      </button>
+      <button class="diff-btn" data-difficulty="capitals_plus">
+        <span class="diff-btn-name">Capitals Plus</span>
+        <span class="diff-btn-desc">Capitals + largest cities</span>
+      </button>`;
+  } else {
+    diffButtons.innerHTML = `
+      <button class="diff-btn" data-difficulty="easy">
+        <span class="diff-btn-name">Easy</span>
+        <span class="diff-btn-desc">Top 5 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="medium">
+        <span class="diff-btn-name">Medium</span>
+        <span class="diff-btn-desc">Top 10 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="hard">
+        <span class="diff-btn-name">Hard</span>
+        <span class="diff-btn-desc">Top 15 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="veryhard">
+        <span class="diff-btn-name">Very Hard</span>
+        <span class="diff-btn-desc">Top 20 cities</span>
+      </button>`;
+  }
+  diffButtons.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => startDifficulty(btn.dataset.difficulty));
+  });
+
+  document.getElementById('country-selector').style.display    = 'none';
+  document.getElementById('difficulty-selector').style.display = 'flex';
+}
+
+function startDifficulty(difficulty) {
+  if (difficulty === 'capitals') {
+    cities = allCities[currentCountry].filter(c => c.capital);
+  } else if (difficulty === 'capitals_plus') {
+    cities = allCities[currentCountry].slice();
+  } else {
+    const count = { easy: 5, medium: 10, hard: 15, veryhard: 20 }[difficulty];
+    cities = allCities[currentCountry].slice(0, count);
+  }
+
+  markers.forEach(m => map.removeLayer(m));
+  clearQuizOverlays();
+
+  const settings = mapSettings[currentCountry];
+  map.setView(settings.center, settings.zoom);
+  document.getElementById('city-total').textContent   = cities.length;
+
+  markers = cities.map((city, i) => {
+    const m = L.marker([city.lat, city.lng], { icon: makeIcon('default', city.name, false) }).addTo(map);
+    m.bindPopup(`<div style="padding:2px 10px">${city.name}</div>`, { closeButton: false, autoClose: false });
+    m.on('click', () => onMarkerClick(i));
+    return m;
+  });
+
+  document.getElementById('difficulty-selector').style.display = 'none';
+  applyMode('learn');
+}
+
+function returnToSelector() {
+  markers.forEach(m => map.removeLayer(m));
+  clearQuizOverlays();
+  map.closePopup();
+  markers = [];
+  cities  = [];
+  currentCountry = '';
+  document.getElementById('feedback-banner').style.display  = 'none';
+  document.getElementById('feedback-overlay').style.display = 'none';
+  document.getElementById('end-screen').style.display       = 'none';
+  document.getElementById('learn-hint').style.display       = 'none';
+  document.getElementById('learn-counter').style.display    = 'none';
+  document.getElementById('learn-reset').style.display      = 'none';
+  document.getElementById('quiz-bar').style.display         = 'none';
+  document.getElementById('map').classList.remove('quiz-mode');
+  document.getElementById('info-panel').style.display          = 'none';
+  document.getElementById('mode-nav').style.display            = 'none';
+  document.getElementById('difficulty-selector').style.display = 'none';
+  document.getElementById('country-selector').style.display    = 'flex';
+}
+
+// ── Event listeners ──
+document.querySelectorAll('.flag-btn').forEach(btn => {
+  btn.addEventListener('click', () => startCountry(btn.dataset.country));
+});
+
+
+document.getElementById('diff-back-btn').addEventListener('click', () => {
+  document.getElementById('difficulty-selector').style.display = 'none';
+  document.getElementById('country-selector').style.display    = 'flex';
+});
+
+document.getElementById('title').addEventListener('click', returnToSelector);
+
+document.getElementById('nav-learn').addEventListener('click', () => applyMode('learn'));
+document.getElementById('nav-quiz').addEventListener('click',  () => applyMode('quiz'));
+document.getElementById('nav-names').addEventListener('click', () => applyMode('names'));
+
+document.getElementById('learn-reset').addEventListener('click', learnReset);
+
+document.getElementById('inspect-btn').addEventListener('click', () => {
+  document.getElementById('feedback-overlay').style.display = 'none';
+  document.getElementById('feedback-banner').classList.add('inspect-mode');
+});
+
+document.getElementById('next-btn').addEventListener('click', () => {
+  document.getElementById('feedback-banner').classList.remove('inspect-mode');
+  quizIndex++;
+  if (quizIndex >= quizQueue.length) showEndScreen();
+  else showQuizQuestion();
+});
+
+document.getElementById('play-again-btn').addEventListener('click', () => {
+  document.getElementById('end-screen').style.display = 'none';
+  returnToSelector();
+});
+
+document.getElementById('save-score-btn').addEventListener('click', () => {
+  const name = document.getElementById('player-name').value;
+  const avg  = quizTotalDist / quizQueue.length;
+  const ts   = saveScoreEntry(name, avg, currentCountry);
+  document.getElementById('save-score-btn').disabled = true;
+  document.getElementById('name-entry').style.display = 'none';
+  renderLeaderboard(currentCountry, ts);
+  document.getElementById('end-screen').scrollTop = document.getElementById('end-screen').scrollHeight;
+});
+
+document.getElementById('player-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('save-score-btn').click();
+});
+
+// ── Quiz: confirm / back ──
+document.getElementById('confirm-yes-btn').addEventListener('click', () => {
+  if (!quizPendingCoords) return;
+  const { lat, lng } = quizPendingCoords;
+  quizPendingCoords = null;
+  handleQuizClick(lat, lng);
+});
+
+document.getElementById('confirm-back-btn').addEventListener('click', clearPending);
+
+// ── Info panel nav ──
+document.getElementById('info-close-btn').addEventListener('click', hideInfoPanel);
+
+
+// ── Quiz: map tap → pending confirmation ──
+map.on('click', function(e) {
+  if (currentMode !== 'quiz' || quizAnswered) return;
+  showPendingGuess(e.latlng.lat, e.latlng.lng);
+});
+</script>
+</body>
+</html>
