@@ -524,6 +524,28 @@ const allCities = {
     { name: "Seattle",       lat: 47.6062,  lng: -122.3321, state: "Washington" },
     { name: "Milwaukee",     lat: 43.0389,  lng:  -87.9065, state: "Wisconsin" },
   ],
+  china: [
+    { name: "Beijing",   lat: 39.9042, lng: 116.4074 },
+    { name: "Shanghai",  lat: 31.2304, lng: 121.4737 },
+    { name: "Hong Kong", lat: 22.3193, lng: 114.1694 },
+    { name: "Xi'an",     lat: 34.3416, lng: 108.9398 },
+    { name: "Guangzhou", lat: 23.1291, lng: 113.2644 },
+    { name: "Shenzhen",  lat: 22.5431, lng: 114.0579 },
+    { name: "Chengdu",   lat: 30.5728, lng: 104.0668 },
+    { name: "Wuhan",     lat: 30.5928, lng: 114.3055 },
+    { name: "Hangzhou",  lat: 30.2741, lng: 120.1551 },
+    { name: "Chongqing", lat: 29.5630, lng: 106.5516 },
+    { name: "Nanjing",   lat: 32.0603, lng: 118.7969 },
+    { name: "Tianjin",   lat: 39.3434, lng: 117.3616 },
+    { name: "Harbin",    lat: 45.8038, lng: 126.5349 },
+    { name: "Qingdao",   lat: 36.0671, lng: 120.3826 },
+    { name: "Suzhou",    lat: 31.2990, lng: 120.5853 },
+    { name: "Changsha",  lat: 28.2282, lng: 112.9388 },
+    { name: "Shenyang",  lat: 41.8057, lng: 123.4315 },
+    { name: "Zhengzhou", lat: 34.7466, lng: 113.6253 },
+    { name: "Foshan",    lat: 23.0219, lng: 113.1215 },
+    { name: "Dongguan",  lat: 23.0207, lng: 113.7518 },
+  ],
 };
 
 // ── Haversine distance in miles ──
@@ -580,20 +602,21 @@ function getDailyEasternSeed() {
 
 // ── Tiered city pools ──
 // Non-USA cities are tiered by index position (mirrors practice mode difficulty):
-//   index 0-4  → easyWorld
-//   index 5-9  → medium
+//   index 0-4   → easyWorld
+//   index 5-9   → medium
 //   index 10-14 → hard
 //   index 15-19 → veryHard
 // All USA cities → easyUSA
 // Challenge order: easyUSA, easyWorld, medium, hard, veryHard
+// 14-day cooldown: a city cannot be selected within 14 days of its last appearance.
 const countryLabels = {
   france: 'France', germany: 'Germany', russia: 'Russia',
-  japan: 'Japan', canada: 'Canada', india: 'India', usa: 'USA',
+  japan: 'Japan', canada: 'Canada', india: 'India', usa: 'USA', china: 'China',
 };
 
 function buildTieredPools() {
   const pools = { easyUSA: [], easyWorld: [], medium: [], hard: [], veryHard: [] };
-  ['france','germany','russia','japan','canada','india'].forEach(country => {
+  ['france','germany','russia','japan','canada','india','china'].forEach(country => {
     allCities[country].forEach((city, idx) => {
       const tier = idx < 5 ? 'easyWorld' : idx < 10 ? 'medium' : idx < 15 ? 'hard' : 'veryHard';
       pools[tier].push({ name: city.name, country: countryLabels[country], lat: city.lat, lng: city.lng });
@@ -605,17 +628,54 @@ function buildTieredPools() {
   return pools;
 }
 
-function selectChallengeCities() {
-  const pools = buildTieredPools();
-  const rng = mulberry32(getDailyEasternSeed());
-  const used = new Set();
+// Returns a YYYYMMDD seed integer offset by the given number of days.
+function getDaySeed(todaySeed, offset) {
+  const year = Math.floor(todaySeed / 10000);
+  const month = Math.floor((todaySeed % 10000) / 100) - 1; // 0-indexed for Date()
+  const day = todaySeed % 100;
+  const d = new Date(year, month, day + offset);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return parseInt(`${y}${m}${dd}`, 10);
+}
 
-  return ['easyUSA', 'easyWorld', 'medium', 'hard', 'veryHard'].map(tier => {
-    const candidates = pools[tier].filter(c => !used.has(c.name));
-    const city = candidates[Math.floor(rng() * candidates.length)];
-    used.add(city.name);
-    return city;
-  });
+function selectChallengeCities() {
+  const COOLDOWN = 14;
+  const todaySeed = getDailyEasternSeed();
+  const pools = buildTieredPools();
+  const tiers = ['easyUSA', 'easyWorld', 'medium', 'hard', 'veryHard'];
+
+  function pickForSeed(daySeed, excluded) {
+    const rng = mulberry32(daySeed);
+    const used = new Set(excluded);
+    const countryCounts = {};
+    return tiers.map(tier => {
+      const candidates = pools[tier].filter(c =>
+        !used.has(c.name) && (countryCounts[c.country] || 0) < 2
+      );
+      const city = candidates[Math.floor(rng() * candidates.length)];
+      used.add(city.name);
+      countryCounts[city.country] = (countryCounts[city.country] || 0) + 1;
+      return city;
+    });
+  }
+
+  // Simulate 2×COOLDOWN-1 days of history (warmup ensures the 13 days we
+  // actually exclude have each had their own full context when computed).
+  const history = []; // chronological arrays of city names, oldest first
+  for (let offset = -(COOLDOWN * 2 - 1); offset < 0; offset++) {
+    const excluded = new Set();
+    history.slice(-(COOLDOWN - 1)).forEach(names => names.forEach(n => excluded.add(n)));
+    const cities = pickForSeed(getDaySeed(todaySeed, offset), excluded);
+    history.push(cities.map(c => c.name));
+  }
+
+  // Today: exclude every city seen in the last COOLDOWN-1 days.
+  const todayExcluded = new Set();
+  history.slice(-(COOLDOWN - 1)).forEach(names => names.forEach(n => todayExcluded.add(n)));
+
+  return pickForSeed(todaySeed, todayExcluded);
 }
 
 // ── Map ──

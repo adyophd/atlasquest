@@ -622,6 +622,10 @@
         <span class="flag-emoji">🇺🇸</span>
         <span class="flag-name">USA</span>
       </button>
+      <button class="flag-btn" data-country="china">
+        <span class="flag-emoji">🇨🇳</span>
+        <span class="flag-name">China</span>
+      </button>
     </div>
   </div>
 </div>
@@ -952,6 +956,28 @@ const allCities = {
     { name: "Seattle",       lat: 47.6062,  lng: -122.3321, state: "Washington" },
     { name: "Milwaukee",     lat: 43.0389,  lng: -87.9065,  state: "Wisconsin" },
   ],
+  china: [
+    { name: "Beijing",   lat: 39.9042, lng: 116.4074 },
+    { name: "Shanghai",  lat: 31.2304, lng: 121.4737 },
+    { name: "Hong Kong", lat: 22.3193, lng: 114.1694 },
+    { name: "Xi'an",     lat: 34.3416, lng: 108.9398 },
+    { name: "Guangzhou", lat: 23.1291, lng: 113.2644 },
+    { name: "Shenzhen",  lat: 22.5431, lng: 114.0579 },
+    { name: "Chengdu",   lat: 30.5728, lng: 104.0668 },
+    { name: "Wuhan",     lat: 30.5928, lng: 114.3055 },
+    { name: "Hangzhou",  lat: 30.2741, lng: 120.1551 },
+    { name: "Chongqing", lat: 29.5630, lng: 106.5516 },
+    { name: "Nanjing",   lat: 32.0603, lng: 118.7969 },
+    { name: "Tianjin",   lat: 39.3434, lng: 117.3616 },
+    { name: "Harbin",    lat: 45.8038, lng: 126.5349 },
+    { name: "Qingdao",   lat: 36.0671, lng: 120.3826 },
+    { name: "Suzhou",    lat: 31.2990, lng: 120.5853 },
+    { name: "Changsha",  lat: 28.2282, lng: 112.9388 },
+    { name: "Shenyang",  lat: 41.8057, lng: 123.4315 },
+    { name: "Zhengzhou", lat: 34.7466, lng: 113.6253 },
+    { name: "Foshan",    lat: 23.0219, lng: 113.1215 },
+    { name: "Dongguan",  lat: 23.0207, lng: 113.7518 },
+  ],
 };
 
 const mapSettings = {
@@ -962,6 +988,7 @@ const mapSettings = {
   canada:  { center: [54.0, -96.0], zoom: 4, label: 'CANADA'  },
   india:   { center: [22.0,  78.0], zoom: 5, label: 'INDIA'   },
   usa:     { center: [39.5, -98.5], zoom: 4, label: 'USA'     },
+  china:   { center: [35.0, 104.0], zoom: 4, label: 'CHINA'   },
 };
 
 // ── City facts (learn mode info panel) ──
@@ -1186,6 +1213,28 @@ const cityFacts = {
   "Virginia Beach": ["Virginia Beach has the longest pleasure beach in the world — 35 miles of Atlantic Ocean shoreline. Just across the harbor sits Naval Station Norfolk — one of the world's largest naval complexes, home to dozens of warships, carriers, and submarines."],
   "Seattle": ["Seattle is the birthplace of Amazon, Boeing, Starbucks, and Nirvana — more iconic companies and cultural exports per capita than almost any other American city. It sits between Puget Sound and Lake Washington with Mount Rainier visible on clear days."],
   "Milwaukee": ["German immigrants so dominated Milwaukee that Pabst, Schlitz, Miller, and Blatz were all founded here, making it America's beer capital. The city's beer barons built the grand parks and neighborhoods that still define Milwaukee today."],
+
+  // ── China ──
+  "Beijing":   ["Beijing is the only city ever to host both the Summer and Winter Olympic Games — the 2008 Summer Olympics and the 2022 Winter Olympics — a distinction no other city has achieved."],
+  "Shanghai":  ["Yao Ming — the 7'6\" NBA center who became basketball's first global Chinese star — was born in Shanghai in 1980, the son of two former professional basketball players who stood over 6'3\"."],
+  "Hong Kong": ["Bruce Lee grew up in Hong Kong and was so prone to street fighting that his family sent him to the United States at age 18. He became the most influential martial artist in cinema history."],
+  "Xi'an":     ["In 1974, farmers digging a well near Xi'an accidentally unearthed 8,000 life-sized clay soldiers buried to guard Emperor Qin Shi Huang for 2,200 years — archaeology's greatest accidental discovery."],
+  "Guangzhou": ["Guangzhou has been China's main trading port for over 2,000 years. Its diaspora spread Cantonese cuisine — dim sum, char siu, and wonton soup — to virtually every country on Earth."],
+  "Shenzhen":  ["Shenzhen was a farming village of 30,000 people in 1979. Designated China's first Special Economic Zone, it grew to over 12 million in four decades — the fastest large-city urbanization in history."],
+  "Chengdu":   ["Du Fu — one of China's two greatest classical poets — fled to Chengdu during a civil war in 759 CE and lived in a thatched cottage for four years, writing over 240 poems. The cottage is now a famous park."],
+  "Wuhan":     ["Li Na — born in Wuhan in 1982 — became the first Asian player to win a Grand Slam singles tennis title when she took the 2011 French Open, breaking a barrier that had stood for over a century."],
+  "Hangzhou":  ["Jack Ma founded Alibaba in his Hangzhou apartment in 1999 with 18 friends and $60,000. It grew into a company worth over a trillion dollars — the world's largest e-commerce marketplace."],
+  "Chongqing": ["Chongqing served as China's wartime capital from 1937 to 1945, enduring over 200 Japanese bombing raids. Its population refused to evacuate, becoming a global symbol of Chinese resistance."],
+  "Nanjing":   ["Sun Yat-sen — the 'Father of Modern China' who ended 2,000 years of imperial rule — is buried in Nanjing. He chose the city as the capital of his new Republic of China, and his mausoleum draws millions."],
+  "Tianjin":   ["Zhou Enlai — China's Premier for 27 years and its sole foreign minister — spent his formative teenage years at Tianjin's Nankai School, where he began the political organizing that shaped modern China."],
+  "Harbin":    ["Harbin was founded by Russian railway engineers in 1898 and retains striking Russian-era architecture. Its annual Ice and Snow Festival — the world's largest — draws over a million visitors each winter."],
+  "Qingdao":   ["Tsingtao Beer — one of China's most recognized global exports — was founded by German settlers in Qingdao in 1903, during Germany's colonial occupation of the city. It is still brewed there today."],
+  "Suzhou":    ["Suzhou's silk weaving tradition stretches back 4,000 years — the city supplied China's imperial courts for millennia, and its brocade was so prized that a single bolt could take a master weaver one year."],
+  "Changsha":  ["Mao Zedong spent his formative years in Changsha — attending school and founding his first political organization here — before leading the revolution that transformed one-quarter of humanity."],
+  "Shenyang":  ["Zhang Xueliang — the 'Young Marshal' who governed Manchuria from Shenyang and kidnapped Chiang Kai-shek in 1936 to force China to fight Japan — was then placed under house arrest for 54 years."],
+  "Zhengzhou": ["Zhengzhou has been a major city for over 3,600 years — ruins of a Shang Dynasty capital lie within its modern boundaries, making it one of the longest-settled cities in East Asia."],
+  "Foshan":    ["Ip Man — the Wing Chun grandmaster who trained Bruce Lee — was born in Foshan in 1893. His life has been retold in more biographical films than any other martial artist in Chinese history."],
+  "Dongguan":  ["Dongguan was an obscure farming town in 1980. Today its factories produce a greater value of export goods than most entire countries — a transformation achieved in just four decades."],
 
 }
 
@@ -1540,7 +1589,7 @@ function updateModeNav() {
 }
 
 // ── Country selection ──
-const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸' };
+const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳' };
 
 function startCountry(country) {
   currentCountry = country;
