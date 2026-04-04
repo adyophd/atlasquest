@@ -564,14 +564,6 @@ function mulberry32(seed) {
   };
 }
 
-function seededShuffle(arr, rng) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // ── Daily seed keyed to Eastern midnight ──
 // Returns an integer like 20260402 representing today's date in ET.
@@ -586,54 +578,44 @@ function getDailyEasternSeed() {
   return parseInt(`${year}${month}${day}`, 10);
 }
 
-// ── Weighted city pool ──
-// Each city appears once per difficulty tier it belongs to:
-// Non-USA index 0-4: 4x  (easy/medium/hard/veryhard)
-// Non-USA index 5-9: 3x  (medium/hard/veryhard)
-// Non-USA index 10-14: 2x (hard/veryhard)
-// Non-USA index 15-19: 1x (veryhard)
-// USA capitals: 2x (capitals + capitals_plus)
-// USA non-capitals: 1x (capitals_plus only)
+// ── Tiered city pools ──
+// Non-USA cities are tiered by index position (mirrors practice mode difficulty):
+//   index 0-4  → easyWorld
+//   index 5-9  → medium
+//   index 10-14 → hard
+//   index 15-19 → veryHard
+// All USA cities → easyUSA
+// Challenge order: easyUSA, easyWorld, medium, hard, veryHard
 const countryLabels = {
   france: 'France', germany: 'Germany', russia: 'Russia',
   japan: 'Japan', canada: 'Canada', india: 'India', usa: 'USA',
 };
 
-function buildWeightedPool() {
-  const pool = [];
+function buildTieredPools() {
+  const pools = { easyUSA: [], easyWorld: [], medium: [], hard: [], veryHard: [] };
   ['france','germany','russia','japan','canada','india'].forEach(country => {
     allCities[country].forEach((city, idx) => {
-      const count = idx < 5 ? 4 : idx < 10 ? 3 : idx < 15 ? 2 : 1;
-      for (let i = 0; i < count; i++) {
-        pool.push({ name: city.name, country: countryLabels[country], lat: city.lat, lng: city.lng });
-      }
+      const tier = idx < 5 ? 'easyWorld' : idx < 10 ? 'medium' : idx < 15 ? 'hard' : 'veryHard';
+      pools[tier].push({ name: city.name, country: countryLabels[country], lat: city.lat, lng: city.lng });
     });
   });
   allCities.usa.forEach(city => {
-    const count = city.capital ? 2 : 1;
-    for (let i = 0; i < count; i++) {
-      pool.push({ name: city.name, country: 'USA', state: city.state, lat: city.lat, lng: city.lng });
-    }
+    pools.easyUSA.push({ name: city.name, country: 'USA', state: city.state, lat: city.lat, lng: city.lng });
   });
-  return pool;
+  return pools;
 }
 
 function selectChallengeCities() {
-  const pool = buildWeightedPool();
+  const pools = buildTieredPools();
   const rng = mulberry32(getDailyEasternSeed());
-  const shuffled = seededShuffle(pool, rng);
-
-  // Pick 5 unique city names from the seeded shuffle (weight bias preserved)
-  const selected = [];
   const used = new Set();
-  for (const entry of shuffled) {
-    if (!used.has(entry.name)) {
-      selected.push(entry);
-      used.add(entry.name);
-    }
-    if (selected.length === 5) break;
-  }
-  return selected;
+
+  return ['easyUSA', 'easyWorld', 'medium', 'hard', 'veryHard'].map(tier => {
+    const candidates = pools[tier].filter(c => !used.has(c.name));
+    const city = candidates[Math.floor(rng() * candidates.length)];
+    used.add(city.name);
+    return city;
+  });
 }
 
 // ── Map ──
