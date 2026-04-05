@@ -259,6 +259,9 @@
     #scores-table td:nth-child(3) { color: #7effa0; }
     #scores-table tr.lb-new td:nth-child(3) { color: #f5c842; }
 
+    /* ── Distance label marker wrapper ── */
+    .quiz-dist-label { background: transparent !important; border: none !important; overflow: visible; }
+
     /* ── Stars ── */
     .star-wrap {
       cursor: pointer; font-size: 22px; line-height: 1;
@@ -1513,6 +1516,7 @@ function handleQuizClick(guessLat, guessLng) {
       icon: L.divIcon({
         className: '',
         html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;transform:translate(calc(-50% + ${ox.toFixed(1)}px),calc(-50% + ${oy.toFixed(1)}px));pointer-events:none;">Distance:<br>${distText} mi</div>`,
+        className: 'quiz-dist-label',
         iconSize: [0, 0], iconAnchor: [0, 0],
       })
     }).addTo(map);
