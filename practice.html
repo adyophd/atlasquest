@@ -626,6 +626,14 @@
         <span class="flag-emoji">🇨🇳</span>
         <span class="flag-name">China</span>
       </button>
+      <button class="flag-btn" data-country="british_isles">
+        <span class="flag-emoji">🇬🇧</span>
+        <span class="flag-name">British Isles</span>
+      </button>
+      <button class="flag-btn" data-country="oceania">
+        <span class="flag-emoji">🇦🇺</span>
+        <span class="flag-name">Australia & NZ</span>
+      </button>
     </div>
   </div>
 </div>
@@ -835,12 +843,12 @@ const allCities = {
     { name: "Mississauga",  lat: 43.5890,  lng: -79.6441 }, // 7  ~0.72M
     { name: "Vancouver",    lat: 49.2827,  lng: -123.1207}, // 8  ~0.66M
     { name: "Brampton",     lat: 43.7315,  lng: -79.7624 }, // 9  ~0.66M
-    { name: "Hamilton",     lat: 43.2557,  lng: -79.8711 }, // 10 ~0.57M
+    { name: "Hamilton (ON)", lat: 43.2557,  lng: -79.8711 }, // 10 ~0.57M
     { name: "Surrey",       lat: 49.1913,  lng: -122.8490}, // 11 ~0.57M
     { name: "Québec City",  lat: 46.8139,  lng: -71.2080 }, // 12 ~0.55M
     { name: "Laval",        lat: 45.5662,  lng: -73.6952 }, // 13 ~0.44M
     { name: "Halifax",      lat: 44.6488,  lng: -63.5752 }, // 14 ~0.44M
-    { name: "London",       lat: 42.9849,  lng: -81.2453 }, // 15 ~0.42M
+    { name: "London (ON)",   lat: 42.9849,  lng: -81.2453 }, // 15 ~0.42M
     { name: "Markham",      lat: 43.8561,  lng: -79.3370 }, // 16 ~0.34M
     { name: "Vaughan",      lat: 43.8361,  lng: -79.4985 }, // 17 ~0.32M
     { name: "Gatineau",     lat: 45.4765,  lng: -75.7013 }, // 18 ~0.29M
@@ -923,7 +931,7 @@ const allCities = {
     { name: "Madison",       lat: 43.0731,  lng: -89.4012,  capital: true, state: "Wisconsin" },
     { name: "Cheyenne",      lat: 41.1400,  lng: -104.8202, capital: true, state: "Wyoming" },
     // ── Non-capital largest cities (Capitals Plus only) ──
-    { name: "Birmingham",    lat: 33.5186,  lng: -86.8104,  state: "Alabama" },
+    { name: "Birmingham (AL)", lat: 33.5186, lng: -86.8104,  state: "Alabama" },
     { name: "Anchorage",     lat: 61.2181,  lng: -149.9003, state: "Alaska" },
     { name: "Los Angeles",   lat: 34.0522,  lng: -118.2437, state: "California" },
     { name: "Bridgeport",    lat: 41.1865,  lng: -73.1952,  state: "Connecticut" },
@@ -978,6 +986,50 @@ const allCities = {
     { name: "Foshan",    lat: 23.0219, lng: 113.1215 },
     { name: "Dongguan",  lat: 23.0207, lng: 113.7518 },
   ],
+  british_isles: [
+    { name: "London",          lat: 51.5074,  lng:  -0.1278 },
+    { name: "Manchester",      lat: 53.4808,  lng:  -2.2426 },
+    { name: "Edinburgh",       lat: 55.9533,  lng:  -3.1883 },
+    { name: "Liverpool",       lat: 53.4084,  lng:  -2.9916 },
+    { name: "Dublin",          lat: 53.3498,  lng:  -6.2603 },
+    { name: "Birmingham",      lat: 52.4862,  lng:  -1.8904 },
+    { name: "Glasgow",         lat: 55.8642,  lng:  -4.2518 },
+    { name: "Bristol",         lat: 51.4545,  lng:  -2.5879 },
+    { name: "Cardiff",         lat: 51.4816,  lng:  -3.1791 },
+    { name: "Belfast",         lat: 54.5973,  lng:  -5.9301 },
+    { name: "Leeds",           lat: 53.8008,  lng:  -1.5491 },
+    { name: "Sheffield",       lat: 53.3811,  lng:  -1.4701 },
+    { name: "Bradford",        lat: 53.7960,  lng:  -1.7594 },
+    { name: "Coventry",        lat: 52.4068,  lng:  -1.5197 },
+    { name: "Leicester",       lat: 52.6369,  lng:  -1.1398 },
+    { name: "Nottingham",      lat: 52.9548,  lng:  -1.1581 },
+    { name: "Hull",            lat: 53.7676,  lng:  -0.3274 },
+    { name: "Wolverhampton",   lat: 52.5862,  lng:  -2.1285 },
+    { name: "Plymouth",        lat: 50.3755,  lng:  -4.1427 },
+    { name: "Stoke-on-Trent",  lat: 53.0027,  lng:  -2.1794 },
+  ],
+  oceania: [
+    { name: "Sydney",          lat: -33.8688, lng:  151.2093 },
+    { name: "Melbourne",       lat: -37.8136, lng:  144.9631 },
+    { name: "Auckland",        lat: -36.8509, lng:  174.7645 },
+    { name: "Brisbane",        lat: -27.4698, lng:  153.0251 },
+    { name: "Perth",           lat: -31.9505, lng:  115.8605 },
+    { name: "Adelaide",        lat: -34.9285, lng:  138.6007 },
+    { name: "Wellington",      lat: -41.2866, lng:  174.7756 },
+    { name: "Christchurch",    lat: -43.5321, lng:  172.6362 },
+    { name: "Gold Coast",      lat: -28.0167, lng:  153.4000 },
+    { name: "Canberra",        lat: -35.2809, lng:  149.1300 },
+    { name: "Newcastle",       lat: -32.9283, lng:  151.7817 },
+    { name: "Wollongong",      lat: -34.4278, lng:  150.8931 },
+    { name: "Geelong",         lat: -38.1499, lng:  144.3617 },
+    { name: "Hobart",          lat: -42.8821, lng:  147.3272 },
+    { name: "Hamilton (NZ)",   lat: -37.7870, lng:  175.2793 },
+    { name: "Townsville",      lat: -19.2590, lng:  146.8169 },
+    { name: "Tauranga",        lat: -37.6878, lng:  176.1651 },
+    { name: "Cairns",          lat: -16.9186, lng:  145.7781 },
+    { name: "Darwin",          lat: -12.4634, lng:  130.8456 },
+    { name: "Dunedin",         lat: -45.8788, lng:  170.5028 },
+  ],
 };
 
 const mapSettings = {
@@ -988,7 +1040,9 @@ const mapSettings = {
   canada:  { center: [54.0, -96.0], zoom: 4, label: 'CANADA'  },
   india:   { center: [22.0,  78.0], zoom: 5, label: 'INDIA'   },
   usa:     { center: [39.5, -98.5], zoom: 4, label: 'USA'     },
-  china:   { center: [35.0, 104.0], zoom: 4, label: 'CHINA'   },
+  china:          { center: [35.0, 104.0],  zoom: 4, label: 'CHINA'          },
+  british_isles:  { center: [54.0,  -3.0],  zoom: 5, label: 'BRITISH ISLES'  },
+  oceania:        { center: [-27.0, 148.0], zoom: 3, label: 'AUSTRALIA & NZ' },
 };
 
 // ── City facts (learn mode info panel) ──
@@ -1095,12 +1149,12 @@ const cityFacts = {
   "Mississauga": ["A 1979 train derailment forced 218,000 Mississauga residents to evacuate — the largest peacetime evacuation in North American history at the time. It was completed with zero fatalities."],
   "Vancouver": ["Greenpeace was founded in Vancouver in 1971 — a small group sailing to protest US nuclear testing in Alaska. It became the world's most influential environmental organization. The modern environmental movement was born here."],
   "Brampton": ["Over 60% of Brampton's residents were born outside Canada — among the highest foreign-born proportions of any major city on Earth. It receives more new immigrants per year than many entire countries."],
-  "Hamilton": ["Hamilton has over 100 waterfalls within city limits — more than any other city in the world — because the Niagara Escarpment cuts directly through it. Most Canadians don't know their 'Steel City' is the waterfall capital of Earth."],
+  "Hamilton (ON)": ["Hamilton has over 100 waterfalls within city limits — more than any other city in the world — because the Niagara Escarpment cuts directly through it. Most Canadians don't know their 'Steel City' is the waterfall capital of Earth."],
   "Surrey": ["The Peace Arch on Surrey's US border, built in 1921, straddles both countries simultaneously — half in Canada, half in the United States — a physical monument to the longest undefended border in the world."],
   "Québec City": ["The Battle of the Plains of Abraham lasted just 15 minutes. Britain's 1759 victory outside Québec City ended French colonial rule in Canada. Fifteen minutes of battle changed the fate of a continent."],
   "Laval": ["Laval was created in 1965 by forcibly merging 14 separate municipalities. Many residents refused to call themselves 'Lavalois' for years afterward. Some still don't."],
   "Halifax": ["When the Titanic sank in 1912, Halifax was the closest major port. Ships from Halifax recovered 328 bodies; 150 are still buried in Halifax cemeteries. The city became the Titanic's de facto resting place."],
-  "London": ["Guy Lombardo, born in London, Ontario, hosted New York's Times Square New Year's Eve broadcast for so many decades that his Auld Lang Syne became the definitive midnight soundtrack for millions. He was Canadian."],
+  "London (ON)": ["Guy Lombardo, born in London, Ontario, hosted New York's Times Square New Year's Eve broadcast for so many decades that his Auld Lang Syne became the definitive midnight soundtrack for millions. He was Canadian."],
   "Markham": ["Markham hosts the Canadian HQs of IBM, AMD, Apple, and dozens of other global tech giants — the densest concentration of tech offices in Canada outside a major downtown. Silicon Valley quietly moved to a Toronto suburb."],
   "Vaughan": ["Bianca Andreescu, raised in Vaughan, became the first Canadian to win a Grand Slam singles title in 50 years when she beat Serena Williams at the 2019 US Open — ranked outside the top 150 when she entered."],
   "Gatineau": ["Canada's most visited museum — the Canadian Museum of History — has sat in Gatineau since 1989, across the river from Ottawa, yet most people assume it's in the capital. It's quietly misattributed every year."],
@@ -1181,7 +1235,7 @@ const cityFacts = {
   "Madison": ["Madison is built on an isthmus between two lakes — Mendota and Monona. The University of Wisconsin sits on Lake Mendota's shore, and the state capital sits on the other end. The entire city is a narrow strip between water."],
   "Cheyenne": ["Cheyenne became a city almost overnight when the Union Pacific Railroad arrived in 1867. Within months it had thousands of gamblers, cowboys, and outlaws and was nicknamed 'the Magic City of the Plains.'"],
   // ── USA: Non-capital largest cities ──
-  "Birmingham": ["In 1963, police violence against civil rights protesters in Birmingham was broadcast live on national television. The footage shocked the world and directly accelerated passage of the Civil Rights Act. Its streets changed history."],
+  "Birmingham (AL)": ["In 1963, police violence against civil rights protesters in Birmingham was broadcast live on national television. The footage shocked the world and directly accelerated passage of the Civil Rights Act. Its streets changed history."],
   "Anchorage": ["Anchorage is home to 40% of Alaska's entire population — one of the most disproportionate concentrations of any U.S. state. Moose regularly wander through its streets and school grounds year-round."],
   "Los Angeles": ["Hollywood — the world's most influential entertainment industry — is based in Los Angeles. The city also has the third-largest urban economy on Earth and more Fortune 500 HQs than any U.S. city except New York."],
   "Bridgeport": ["P.T. Barnum — who gave the world the circus ring — served as Bridgeport's mayor in 1875. The showman who ran the world's greatest spectacle spent years trying to transform Bridgeport into a model industrial city."],
@@ -1235,6 +1289,50 @@ const cityFacts = {
   "Zhengzhou": ["Zhengzhou has been a major city for over 3,600 years — ruins of a Shang Dynasty capital lie within its modern boundaries, making it one of the longest-settled cities in East Asia."],
   "Foshan":    ["Ip Man — the Wing Chun grandmaster who trained Bruce Lee — was born in Foshan in 1893. His life has been retold in more biographical films than any other martial artist in Chinese history."],
   "Dongguan":  ["Dongguan was an obscure farming town in 1980. Today its factories produce a greater value of export goods than most entire countries — a transformation achieved in just four decades."],
+
+  // ── British Isles ──
+  "London":         ["Charlie Chaplin was born in south London in 1889. At a Chaplin lookalike contest in Monte Carlo, he entered under his own name and reportedly came in third."],
+  "Manchester":     ["Friedrich Engels managed his family's Manchester cotton mill while co-writing The Communist Manifesto. The exploitation he witnessed in the mills and slums directly fueled Marx's theories."],
+  "Edinburgh":      ["Arthur Conan Doyle was born in Edinburgh in 1859. He based Sherlock Holmes on his professor Joseph Bell, whose uncanny deductive observations were the model for every Holmes scene."],
+  "Liverpool":      ["John Lennon was born in Liverpool during a German air raid in 1940. His mother Julia taught him his first guitar chords; she was killed by a car when he was 17."],
+  "Dublin":         ["Oscar Wilde was born in Dublin in 1854. His mother — a celebrated Irish nationalist poet — dressed him as a girl in childhood. He later said it prepared him perfectly for performance."],
+  "Birmingham":     ["J.R.R. Tolkien grew up in Birmingham, where the suburb of Sarehole inspired the Shire. He said Birmingham's countryside directly shaped Middle-earth's rural landscape."],
+  "Glasgow":        ["Charles Rennie Mackintosh, born in Glasgow in 1868, created an Art Nouveau style so distinctive it still defines the city's visual identity more than 100 years after his death."],
+  "Bristol":        ["Cary Grant was born Archibald Leach in Bristol in 1904. He reinvented himself so completely that when asked about his age, the reply came: 'Old Cary Grant fine. How you?'"],
+  "Cardiff":        ["Roald Dahl was born in Cardiff in 1916 to Norwegian parents. His darkly comic children's stories were dismissed by publishers for years before eventually selling 250 million copies."],
+  "Belfast":        ["C.S. Lewis was born in Belfast in 1898. He later said the rain-soaked hills of County Down, visible from his childhood home, became the hills of Narnia in his imagination."],
+  "Leeds":          ["Marks & Spencer began as a penny bazaar stall in Leeds' Kirkgate Market in 1884. Michael Marks — a penniless Polish immigrant — built it into Britain's most iconic retailer."],
+  "Sheffield":      ["Sheffield's Harry Brearley invented stainless steel in 1913 while trying to make better gun barrels. He noticed the discovery when discarded samples refused to rust in a pile of scrap."],
+  "Bradford":       ["David Hockney was born in Bradford in 1937. He became one of the most influential British artists of the 20th century, best known for his luminous California swimming pool paintings."],
+  "Coventry":       ["Frank Whittle, born in Coventry in 1907, invented the jet engine. The Air Ministry dismissed him as a crank and declined to fund his work — so he patented it privately."],
+  "Leicester":      ["Richard III's skeleton was found under a Leicester car park in 2012, 527 years after his death. DNA confirmed the identification, overturning centuries of assumptions about his burial."],
+  "Nottingham":     ["Paul Smith, born in Nottingham in 1946, opened his first shop with £600 and kept it open just 3 hours a week while learning to sew. He built it into a global fashion empire."],
+  "Hull":           ["William Wilberforce was born in Hull in 1759. He spent 20 years in Parliament fighting to abolish the slave trade. Slavery was abolished in British colonies three days before he died."],
+  "Wolverhampton":  ["Wolverhampton Wanderers were among the twelve founding clubs of the Football League in 1888 — one of the oldest professional football structures on Earth. Several founding clubs no longer exist."],
+  "Plymouth":       ["Francis Drake was vice admiral of the fleet that defeated the Spanish Armada in 1588. He reportedly finished a game of bowls on Plymouth Hoe before sailing — England's defining image of cool nerve."],
+  "Stoke-on-Trent": ["Reginald Mitchell, born near Stoke in 1895, designed the Spitfire — the fighter that helped win the Battle of Britain. He died of cancer in 1937 and never saw it fly in combat."],
+
+  // ── Australia & NZ ──
+  "Sydney":         ["The Sydney Opera House was designed by Danish architect Jørn Utzon, who resigned mid-construction after a dispute and never returned to see the building he had dreamed into existence."],
+  "Melbourne":      ["Kylie Minogue was born in Melbourne in 1968. Rejected by a record label at 16, she released her first single at 19 — it went to number one. She became Australia's most successful musical export."],
+  "Auckland":       ["Sir Edmund Hillary was born in Auckland in 1919. On May 29, 1953, he and Tenzing Norgay became the first people confirmed to have reached the summit of Mount Everest."],
+  "Brisbane":       ["During WWII, MacArthur drew the secret 'Brisbane Line' — a plan to abandon all of Australia north of Brisbane to Japanese invasion and defend only the southeast corner."],
+  "Perth":          ["Perth is the most isolated major city on Earth. The nearest comparable city, Adelaide, is 2,700km away — farther than London to Cairo. Most Australians have never visited."],
+  "Adelaide":       ["Adelaide is the only Australian capital city founded entirely by free settlers — no convicts. The colony was designed as a utopian experiment: land sales would fund the settlement."],
+  "Wellington":     ["Peter Jackson was born near Wellington in 1961. He filmed The Lord of the Rings entirely in New Zealand — a production so large it employed roughly 1% of the country's workforce."],
+  "Christchurch":   ["A 6.3-magnitude earthquake struck Christchurch in February 2011, killing 185 people and collapsing the city's Gothic cathedral. The rebuild took over a decade and remains unfinished."],
+  "Gold Coast":     ["The Gold Coast has more canal waterways than Venice. Developed from swamp and mangrove in the 1950s, it now has over 260km of navigable canals threading through its suburbs."],
+  "Canberra":       ["Canberra was purpose-built after Sydney and Melbourne could not agree which deserved to be Australia's capital. The compromise site — equidistant between them — was chosen in 1908."],
+  "Newcastle":      ["Australia's oldest coal mine opened in Newcastle in 1804, worked by convicts. Escaping into the surrounding bush was considered punishment enough — the landscape itself was the prison."],
+  "Wollongong":     ["Wollongong's Port Kembla steel mill has produced roughly half of Australia's steel since 1928. Japanese submarines shelled the nearby coast in 1942, one of the few attacks on mainland Australia."],
+  "Geelong":        ["Ford's Australian manufacturing plant in Geelong produced the iconic Ford Falcon for decades. When it closed in 2016, it marked the effective end of all car manufacturing in Australia."],
+  "Hobart":         ["Hobart is the world's primary departure point for Antarctic expeditions. More ships leave for Antarctica from Hobart than from any other port — it is the last city before the ice."],
+  "Hamilton (NZ)":  ["Hamilton is built on the Waikato — New Zealand's longest river. The valley was the site of the Land Wars' most intense fighting in the 1860s, the defining conflict of modern New Zealand."],
+  "Townsville":     ["Townsville served as a major Allied base during WWII and was repeatedly bombed by Japan. At its peak, more soldiers passed through than the city's entire peacetime population."],
+  "Tauranga":       ["Tauranga is New Zealand's fastest-growing city and home to its busiest cargo port by volume. The port handles roughly 20% of all New Zealand exports through a single harbor terminal."],
+  "Cairns":         ["The Great Barrier Reef begins 30 minutes by boat from Cairns. More tourists visit this reef system annually than visit the entire continent of Antarctica in a decade."],
+  "Darwin":         ["Japan dropped more bombs on Darwin on February 19, 1942 than fell on Pearl Harbor. The attack killed over 230 people — and was covered up by the Australian government for months."],
+  "Dunedin":        ["Dunedin's Baldwin Street is one of the world's steepest residential roads at a 35-degree gradient. Locals celebrate with an annual event rolling 30,000 candy-coated chocolates down it."],
 
 }
 
@@ -1589,7 +1687,7 @@ function updateModeNav() {
 }
 
 // ── Country selection ──
-const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳' };
+const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳', british_isles: '🇬🇧', oceania: '🇦🇺' };
 
 function startCountry(country) {
   currentCountry = country;

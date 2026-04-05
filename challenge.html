@@ -406,12 +406,12 @@ const allCities = {
     { name: "Mississauga", lat: 43.5890,  lng:  -79.6441 },
     { name: "Vancouver",   lat: 49.2827,  lng: -123.1207 },
     { name: "Brampton",    lat: 43.7315,  lng:  -79.7624 },
-    { name: "Hamilton",    lat: 43.2557,  lng:  -79.8711 },
+    { name: "Hamilton (ON)", lat: 43.2557,  lng:  -79.8711 },
     { name: "Surrey",      lat: 49.1913,  lng: -122.8490 },
     { name: "Québec City", lat: 46.8139,  lng:  -71.2080 },
     { name: "Laval",       lat: 45.5662,  lng:  -73.6952 },
     { name: "Halifax",     lat: 44.6488,  lng:  -63.5752 },
-    { name: "London",      lat: 42.9849,  lng:  -81.2453 },
+    { name: "London (ON)", lat: 42.9849,  lng:  -81.2453 },
     { name: "Markham",     lat: 43.8561,  lng:  -79.3370 },
     { name: "Vaughan",     lat: 43.8361,  lng:  -79.4985 },
     { name: "Gatineau",    lat: 45.4765,  lng:  -75.7013 },
@@ -491,7 +491,7 @@ const allCities = {
     { name: "Charleston",    lat: 38.3498,  lng:  -81.6326, capital: true, state: "West Virginia" },
     { name: "Madison",       lat: 43.0731,  lng:  -89.4012, capital: true, state: "Wisconsin" },
     { name: "Cheyenne",      lat: 41.1400,  lng: -104.8202, capital: true, state: "Wyoming" },
-    { name: "Birmingham",    lat: 33.5186,  lng:  -86.8104, state: "Alabama" },
+    { name: "Birmingham (AL)", lat: 33.5186, lng:  -86.8104, state: "Alabama" },
     { name: "Anchorage",     lat: 61.2181,  lng: -149.9003, state: "Alaska" },
     { name: "Los Angeles",   lat: 34.0522,  lng: -118.2437, state: "California" },
     { name: "Bridgeport",    lat: 41.1865,  lng:  -73.1952, state: "Connecticut" },
@@ -545,6 +545,50 @@ const allCities = {
     { name: "Zhengzhou", lat: 34.7466, lng: 113.6253 },
     { name: "Foshan",    lat: 23.0219, lng: 113.1215 },
     { name: "Dongguan",  lat: 23.0207, lng: 113.7518 },
+  ],
+  british_isles: [
+    { name: "London",          lat: 51.5074,  lng:  -0.1278 },
+    { name: "Manchester",      lat: 53.4808,  lng:  -2.2426 },
+    { name: "Edinburgh",       lat: 55.9533,  lng:  -3.1883 },
+    { name: "Liverpool",       lat: 53.4084,  lng:  -2.9916 },
+    { name: "Dublin",          lat: 53.3498,  lng:  -6.2603 },
+    { name: "Birmingham",      lat: 52.4862,  lng:  -1.8904 },
+    { name: "Glasgow",         lat: 55.8642,  lng:  -4.2518 },
+    { name: "Bristol",         lat: 51.4545,  lng:  -2.5879 },
+    { name: "Cardiff",         lat: 51.4816,  lng:  -3.1791 },
+    { name: "Belfast",         lat: 54.5973,  lng:  -5.9301 },
+    { name: "Leeds",           lat: 53.8008,  lng:  -1.5491 },
+    { name: "Sheffield",       lat: 53.3811,  lng:  -1.4701 },
+    { name: "Bradford",        lat: 53.7960,  lng:  -1.7594 },
+    { name: "Coventry",        lat: 52.4068,  lng:  -1.5197 },
+    { name: "Leicester",       lat: 52.6369,  lng:  -1.1398 },
+    { name: "Nottingham",      lat: 52.9548,  lng:  -1.1581 },
+    { name: "Hull",            lat: 53.7676,  lng:  -0.3274 },
+    { name: "Wolverhampton",   lat: 52.5862,  lng:  -2.1285 },
+    { name: "Plymouth",        lat: 50.3755,  lng:  -4.1427 },
+    { name: "Stoke-on-Trent",  lat: 53.0027,  lng:  -2.1794 },
+  ],
+  oceania: [
+    { name: "Sydney",          lat: -33.8688, lng:  151.2093 },
+    { name: "Melbourne",       lat: -37.8136, lng:  144.9631 },
+    { name: "Auckland",        lat: -36.8509, lng:  174.7645 },
+    { name: "Brisbane",        lat: -27.4698, lng:  153.0251 },
+    { name: "Perth",           lat: -31.9505, lng:  115.8605 },
+    { name: "Adelaide",        lat: -34.9285, lng:  138.6007 },
+    { name: "Wellington",      lat: -41.2866, lng:  174.7756 },
+    { name: "Christchurch",    lat: -43.5321, lng:  172.6362 },
+    { name: "Gold Coast",      lat: -28.0167, lng:  153.4000 },
+    { name: "Canberra",        lat: -35.2809, lng:  149.1300 },
+    { name: "Newcastle",       lat: -32.9283, lng:  151.7817 },
+    { name: "Wollongong",      lat: -34.4278, lng:  150.8931 },
+    { name: "Geelong",         lat: -38.1499, lng:  144.3617 },
+    { name: "Hobart",          lat: -42.8821, lng:  147.3272 },
+    { name: "Hamilton (NZ)",   lat: -37.7870, lng:  175.2793 },
+    { name: "Townsville",      lat: -19.2590, lng:  146.8169 },
+    { name: "Tauranga",        lat: -37.6878, lng:  176.1651 },
+    { name: "Cairns",          lat: -16.9186, lng:  145.7781 },
+    { name: "Darwin",          lat: -12.4634, lng:  130.8456 },
+    { name: "Dunedin",         lat: -45.8788, lng:  170.5028 },
   ],
 };
 
@@ -612,11 +656,12 @@ function getDailyEasternSeed() {
 const countryLabels = {
   france: 'France', germany: 'Germany', russia: 'Russia',
   japan: 'Japan', canada: 'Canada', india: 'India', usa: 'USA', china: 'China',
+  british_isles: 'British Isles', oceania: 'Australia & NZ',
 };
 
 function buildTieredPools() {
   const pools = { easyUSA: [], easyWorld: [], medium: [], hard: [], veryHard: [] };
-  ['france','germany','russia','japan','canada','india','china'].forEach(country => {
+  ['france','germany','russia','japan','canada','india','china','british_isles','oceania'].forEach(country => {
     allCities[country].forEach((city, idx) => {
       const tier = idx < 5 ? 'easyWorld' : idx < 10 ? 'medium' : idx < 15 ? 'hard' : 'veryHard';
       pools[tier].push({ name: city.name, country: countryLabels[country], lat: city.lat, lng: city.lng });
