@@ -793,8 +793,7 @@ function showPendingGuess(lat, lng) {
   quizPendingMarker = L.circleMarker([lat, lng], {
     radius: 10, color: '#fff', fillColor: '#60b4ff', fillOpacity: 0.85, weight: 2.5
   }).addTo(map);
-  document.getElementById('confirm-banner').style.display   = 'block';
-  document.getElementById('feedback-overlay').style.display = 'block';
+  document.getElementById('confirm-banner').style.display = 'block';
 }
 
 function handleQuizClick(guessLat, guessLng) {
@@ -827,7 +826,7 @@ function handleQuizClick(guessLat, guessLng) {
   const distDisplay = dist < 10 ? dist.toFixed(1) : Math.round(dist);
   const grade = distGrade(dist);
   const banner = document.getElementById('feedback-banner');
-  banner.className = '';
+  banner.className = 'inspect-mode';
   document.getElementById('feedback-result').textContent = city.state
     ? `${city.name}, ${city.state}, ${city.country}`
     : `${city.name}, ${city.country}`;
@@ -836,7 +835,6 @@ function handleQuizClick(guessLat, guessLng) {
   gradeEl.className   = grade.cls;
   document.getElementById('feedback-detail').textContent = `${distDisplay} miles off`;
   banner.style.display  = 'block';
-  document.getElementById('feedback-overlay').style.display = 'block';
 }
 
 function showEndScreen() {
@@ -867,10 +865,7 @@ document.getElementById('next-btn').addEventListener('click', () => {
   else showQuizQuestion();
 });
 
-document.getElementById('inspect-btn').addEventListener('click', () => {
-  document.getElementById('feedback-overlay').style.display = 'none';
-  document.getElementById('feedback-banner').classList.add('inspect-mode');
-});
+// inspect-btn removed — feedback always starts in inspect-mode
 
 document.getElementById('confirm-yes-btn').addEventListener('click', () => {
   if (!quizPendingCoords) return;
