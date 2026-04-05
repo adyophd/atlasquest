@@ -835,18 +835,21 @@ function handleQuizClick(guessLat, guessLng) {
   {
     const pA = map.latLngToContainerPoint([guessLat, guessLng]);
     const pB = map.latLngToContainerPoint([city.lat, city.lng]);
+    const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
     const dx = pB.x - pA.x, dy = pB.y - pA.y;
     const len = Math.sqrt(dx * dx + dy * dy);
-    const DODGE = 38;
+    const DODGE = 42;
     let ox = len > 0 ? (-dy / len) * DODGE : DODGE;
     let oy = len > 0 ? (dx / len) * DODGE : 0;
     if (oy > 0) { ox = -ox; oy = -oy; }  // prefer dodging above the line
+    const dodgedLatLng = map.containerPointToLatLng(L.point(mx + ox, my + oy));
     const distText = dist < 10 ? dist.toFixed(1) : Math.round(dist);
-    quizDistLabel = L.marker([(guessLat + city.lat) / 2, (guessLng + city.lng) / 2], {
+    quizDistLabel = L.marker(dodgedLatLng, {
       icon: L.divIcon({
         className: 'quiz-dist-label',
-        html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;transform:translate(calc(-50% + ${ox.toFixed(1)}px),calc(-50% + ${oy.toFixed(1)}px));pointer-events:none;">Distance:<br>${distText} mi</div>`,
-        iconSize: [0, 0], iconAnchor: [0, 0],
+        html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;">Distance:<br>${distText} mi</div>`,
+        iconSize: null,
+        iconAnchor: [39, 20],
       })
     }).addTo(map);
   }
