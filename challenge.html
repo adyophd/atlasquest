@@ -755,6 +755,7 @@ let quizAnswerMarker   = null;
 let quizLine           = null;
 let quizPendingMarker  = null;
 let quizDistLabel      = null;
+let distLabelHandler   = null;
 let quizPendingCoords  = null;
 
 function clearPending() {
@@ -769,6 +770,7 @@ function clearQuizOverlays() {
   if (quizGuessMarker)  { map.removeLayer(quizGuessMarker);  quizGuessMarker  = null; }
   if (quizAnswerMarker) { map.removeLayer(quizAnswerMarker); quizAnswerMarker = null; }
   if (quizLine)         { map.removeLayer(quizLine);         quizLine         = null; }
+  if (distLabelHandler) { map.off('moveend', distLabelHandler); distLabelHandler = null; }
   if (quizDistLabel)    { map.removeLayer(quizDistLabel);    quizDistLabel    = null; }
 }
 
@@ -831,36 +833,36 @@ function handleQuizClick(guessLat, guessLng) {
     iconSize: [28, 28], iconAnchor: [14, 14],
   }) }).addTo(map);
 
-  // Distance label at midpoint, dodged perpendicular to the line
-  {
-    const pA = map.latLngToContainerPoint([guessLat, guessLng]);
-    const pB = map.latLngToContainerPoint([city.lat, city.lng]);
-    const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
-    const dx = pB.x - pA.x, dy = pB.y - pA.y;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    const DODGE = 42;
-    let ox = len > 0 ? (-dy / len) * DODGE : DODGE;
-    let oy = len > 0 ? (dx / len) * DODGE : 0;
-    if (oy > 0) { ox = -ox; oy = -oy; }  // prefer dodging above the line
-    const dodgedLatLng = map.containerPointToLatLng(L.point(mx + ox, my + oy));
-    const distText = dist < 10 ? dist.toFixed(1) : Math.round(dist);
-    quizDistLabel = L.marker(dodgedLatLng, {
-      icon: L.divIcon({
-        className: 'quiz-dist-label',
-        html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;">Distance:<br>${distText} mi</div>`,
-        iconSize: null,
-        iconAnchor: [39, 20],
-      })
-    }).addTo(map);
-  }
-
-  // Zoom to frame both points
+  // Zoom to frame both points; place distance label after animation settles
+  const distText = dist < 10 ? dist.toFixed(1) : Math.round(dist);
   requestAnimationFrame(() => {
     const revealContainer = map.getContainer();
     map.flyToBounds(
       L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
       { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
     );
+    distLabelHandler = () => {
+      distLabelHandler = null;
+      const pA = map.latLngToContainerPoint([guessLat, guessLng]);
+      const pB = map.latLngToContainerPoint([city.lat, city.lng]);
+      const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
+      const dx = pB.x - pA.x, dy = pB.y - pA.y;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const DODGE = 42;
+      let ox = len > 0 ? (-dy / len) * DODGE : DODGE;
+      let oy = len > 0 ? (dx / len) * DODGE : 0;
+      if (oy > 0) { ox = -ox; oy = -oy; }
+      const dodgedLatLng = map.containerPointToLatLng(L.point(mx + ox, my + oy));
+      quizDistLabel = L.marker(dodgedLatLng, {
+        icon: L.divIcon({
+          className: 'quiz-dist-label',
+          html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;">Distance:<br>${distText} mi</div>`,
+          iconSize: null,
+          iconAnchor: [39, 20],
+        })
+      }).addTo(map);
+    };
+    map.once('moveend', distLabelHandler);
   });
 
   const distDisplay = dist < 10 ? dist.toFixed(1) : Math.round(dist);
