@@ -1383,7 +1383,6 @@ let quizGuessMarker    = null;
 let quizAnswerMarker   = null;
 let quizLine           = null;
 let quizPendingMarker  = null;
-let revealGuessHandler = null;
 let quizPendingCoords = null;
 
 function shuffle(arr) {
@@ -1404,7 +1403,6 @@ function clearPending() {
 
 function clearQuizOverlays() {
   clearPending();
-  if (revealGuessHandler) { map.off('moveend', revealGuessHandler); revealGuessHandler = null; }
   if (quizGuessMarker)  { map.removeLayer(quizGuessMarker);  quizGuessMarker  = null; }
   if (quizAnswerMarker) { map.removeLayer(quizAnswerMarker); quizAnswerMarker = null; }
   if (quizLine)         { map.removeLayer(quizLine);         quizLine         = null; }
@@ -1491,23 +1489,20 @@ function handleQuizClick(guessLat, guessLng) {
     color: '#aaa', weight: 1.5, dashArray: '6,5', opacity: 0.6
   }).addTo(map);
 
-  // Zoom to frame both points; add guess dot only after animation ends to avoid resize artifact
+  // Guess location — red dot, same size as the answer star
+  quizGuessMarker = L.marker([guessLat, guessLng], { icon: L.divIcon({
+    className: '',
+    html: '<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,107,107,0.85);border:2px solid #ff6b6b;box-sizing:border-box;"></div>',
+    iconSize: [28, 28], iconAnchor: [14, 14],
+  }) }).addTo(map);
+
+  // Zoom to frame both points
   requestAnimationFrame(() => {
     const revealContainer = map.getContainer();
     map.flyToBounds(
       L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
       { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
     );
-    if (revealGuessHandler) map.off('moveend', revealGuessHandler);
-    revealGuessHandler = () => {
-      revealGuessHandler = null;
-      quizGuessMarker = L.marker([guessLat, guessLng], { icon: L.divIcon({
-        className: '',
-        html: '<div style="width:16px;height:16px;border-radius:50%;background:rgba(255,107,107,0.85);border:2px solid #ff6b6b;box-sizing:border-box;"></div>',
-        iconSize: [16, 16], iconAnchor: [8, 8],
-      }) }).addTo(map);
-    };
-    map.once('moveend', revealGuessHandler);
   });
 
   // Update running average
