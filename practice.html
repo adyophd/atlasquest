@@ -359,59 +359,45 @@
       z-index: 20000;
       background: #1a1a2e;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 16px;
+      gap: 4px;
     }
     #brand-title {
-      font-size: 2.4rem;
+      font-size: 2rem;
       font-weight: 800;
       letter-spacing: 6px;
       color: #f5c842;
-      margin-bottom: 4px;
-      text-align: center;
-    }
-    #selector-title {
-      font-size: 2rem;
-      letter-spacing: 4px;
-      color: #f5c842;
-      margin-bottom: 8px;
       text-align: center;
     }
     #selector-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       letter-spacing: 3px;
       color: #555;
-      margin-bottom: 50px;
+      margin-bottom: 8px;
       text-align: center;
       text-transform: uppercase;
     }
-    #flag-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      justify-content: center;
-      max-width: 560px;
-      margin: 0 auto;
+    #globe-canvas {
+      display: block;
+      border-radius: 50%;
+      cursor: grab;
+      touch-action: none;
     }
-    .flag-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1.5px solid #333;
-      border-radius: 16px;
-      padding: 30px 44px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    #globe-canvas:active { cursor: grabbing; }
+    #globe-label {
+      height: 28px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #f5c842;
+      text-align: center;
+      text-transform: uppercase;
+      margin-top: 10px;
+      transition: opacity 0.15s;
     }
-    .flag-btn:hover {
-      border-color: #f5c842;
-      background: rgba(245,200,66,0.07);
-      transform: translateY(-4px);
-    }
-    .flag-emoji { font-size: 4.5rem; line-height: 1; }
-    .flag-name  { font-size: 0.85rem; letter-spacing: 2px; color: #bbb; font-weight: 600; text-transform: uppercase; }
     #title { cursor: pointer; }
     #title:hover { color: #bbb; }
 
@@ -486,12 +472,8 @@
       #mode-nav { width: 100%; }
       .mode-nav-btn { flex: 1; padding: 12px 6px; font-size: 0.82rem; }
 
-      #selector-title { font-size: 1.4rem; letter-spacing: 2px; }
-      #selector-subtitle { margin-bottom: 36px; }
-      #flag-buttons { gap: 16px; }
-      .flag-btn { padding: 20px 24px; }
-      .flag-emoji { font-size: 3.5rem; }
-      .flag-btn:hover { transform: none; } /* disable stuck-hover on iOS */
+      #brand-title { font-size: 1.5rem; letter-spacing: 3px; }
+      #selector-subtitle { margin-bottom: 4px; }
 
       .star-wrap { font-size: 30px; } /* larger touch target */
 
@@ -590,52 +572,10 @@
 
 <!-- Country selector -->
 <div id="country-selector">
-  <div>
-    <div id="brand-title">AtlasQuest</div>
-    <div id="selector-subtitle">Choose a country to learn</div>
-    <div id="flag-buttons">
-      <button class="flag-btn" data-country="france">
-        <span class="flag-emoji">🇫🇷</span>
-        <span class="flag-name">France</span>
-      </button>
-      <button class="flag-btn" data-country="germany">
-        <span class="flag-emoji">🇩🇪</span>
-        <span class="flag-name">Germany</span>
-      </button>
-      <button class="flag-btn" data-country="russia">
-        <span class="flag-emoji">🇷🇺</span>
-        <span class="flag-name">Russia</span>
-      </button>
-      <button class="flag-btn" data-country="japan">
-        <span class="flag-emoji">🇯🇵</span>
-        <span class="flag-name">Japan</span>
-      </button>
-      <button class="flag-btn" data-country="canada">
-        <span class="flag-emoji">🇨🇦</span>
-        <span class="flag-name">Canada</span>
-      </button>
-      <button class="flag-btn" data-country="india">
-        <span class="flag-emoji">🇮🇳</span>
-        <span class="flag-name">India</span>
-      </button>
-      <button class="flag-btn" data-country="usa">
-        <span class="flag-emoji">🇺🇸</span>
-        <span class="flag-name">USA</span>
-      </button>
-      <button class="flag-btn" data-country="china">
-        <span class="flag-emoji">🇨🇳</span>
-        <span class="flag-name">China</span>
-      </button>
-      <button class="flag-btn" data-country="british_isles">
-        <span class="flag-emoji">🇬🇧</span>
-        <span class="flag-name">British Isles</span>
-      </button>
-      <button class="flag-btn" data-country="oceania">
-        <span class="flag-emoji">🇦🇺</span>
-        <span class="flag-name">Australia & NZ</span>
-      </button>
-    </div>
-  </div>
+  <div id="brand-title">AtlasQuest</div>
+  <div id="selector-subtitle">Choose a country to practice</div>
+  <canvas id="globe-canvas"></canvas>
+  <div id="globe-label"></div>
 </div>
 
 <!-- Difficulty selector -->
@@ -741,6 +681,8 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── City data ──
@@ -1546,12 +1488,15 @@ function handleQuizClick(guessLat, guessLng) {
     color: '#aaa', weight: 1.5, dashArray: '6,5', opacity: 0.6
   }).addTo(map);
 
-  // Zoom to show both markers in the central two-thirds of the view
-  const revealContainer = map.getContainer();
-  map.flyToBounds(
-    L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
-    { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
-  );
+  // Zoom to show both markers in the central two-thirds of the view.
+  // requestAnimationFrame ensures markers are painted before the animation begins.
+  requestAnimationFrame(() => {
+    const revealContainer = map.getContainer();
+    map.flyToBounds(
+      L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
+      { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
+    );
+  });
 
   // Update running average
   const avg = quizTotalDist / (quizIndex + 1);
@@ -1785,12 +1730,191 @@ function returnToSelector() {
   document.getElementById('mode-nav').style.display            = 'none';
   document.getElementById('difficulty-selector').style.display = 'none';
   document.getElementById('country-selector').style.display    = 'flex';
+  window._globeReset && window._globeReset();
 }
 
+// ── Globe ──
+(function initGlobe() {
+  const canvas  = document.getElementById('globe-canvas');
+  const ctx     = canvas.getContext('2d');
+  const label   = document.getElementById('globe-label');
+
+  const ISO_TO_KEY = {
+    250: 'france', 276: 'germany', 643: 'russia', 392: 'japan',
+    124: 'canada', 356: 'india',  840: 'usa',    156: 'china',
+    826: 'british_isles', 372: 'british_isles',
+     36: 'oceania',       554: 'oceania'
+  };
+  const KEY_LABELS = {
+    france: 'France', germany: 'Germany', russia: 'Russia', japan: 'Japan',
+    canada: 'Canada', india: 'India', usa: 'United States', china: 'China',
+    british_isles: 'British Isles', oceania: 'Australia & NZ'
+  };
+
+  let worldData = null, selectableFeatures = [], allFeatures = [];
+  let rotation = [-12, -48, 0]; // Europe-centered
+  let dragging = false, dragStart = null, rotStart = null;
+  let lastInteract = -Infinity;
+  let hoveredKey = null, clickedKey = null;
+  let projection, path;
+
+  function globeSize() {
+    return Math.min(window.innerWidth * 0.88, window.innerHeight * 0.62, 520);
+  }
+
+  function resize() {
+    const s = globeSize();
+    canvas.width = canvas.height = s;
+    canvas.style.width = canvas.style.height = s + 'px';
+    if (projection) {
+      projection.scale(s / 2.1).translate([s / 2, s / 2]);
+      path = d3.geoPath(projection, ctx);
+    }
+  }
+
+  function setupProjection() {
+    const s = canvas.width;
+    projection = d3.geoOrthographic()
+      .scale(s / 2.1)
+      .translate([s / 2, s / 2])
+      .clipAngle(90)
+      .rotate(rotation);
+    path = d3.geoPath(projection, ctx);
+  }
+
+  function draw() {
+    if (!projection || !worldData) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Ocean
+    ctx.beginPath(); path({type: 'Sphere'});
+    ctx.fillStyle = '#0d1b3e'; ctx.fill();
+
+    // Countries
+    for (const {feature, key} of allFeatures) {
+      ctx.beginPath(); path(feature);
+      if (key && key === hoveredKey) ctx.fillStyle = '#ffffff';
+      else if (key)                  ctx.fillStyle = '#f5c842';
+      else                           ctx.fillStyle = '#243558';
+      ctx.fill();
+    }
+
+    // Borders
+    ctx.beginPath();
+    path(topojson.mesh(worldData, worldData.objects.countries, (a, b) => a !== b));
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+    // Sphere ring
+    ctx.beginPath(); path({type: 'Sphere'});
+    ctx.strokeStyle = '#1a3060'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+
+  function findAt(x, y) {
+    const coords = projection.invert([x, y]);
+    if (!coords || isNaN(coords[0])) return null;
+    for (const {feature, key} of selectableFeatures) {
+      if (d3.geoContains(feature, coords)) return key;
+    }
+    return null;
+  }
+
+  function canvasCoords(clientX, clientY) {
+    const r = canvas.getBoundingClientRect();
+    const sx = canvas.width / r.width, sy = canvas.height / r.height;
+    return [(clientX - r.left) * sx, (clientY - r.top) * sy];
+  }
+
+  function animate(t) {
+    requestAnimationFrame(animate);
+    const sel = document.getElementById('country-selector');
+    if (!sel || sel.style.display === 'none') return;
+    if (!dragging && t - lastInteract > 2500) {
+      rotation[0] += 0.018;
+      projection && projection.rotate(rotation);
+    }
+    draw();
+  }
+
+  // Mouse
+  canvas.addEventListener('mousemove', e => {
+    const [x, y] = canvasCoords(e.clientX, e.clientY);
+    if (dragging) {
+      const dx = e.clientX - dragStart[0], dy = e.clientY - dragStart[1];
+      rotation = [rotStart[0] + dx * 0.3, Math.max(-90, Math.min(90, rotStart[1] - dy * 0.3)), 0];
+      projection.rotate(rotation);
+      hoveredKey = null; label.textContent = '';
+    } else {
+      hoveredKey = findAt(x, y);
+      canvas.style.cursor = hoveredKey ? 'pointer' : 'grab';
+      label.textContent = hoveredKey ? KEY_LABELS[hoveredKey] : (clickedKey ? KEY_LABELS[clickedKey] : '');
+    }
+  });
+
+  canvas.addEventListener('mousedown', e => {
+    dragging = true; dragStart = [e.clientX, e.clientY]; rotStart = [...rotation];
+    lastInteract = performance.now(); canvas.style.cursor = 'grabbing';
+  });
+
+  canvas.addEventListener('mouseup', e => {
+    const wasDrag = Math.abs(e.clientX - dragStart[0]) > 5 || Math.abs(e.clientY - dragStart[1]) > 5;
+    dragging = false; lastInteract = performance.now(); canvas.style.cursor = 'grab';
+    if (!wasDrag) {
+      const [x, y] = canvasCoords(e.clientX, e.clientY);
+      const key = findAt(x, y);
+      if (key) { clickedKey = key; label.textContent = KEY_LABELS[key]; setTimeout(() => startCountry(key), 160); }
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    if (!dragging) { hoveredKey = null; label.textContent = clickedKey ? KEY_LABELS[clickedKey] : ''; }
+  });
+
+  // Touch
+  let touchOrigin = null, touchRotOrigin = null;
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault(); lastInteract = performance.now();
+    const t = e.touches[0];
+    touchOrigin = [t.clientX, t.clientY]; touchRotOrigin = [...rotation];
+  }, {passive: false});
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault(); lastInteract = performance.now();
+    const t = e.touches[0], dx = t.clientX - touchOrigin[0], dy = t.clientY - touchOrigin[1];
+    rotation = [touchRotOrigin[0] + dx * 0.3, Math.max(-90, Math.min(90, touchRotOrigin[1] - dy * 0.3)), 0];
+    projection.rotate(rotation);
+  }, {passive: false});
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault(); lastInteract = performance.now();
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchOrigin[0], dy = t.clientY - touchOrigin[1];
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+      const [x, y] = canvasCoords(t.clientX, t.clientY);
+      const key = findAt(x, y);
+      if (key) { clickedKey = key; label.textContent = KEY_LABELS[key]; setTimeout(() => startCountry(key), 160); }
+    }
+  }, {passive: false});
+
+  // Reset label when returning to selector
+  window._globeReset = () => { clickedKey = null; hoveredKey = null; label.textContent = ''; };
+
+  window.addEventListener('resize', () => { resize(); if (projection) setupProjection(); });
+
+  // Load world data and start
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+    .then(r => r.json())
+    .then(data => {
+      worldData = data;
+      const features = topojson.feature(data, data.objects.countries).features;
+      allFeatures = features.map(f => ({ feature: f, key: ISO_TO_KEY[+f.id] || null }));
+      selectableFeatures = allFeatures.filter(f => f.key);
+      resize(); setupProjection();
+      requestAnimationFrame(animate);
+    })
+    .catch(() => { label.textContent = 'Failed to load globe'; });
+})();
+
 // ── Event listeners ──
-document.querySelectorAll('.flag-btn').forEach(btn => {
-  btn.addEventListener('click', () => startCountry(btn.dataset.country));
-});
 
 
 document.getElementById('diff-back-btn').addEventListener('click', () => {

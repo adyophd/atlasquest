@@ -823,12 +823,15 @@ function handleQuizClick(guessLat, guessLng) {
     color: '#aaa', weight: 1.5, dashArray: '6,5', opacity: 0.6
   }).addTo(map);
 
-  // Zoom to show both markers in the central two-thirds of the view
-  const revealContainer = map.getContainer();
-  map.flyToBounds(
-    L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
-    { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
-  );
+  // Zoom to show both markers in the central two-thirds of the view.
+  // requestAnimationFrame ensures markers are painted before the animation begins.
+  requestAnimationFrame(() => {
+    const revealContainer = map.getContainer();
+    map.flyToBounds(
+      L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
+      { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
+    );
+  });
 
   const distDisplay = dist < 10 ? dist.toFixed(1) : Math.round(dist);
   const grade = distGrade(dist);
