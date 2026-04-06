@@ -890,10 +890,32 @@ function handleQuizClick(guessLat, guessLng) {
   banner.style.display  = 'block';
 }
 
-function showEndScreen() {
+// ── Daily challenge completion persistence ──
+function getTodayKey() {
+  return 'atlasquest_challenge_' + getDailyEasternSeed();
+}
+function saveChallenge() {
+  localStorage.setItem(getTodayKey(), JSON.stringify({
+    grades:    quizCityGrades,
+    bestCity:  quizBestCity,
+    worstCity: quizWorstCity,
+    totalDist: quizTotalDist,
+    cityCount: challengeCities.length,
+  }));
+}
+function loadTodayResult() {
+  try {
+    const raw = localStorage.getItem(getTodayKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) { return null; }
+}
+
+function showEndScreen(fromStorage = false) {
   document.getElementById('feedback-banner').style.display  = 'none';
   document.getElementById('feedback-overlay').style.display = 'none';
   clearQuizOverlays();
+
+  if (!fromStorage) saveChallenge();
 
   const avg   = quizTotalDist / challengeCities.length;
   const grade = distGrade(avg);
@@ -986,7 +1008,16 @@ map.on('click', function(e) {
 });
 
 // ── Start ──
-showQuizQuestion();
+const _todayResult = loadTodayResult();
+if (_todayResult) {
+  quizCityGrades = _todayResult.grades;
+  quizBestCity   = _todayResult.bestCity;
+  quizWorstCity  = _todayResult.worstCity;
+  quizTotalDist  = _todayResult.totalDist;
+  showEndScreen(true);
+} else {
+  showQuizQuestion();
+}
 </script>
 </body>
 </html>
