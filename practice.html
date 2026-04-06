@@ -1508,36 +1508,42 @@ function handleQuizClick(guessLat, guessLng) {
     iconSize: [28, 28], iconAnchor: [14, 14],
   }) }).addTo(map);
 
-  // Zoom to frame both points; place distance label after animation settles
+  // Place distance label (immediately if top grade, else after zoom settles)
   const distText = dist < 10 ? dist.toFixed(1) : Math.round(dist);
+  const isTopGrade = dist < 80; // A+ or A — no zoom
+  const placeDistLabel = () => {
+    distLabelHandler = null;
+    const pA = map.latLngToContainerPoint([guessLat, normGuessLng]);
+    const pB = map.latLngToContainerPoint([city.lat, city.lng]);
+    const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
+    const dx = pB.x - pA.x, dy = pB.y - pA.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const DODGE = 42;
+    let ox = len > 0 ? (-dy / len) * DODGE : DODGE;
+    let oy = len > 0 ? (dx / len) * DODGE : 0;
+    if (oy > 0) { ox = -ox; oy = -oy; }
+    const dodgedLatLng = map.containerPointToLatLng(L.point(mx + ox, my + oy));
+    quizDistLabel = L.marker(dodgedLatLng, {
+      icon: L.divIcon({
+        className: 'quiz-dist-label',
+        html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;">Distance:<br>${distText} mi</div>`,
+        iconSize: null,
+        iconAnchor: [39, 20],
+      })
+    }).addTo(map);
+  };
   requestAnimationFrame(() => {
-    const revealContainer = map.getContainer();
-    map.flyToBounds(
-      L.latLngBounds([guessLat, normGuessLng], [city.lat, city.lng]),
-      { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
-    );
-    distLabelHandler = () => {
-      distLabelHandler = null;
-      const pA = map.latLngToContainerPoint([guessLat, normGuessLng]);
-      const pB = map.latLngToContainerPoint([city.lat, city.lng]);
-      const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
-      const dx = pB.x - pA.x, dy = pB.y - pA.y;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      const DODGE = 42;
-      let ox = len > 0 ? (-dy / len) * DODGE : DODGE;
-      let oy = len > 0 ? (dx / len) * DODGE : 0;
-      if (oy > 0) { ox = -ox; oy = -oy; }
-      const dodgedLatLng = map.containerPointToLatLng(L.point(mx + ox, my + oy));
-      quizDistLabel = L.marker(dodgedLatLng, {
-        icon: L.divIcon({
-          className: 'quiz-dist-label',
-          html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;">Distance:<br>${distText} mi</div>`,
-          iconSize: null,
-          iconAnchor: [39, 20],
-        })
-      }).addTo(map);
-    };
-    map.once('moveend', distLabelHandler);
+    if (isTopGrade) {
+      placeDistLabel();
+    } else {
+      const revealContainer = map.getContainer();
+      map.flyToBounds(
+        L.latLngBounds([guessLat, normGuessLng], [city.lat, city.lng]),
+        { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
+      );
+      distLabelHandler = placeDistLabel;
+      map.once('moveend', distLabelHandler);
+    }
   });
 
   // Update running average
