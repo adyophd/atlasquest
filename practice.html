@@ -1510,7 +1510,7 @@ function handleQuizClick(guessLat, guessLng) {
 
   // Place distance label (immediately if top grade, else after zoom settles)
   const distText = dist < 10 ? dist.toFixed(1) : Math.round(dist);
-  const isTopGrade = dist < 80; // A+ or A — no zoom
+  const isTopGrade = dist < 40; // A+ only — no zoom
   const placeDistLabel = () => {
     distLabelHandler = null;
     const pA = map.latLngToContainerPoint([guessLat, normGuessLng]);
