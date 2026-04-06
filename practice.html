@@ -719,26 +719,26 @@ const allCities = {
     { name: "Clermont-Ferrand", lat: 45.7772,  lng:  3.0870 },
   ],
   japan: [
-    { name: "Tokyo",       lat: 35.6762,  lng: 139.6503 }, // 1  ~13.9M
-    { name: "Yokohama",    lat: 35.4437,  lng: 139.6380 }, // 2  ~3.7M
-    { name: "Osaka",       lat: 34.6937,  lng: 135.5023 }, // 3  ~2.7M
-    { name: "Nagoya",      lat: 35.1815,  lng: 136.9066 }, // 4  ~2.3M
-    { name: "Sapporo",     lat: 43.0618,  lng: 141.3545 }, // 5  ~2.0M
-    { name: "Fukuoka",     lat: 33.5904,  lng: 130.4017 }, // 6  ~1.6M
-    { name: "Kobe",        lat: 34.6901,  lng: 135.1956 }, // 7  ~1.5M
-    { name: "Kawasaki",    lat: 35.5308,  lng: 139.7030 }, // 8  ~1.5M
-    { name: "Kyoto",       lat: 35.0116,  lng: 135.7681 }, // 9  ~1.5M
-    { name: "Saitama",     lat: 35.8617,  lng: 139.6455 }, // 10 ~1.3M
-    { name: "Hiroshima",   lat: 34.3853,  lng: 132.4553 }, // 11 ~1.2M
-    { name: "Sendai",      lat: 38.2688,  lng: 140.8721 }, // 12 ~1.1M
-    { name: "Chiba",       lat: 35.6073,  lng: 140.1063 }, // 13 ~0.98M
-    { name: "Kitakyushu",  lat: 33.8834,  lng: 130.8751 }, // 14 ~0.93M
-    { name: "Sakai",       lat: 34.5733,  lng: 135.4830 }, // 15 ~0.83M
-    { name: "Niigata",     lat: 37.9161,  lng: 139.0364 }, // 16 ~0.79M
-    { name: "Hamamatsu",   lat: 34.7108,  lng: 137.7261 }, // 17 ~0.79M
-    { name: "Kumamoto",    lat: 32.8031,  lng: 130.7079 }, // 18 ~0.74M
-    { name: "Sagamihara",  lat: 35.5667,  lng: 139.3667 }, // 19 ~0.72M
-    { name: "Shizuoka",    lat: 34.9769,  lng: 138.3831 }, // 20 ~0.70M
+    { name: "Tokyo",      lat: 35.6762,  lng: 139.6503 }, // 1  universal recognition
+    { name: "Hiroshima",  lat: 34.3853,  lng: 132.4553 }, // 2  atomic bomb
+    { name: "Kyoto",      lat: 35.0116,  lng: 135.7681 }, // 3  cultural capital
+    { name: "Nagasaki",   lat: 32.7503,  lng: 129.8779 }, // 4  atomic bomb + isolation port
+    { name: "Osaka",      lat: 34.6937,  lng: 135.5023 }, // 5  second city
+    { name: "Kobe",       lat: 34.6901,  lng: 135.1956 }, // 6  Kobe beef
+    { name: "Sapporo",    lat: 43.0618,  lng: 141.3545 }, // 7  Sapporo beer
+    { name: "Yokohama",   lat: 35.4437,  lng: 139.6380 }, // 8  first modern port
+    { name: "Nara",       lat: 34.6851,  lng: 135.8048 }, // 9  deer, first capital
+    { name: "Nagoya",     lat: 35.1815,  lng: 136.9066 }, // 10 Toyota, Tokugawa
+    { name: "Kamakura",   lat: 35.3197,  lng: 139.5467 }, // 11 Great Buddha, medieval capital
+    { name: "Fukuoka",    lat: 33.5904,  lng: 130.4017 }, // 12 gateway to Asia
+    { name: "Sendai",     lat: 38.2688,  lng: 140.8721 }, // 13 2011 earthquake
+    { name: "Kanazawa",   lat: 36.5613,  lng: 136.6562 }, // 14 Little Kyoto, intact heritage
+    { name: "Nikko",      lat: 36.7198,  lng: 139.6985 }, // 15 Toshogu shrine
+    { name: "Kagoshima",  lat: 31.5966,  lng: 130.5571 }, // 16 last samurai
+    { name: "Hakodate",   lat: 41.7688,  lng: 140.7290 }, // 17 first opened to West
+    { name: "Matsuyama",  lat: 33.8395,  lng: 132.7659 }, // 18 oldest onsen, haiku poet Shiki
+    { name: "Kumamoto",   lat: 32.8031,  lng: 130.7079 }, // 19 Musashi, great castle
+    { name: "Sakai",      lat: 34.5733,  lng: 135.4830 }, // 20 Sen no Rikyu, tea ceremony
   ],
   russia: [
     { name: "Moscow",           lat: 55.7558,  lng:  37.6173 }, // 1  ~12.5M
@@ -1070,25 +1070,25 @@ const cityFacts = {
 
   // ── Japan ──
   "Tokyo": ["Tokyo has more Michelin-starred restaurants than Paris and New York combined. The world's most decorated food city is not in France or the USA — it's Japan, and specifically this one city."],
-  "Yokohama": ["In 1859, Yokohama was a fishing village of under 100 houses. Within a decade it had Japan's first railway, first telegraph, and first racetrack. The transformation from village to city took ten years."],
-  "Osaka": ["Osaka residents greet each other with 'Moukari makka?' — 'Making any money?' — instead of 'How are you?' In a country famous for formality, Osaka's bluntly commercial culture feels like a different nation."],
-  "Nagoya": ["Tokugawa Ieyasu — who unified Japan and founded the dynasty that ruled it for 265 years of deliberate isolation — was born in Nagoya. The man who sealed Japan from the world for two centuries was from here."],
-  "Sapporo": ["Sapporo was designed from scratch in 1869 on a perfect American-style grid — the only major Japanese city built to a street plan. Every other Japanese city grew organically; Sapporo was engineered on blank terrain."],
-  "Fukuoka": ["Kublai Khan launched two massive Mongol invasions of Japan (1274 and 1281), both landing near Fukuoka. Both fleets were destroyed by defenders and typhoons the Japanese called kamikaze — 'divine wind.'"],
-  "Kobe": ["The 1995 Kobe earthquake (M6.9) killed 6,434 people and toppled an elevated highway — photographed lying on its side. The image of the collapsed Hanshin Expressway became the disaster's global icon."],
-  "Kawasaki": ["Kawasaki's Kanamara Matsuri — the Festival of the Steel Phallus — features giant phallic statues paraded through the streets each spring. What began as a Shinto fertility prayer became Japan's most internationally photographed festival."],
-  "Kyoto": ["Kyoto was removed from the atomic bomb target list because US Secretary of War Henry Stimson had visited and fought personally for its preservation — arguing for its removal. Hiroshima was bombed instead."],
-  "Saitama": ["Saitama's Omiya Bonsai Village is the world capital of bonsai — home to 30+ specialist nurseries and Earth's only public bonsai art museum. The ancient art of miniature trees peaks in a Tokyo suburb."],
   "Hiroshima": ["On August 6, 1945, one bomb killed an estimated 70,000–80,000 people instantly, making Hiroshima the first city destroyed by a nuclear weapon. The city was rebuilt and is now larger than before the bombing."],
+  "Kyoto": ["Kyoto was removed from the atomic bomb target list because US Secretary of War Henry Stimson had visited and fought personally for its preservation — arguing for its removal. Hiroshima was bombed instead."],
+  "Nagasaki": ["During Japan's 200-year isolation, Nagasaki was the only port open to foreigners — Dutch traders on a tiny artificial island. All Western ideas that reached Japan passed through this single bottleneck."],
+  "Osaka": ["Osaka residents greet each other with 'Moukari makka?' — 'Making any money?' — instead of 'How are you?' In a country famous for formality, Osaka's bluntly commercial culture feels like a different nation."],
+  "Kobe": ["The 1995 Kobe earthquake (M6.9) killed 6,434 people and toppled an elevated highway — photographed lying on its side. The image of the collapsed Hanshin Expressway became the disaster's global icon."],
+  "Sapporo": ["Sapporo was designed from scratch in 1869 on a perfect American-style grid — the only major Japanese city built to a street plan. Every other Japanese city grew organically; Sapporo was engineered on blank terrain."],
+  "Yokohama": ["In 1859, Yokohama was a fishing village of under 100 houses. Within a decade it had Japan's first railway, first telegraph, and first racetrack. The transformation from village to city took ten years."],
+  "Nara": ["Nara's deer have been sacred since 768 AD — divine messengers who cannot be harmed. They learned to bow at tourists over centuries of contact. The city shares its streets with 1,400 wild deer."],
+  "Nagoya": ["Tokugawa Ieyasu — who unified Japan and founded the dynasty that ruled it for 265 years of deliberate isolation — was born in Nagoya. The man who sealed Japan from the world for two centuries was from here."],
+  "Kamakura": ["Kamakura's Great Buddha has sat outdoors since 1334 — the wooden hall housing it was swept away by a tsunami. For nearly 700 years, Japan's most iconic bronze statue has had no roof."],
+  "Fukuoka": ["Kublai Khan launched two massive Mongol invasions of Japan (1274 and 1281), both landing near Fukuoka. Both fleets were destroyed by defenders and typhoons the Japanese called kamikaze — 'divine wind.'"],
   "Sendai": ["The 2011 Tōhoku earthquake (M9.1) devastated Sendai's coast, killing nearly 16,000 people, and triggered the Fukushima nuclear meltdown 100km south. Sendai became the face of Japan's worst postwar disaster."],
-  "Chiba": ["Tokyo Disneyland is not in Tokyo — it's in Chiba, just across the city border. The park opened in 1983 using the 'Tokyo' brand while sitting on cheaper Chiba land. Millions visit without knowing they've left Tokyo."],
-  "Kitakyushu": ["Kokura — now part of Kitakyushu — was the primary target for the second atomic bomb. Cloud cover hid the city from the bombardier. The plane diverted to its backup: Nagasaki. Kitakyushu was saved by clouds."],
-  "Sakai": ["Sakai is Japan's knife-making capital — its blades have been internationally prized since the 15th century. Professional chefs worldwide order Sakai knives the way musicians order Stradivarius instruments."],
-  "Niigata": ["Niigata has more sake breweries per capita than anywhere else in Japan — a result of its legendary snowfall producing the pure cold meltwater essential for premium sake. Its sake wins national competitions consistently."],
-  "Hamamatsu": ["Both Yamaha and Honda were founded in Hamamatsu — the only city to give birth to two globally iconic brands in music and motorcycles. Soichiro Honda built his first motorcycle in a Hamamatsu workshop."],
+  "Kanazawa": ["Kanazawa was never bombed in WWII — one of the only major Japanese cities left intact. Its samurai districts, geisha quarters, and centuries-old crafts survived the war that destroyed everything else."],
+  "Nikko": ["The 'hear no evil, see no evil, speak no evil' monkeys were carved at Nikko's Toshogu shrine in 1636. The world's most famous icon of a proverb was made in this mountain town."],
+  "Kagoshima": ["Saigo Takamori — the samurai who inspired 'The Last Samurai' — led his final rebellion from Kagoshima in 1877. He was Japan's most beloved general and died fighting the modernization he helped create."],
+  "Hakodate": ["When Commodore Perry forced Japan open in 1854, Hakodate was one of only two ports designated for foreign trade. Japan's 200-year isolation ended partly at this remote northern harbor."],
+  "Matsuyama": ["Masaoka Shiki — the poet who reinvented haiku as a serious literary form — was born in Matsuyama. The modern haiku practiced by millions worldwide was largely rebuilt in this city."],
   "Kumamoto": ["Miyamoto Musashi — Japan's most legendary swordsman, undefeated in over 60 duels — spent his final years in a cave near Kumamoto writing The Book of Five Rings. He completed it days before his death in 1645."],
-  "Sagamihara": ["JAXA's Sagamihara campus controlled the Hayabusa probe — the spacecraft that landed on an asteroid hundreds of millions of kilometers away, collected samples, and successfully returned them to Earth."],
-  "Shizuoka": ["Shizuoka is squeezed between Mt. Fuji to the north and the Pacific to the south — farmers grow wasabi in cold mountain streams and tea on volcanic slopes simultaneously. That combination exists nowhere else on Earth."],
+  "Sakai": ["Sen no Rikyū — the tea master who defined wabi-sabi aesthetics and reshaped Japanese art, architecture, and design — was born in Sakai. Oda Nobunaga later forced him to commit seppuku."],
 
   // ── Canada ──
   "Toronto": ["American forces burned Toronto in 1813, destroying its Parliament Buildings. The British retaliated by burning Washington D.C., including the White House. Toronto's burning triggered one of American history's most famous moments."],
