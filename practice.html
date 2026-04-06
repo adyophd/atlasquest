@@ -1485,6 +1485,11 @@ function handleQuizClick(guessLat, guessLng) {
   const dist = haversineMiles(guessLat, guessLng, city.lat, city.lng);
   quizTotalDist += dist;
 
+  // Normalize to the map copy closest to the city so visuals don't wrap the long way
+  let normGuessLng = guessLng;
+  while (normGuessLng - city.lng > 180) normGuessLng -= 360;
+  while (normGuessLng - city.lng < -180) normGuessLng += 360;
+
   // True location — glowing star with popup
   quizAnswerMarker = L.marker([city.lat, city.lng], { icon: makeIcon('answer', city.name, false) }).addTo(map);
   quizAnswerMarker
@@ -1492,12 +1497,12 @@ function handleQuizClick(guessLat, guessLng) {
     .openPopup();
 
   // Dashed line between guess and true location
-  quizLine = L.polyline([[guessLat, guessLng], [city.lat, city.lng]], {
+  quizLine = L.polyline([[guessLat, normGuessLng], [city.lat, city.lng]], {
     color: '#aaa', weight: 1.5, dashArray: '6,5', opacity: 0.6
   }).addTo(map);
 
   // Guess location — red dot, same size as the answer star
-  quizGuessMarker = L.marker([guessLat, guessLng], { icon: L.divIcon({
+  quizGuessMarker = L.marker([guessLat, normGuessLng], { icon: L.divIcon({
     className: '',
     html: '<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,107,107,0.85);border:2px solid #ff6b6b;box-sizing:border-box;"></div>',
     iconSize: [28, 28], iconAnchor: [14, 14],
@@ -1508,12 +1513,12 @@ function handleQuizClick(guessLat, guessLng) {
   requestAnimationFrame(() => {
     const revealContainer = map.getContainer();
     map.flyToBounds(
-      L.latLngBounds([guessLat, guessLng], [city.lat, city.lng]),
+      L.latLngBounds([guessLat, normGuessLng], [city.lat, city.lng]),
       { padding: [revealContainer.offsetWidth / 6, revealContainer.offsetHeight / 6], maxZoom: 12 }
     );
     distLabelHandler = () => {
       distLabelHandler = null;
-      const pA = map.latLngToContainerPoint([guessLat, guessLng]);
+      const pA = map.latLngToContainerPoint([guessLat, normGuessLng]);
       const pB = map.latLngToContainerPoint([city.lat, city.lng]);
       const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
       const dx = pB.x - pA.x, dy = pB.y - pA.y;
