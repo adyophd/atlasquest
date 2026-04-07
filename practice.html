@@ -1828,11 +1828,11 @@ function getCountryGlobeColor(key) {
       if (idx < bestIdx) bestIdx = idx;
     }
   }
-  if (bestIdx === GRADE_ORDER.length) return '#f5c842'; // no completions — default yellow
+  if (bestIdx === GRADE_ORDER.length) return '#4a6080'; // no completions — muted blue-grey
   const letter = GRADE_ORDER[bestIdx][0];
-  if (letter === 'A') return '#7effa0';
-  if (letter === 'B' || letter === 'C') return '#f5c842';
-  return '#ff6b6b';
+  if (letter === 'A') return '#7effa0';                 // green
+  if (letter === 'B' || letter === 'C') return '#f5c842'; // yellow
+  return '#ff6b6b';                                     // red
 }
 
 function getCountryGlow(key) {
@@ -1842,7 +1842,7 @@ function getCountryGlow(key) {
   for (let i = 0; i < diffs.length; i++) {
     if (results[`${key}_${diffs[i]}`]) highestCompleted = i;
   }
-  const blurs = [8, 16, 24, 32];
+  const blurs = [14, 22, 30, 38];
   return highestCompleted >= 0 ? blurs[highestCompleted] : 0;
 }
 
