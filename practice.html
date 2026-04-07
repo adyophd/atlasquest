@@ -1820,30 +1820,23 @@ function saveBestGrade(country, difficulty, gradeLabel) {
 function getCountryGlobeColor(key) {
   const results = getPracticeResults();
   const diffs = DIFF_ORDER[key] || [];
-  let bestIdx = GRADE_ORDER.length;
-  for (const d of diffs) {
-    const g = results[`${key}_${d}`];
-    if (g) {
-      const idx = GRADE_ORDER.indexOf(g);
-      if (idx < bestIdx) bestIdx = idx;
-    }
+  // Find the highest difficulty tier that has been passed (any recorded result)
+  let highest = -1;
+  for (let i = 0; i < diffs.length; i++) {
+    if (results[`${key}_${diffs[i]}`]) highest = i;
   }
-  if (bestIdx === GRADE_ORDER.length) return '#4a6080'; // no completions — muted blue-grey
-  const letter = GRADE_ORDER[bestIdx][0];
-  if (letter === 'A') return '#7effa0';                 // green
-  if (letter === 'B' || letter === 'C') return '#f5c842'; // yellow
-  return '#ff6b6b';                                     // red
+  if (highest === -1) return '#4a6080';            // nothing completed — muted blue-grey
+  if (highest === diffs.length - 1) return '#07EEB8'; // passed final tier (Very Hard / Capitals Plus) — green
+  const tierColors = ['#DA3EFF', '#0798F3', '#07EEB8']; // Easy→purple, Medium→blue, Hard→green
+  return tierColors[Math.min(highest, tierColors.length - 1)];
 }
 
 function getCountryGlow(key) {
   const results = getPracticeResults();
   const diffs = DIFF_ORDER[key] || [];
-  let highestCompleted = -1;
-  for (let i = 0; i < diffs.length; i++) {
-    if (results[`${key}_${diffs[i]}`]) highestCompleted = i;
-  }
-  const blurs = [14, 22, 30, 38];
-  return highestCompleted >= 0 ? blurs[highestCompleted] : 0;
+  // Only glow when the final difficulty tier has been passed
+  const lastPassed = results[`${key}_${diffs[diffs.length - 1]}`];
+  return lastPassed ? 35 : 0;
 }
 
 // ── Globe ──

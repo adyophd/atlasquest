@@ -190,21 +190,22 @@ function unlockMap(country, difficulty) {
 ## Globe Color Logic (practice.html — `draw()` function)
 
 ### Color rule
-Fill color = **best grade achieved across ALL completed difficulties** for that country.
-Never degrades: once a country is green (A on any difficulty), it stays green regardless of performance on harder maps.
+Fill color = **highest difficulty tier passed** (any recorded quiz result counts as "passed").
+Colors represent progression milestone, not grade quality.
+
+| Highest tier passed | Color | Notes |
+|---|---|---|
+| None | `#4a6080` muted blue-grey | Unplayed |
+| Easy / Capitals | `#DA3EFF` purple | No glow |
+| Medium | `#0798F3` blue | No glow |
+| Hard | `#07EEB8` green | No glow |
+| Very Hard / Capitals Plus | `#07EEB8` green | Vibrant glow (shadowBlur 35) |
+
+For USA (2-tier: Capitals / Capitals Plus): Capitals → purple, Capitals Plus → green + glow.
 
 ### Glow rule
-Glow intensity = **highest difficulty completed** (any grade counts as "completed").
-This is independent of fill color — you can have a green country with a strong glow.
-Glow color is always white.
-
-| Highest difficulty completed | shadowBlur | Feel |
-|---|---|---|
-| None | 0 | No glow |
-| Easy / Capitals | 8 | Subtle halo |
-| Medium / Capitals Plus | 16 | Noticeable |
-| Hard | 24 | Strong |
-| Very Hard | 32 | Vibrant |
+Only the **final difficulty tier** (Very Hard / Capitals Plus) triggers a glow.
+shadowBlur = 35, shadowColor = rgba(255,255,255,0.9).
 
 ### Difficulty ordering
 
