@@ -1825,8 +1825,8 @@ function getCountryGlobeColor(key) {
   for (let i = 0; i < diffs.length; i++) {
     if (results[`${key}_${diffs[i]}`]) highest = i;
   }
-  if (highest === -1) return '#737B89';            // unlocked, not yet passed — grey (Undiscovered)
-  const tierColors = ['#8295A5', '#5D75C0', '#3855C5', '#2C2488']; // Novice→Competent→Proficient→Mastery
+  if (highest === -1) return '#af0932';            // unlocked, not yet passed
+  const tierColors = ['#b82e00', '#8a6100', '#17663a', '#005985']; // Easy→Medium→Hard→Very Hard
   return tierColors[Math.min(highest, tierColors.length - 1)];
 }
 
@@ -1916,7 +1916,7 @@ function getCountryGlow(key) {
         ctx.shadowBlur = 0;
       } else if (key) {
         ctx.fillStyle  = getCountryGlobeColor(key);
-        ctx.shadowColor = '#6B5FFF';
+        ctx.shadowColor = '#005985';
         ctx.shadowBlur  = getCountryGlow(key);
       } else {
         ctx.fillStyle  = '#243558';
