@@ -1308,6 +1308,7 @@ L.tileLayer(
 // ── Shared state ──
 let currentMode = 'quiz';
 let currentCountry = '';
+let currentDifficulty = '';
 let cities  = [];
 let markers = [];
 
@@ -1612,6 +1613,7 @@ function showEndScreen() {
   clearQuizOverlays();
 
   const avg = quizTotalDist / quizQueue.length;
+  saveBestGrade(currentCountry, currentDifficulty, distGrade(avg).label);
   document.getElementById('final-score').textContent = Math.round(avg) + ' mi';
   document.getElementById('final-label').textContent =
     avg < 30  ? 'Incredible — perfect geography!' :
@@ -1732,6 +1734,7 @@ function startCountry(country) {
 }
 
 function startDifficulty(difficulty) {
+  currentDifficulty = difficulty;
   if (difficulty === 'capitals') {
     cities = allCities[currentCountry].filter(c => c.capital);
   } else if (difficulty === 'capitals_plus') {
@@ -1766,6 +1769,7 @@ function returnToSelector() {
   markers = [];
   cities  = [];
   currentCountry = '';
+  currentDifficulty = '';
   document.getElementById('feedback-banner').style.display  = 'none';
   document.getElementById('feedback-overlay').style.display = 'none';
   document.getElementById('end-screen').style.display       = 'none';
@@ -1779,6 +1783,67 @@ function returnToSelector() {
   document.getElementById('difficulty-selector').style.display = 'none';
   document.getElementById('country-selector').style.display    = 'flex';
   window._globeReset && window._globeReset();
+}
+
+// ── Progression: practice results & globe visuals ──
+const GRADE_ORDER = ['A+','A','A-','B+','B','B-','C+','C','C-','D+','D','D-','F'];
+
+const DIFF_ORDER = {
+  france:        ['easy','medium','hard','veryhard'],
+  germany:       ['easy','medium','hard','veryhard'],
+  russia:        ['easy','medium','hard','veryhard'],
+  japan:         ['easy','medium','hard','veryhard'],
+  canada:        ['easy','medium','hard','veryhard'],
+  india:         ['easy','medium','hard','veryhard'],
+  china:         ['easy','medium','hard','veryhard'],
+  british_isles: ['easy','medium','hard','veryhard'],
+  oceania:       ['easy','medium','hard','veryhard'],
+  usa:           ['capitals','capitals_plus'],
+};
+
+function getPracticeResults() {
+  try { return JSON.parse(localStorage.getItem('atlasquest_practice_results')) || {}; }
+  catch (_) { return {}; }
+}
+
+function saveBestGrade(country, difficulty, gradeLabel) {
+  if (!country || !difficulty) return;
+  const results = getPracticeResults();
+  const key = `${country}_${difficulty}`;
+  const existing = results[key];
+  if (!existing || GRADE_ORDER.indexOf(gradeLabel) < GRADE_ORDER.indexOf(existing)) {
+    results[key] = gradeLabel;
+    localStorage.setItem('atlasquest_practice_results', JSON.stringify(results));
+  }
+}
+
+function getCountryGlobeColor(key) {
+  const results = getPracticeResults();
+  const diffs = DIFF_ORDER[key] || [];
+  let bestIdx = GRADE_ORDER.length;
+  for (const d of diffs) {
+    const g = results[`${key}_${d}`];
+    if (g) {
+      const idx = GRADE_ORDER.indexOf(g);
+      if (idx < bestIdx) bestIdx = idx;
+    }
+  }
+  if (bestIdx === GRADE_ORDER.length) return '#f5c842'; // no completions — default yellow
+  const letter = GRADE_ORDER[bestIdx][0];
+  if (letter === 'A') return '#7effa0';
+  if (letter === 'B' || letter === 'C') return '#f5c842';
+  return '#ff6b6b';
+}
+
+function getCountryGlow(key) {
+  const results = getPracticeResults();
+  const diffs = DIFF_ORDER[key] || [];
+  let highestCompleted = -1;
+  for (let i = 0; i < diffs.length; i++) {
+    if (results[`${key}_${diffs[i]}`]) highestCompleted = i;
+  }
+  const blurs = [8, 16, 24, 32];
+  return highestCompleted >= 0 ? blurs[highestCompleted] : 0;
 }
 
 // ── Globe ──
@@ -1854,10 +1919,19 @@ function returnToSelector() {
     // Countries
     for (const {feature, key} of allFeatures) {
       ctx.beginPath(); path(feature);
-      if (key && key === hoveredKey) ctx.fillStyle = '#ffffff';
-      else if (key)                  ctx.fillStyle = '#f5c842';
-      else                           ctx.fillStyle = '#243558';
+      if (key && key === hoveredKey) {
+        ctx.fillStyle  = '#ffffff';
+        ctx.shadowBlur = 0;
+      } else if (key) {
+        ctx.fillStyle  = getCountryGlobeColor(key);
+        ctx.shadowColor = 'rgba(255,255,255,0.9)';
+        ctx.shadowBlur  = getCountryGlow(key);
+      } else {
+        ctx.fillStyle  = '#243558';
+        ctx.shadowBlur = 0;
+      }
       ctx.fill();
+      ctx.shadowBlur = 0; // always reset — prevents bleed into borders pass
     }
 
     // Borders
