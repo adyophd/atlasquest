@@ -196,12 +196,10 @@ Colors represent progression milestone, not grade quality.
 | Highest tier passed | Color | Notes |
 |---|---|---|
 | None | `#4a6080` muted blue-grey | Unplayed |
-| Easy / Capitals | `#DA3EFF` purple | No glow |
-| Medium | `#0798F3` blue | No glow |
-| Hard | `#07EEB8` green | No glow |
-| Very Hard / Capitals Plus | `#07EEB8` green | Vibrant glow (shadowBlur 35) |
-
-For USA (2-tier: Capitals / Capitals Plus): Capitals → purple, Capitals Plus → green + glow.
+| Easy / Capitals | `#3A9E28` faint neon green | No glow |
+| Medium | `#25D611` medium bold neon green | No glow |
+| Hard | `#39FF14` boldest neon green | No glow |
+| Very Hard / Capitals Plus | `#39FF14` boldest neon green | Vibrant glow (shadowBlur 35) |
 
 ### Glow rule
 Only the **final difficulty tier** (Very Hard / Capitals Plus) triggers a glow.

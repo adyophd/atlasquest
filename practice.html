@@ -1826,8 +1826,7 @@ function getCountryGlobeColor(key) {
     if (results[`${key}_${diffs[i]}`]) highest = i;
   }
   if (highest === -1) return '#4a6080';            // nothing completed — muted blue-grey
-  if (highest === diffs.length - 1) return '#07EEB8'; // passed final tier (Very Hard / Capitals Plus) — green
-  const tierColors = ['#DA3EFF', '#0798F3', '#07EEB8']; // Easy→purple, Medium→blue, Hard→green
+  const tierColors = ['#3A9E28', '#25D611', '#39FF14', '#39FF14']; // faint → medium → bold → bold+glow
   return tierColors[Math.min(highest, tierColors.length - 1)];
 }
 
