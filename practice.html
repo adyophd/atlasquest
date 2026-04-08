@@ -938,26 +938,26 @@ const allCities = {
     { name: "Changsha",  lat: 28.2282, lng: 112.9388 },
   ],
   british_isles: [
-    { name: "London",          lat: 51.5074,  lng:  -0.1278, country: "England"          },
-    { name: "Manchester",      lat: 53.4808,  lng:  -2.2426, country: "England"          },
-    { name: "Edinburgh",       lat: 55.9533,  lng:  -3.1883, country: "Scotland"         },
-    { name: "Liverpool",       lat: 53.4084,  lng:  -2.9916, country: "England"          },
-    { name: "Dublin",          lat: 53.3498,  lng:  -6.2603, country: "Ireland"          },
-    { name: "Birmingham",      lat: 52.4862,  lng:  -1.8904, country: "England"          },
-    { name: "Glasgow",         lat: 55.8642,  lng:  -4.2518, country: "Scotland"         },
-    { name: "Bristol",         lat: 51.4545,  lng:  -2.5879, country: "England"          },
-    { name: "Cardiff",         lat: 51.4816,  lng:  -3.1791, country: "Wales"            },
-    { name: "Belfast",         lat: 54.5973,  lng:  -5.9301, country: "Northern Ireland" },
-    { name: "Leeds",           lat: 53.8008,  lng:  -1.5491, country: "England"          },
-    { name: "Sheffield",       lat: 53.3811,  lng:  -1.4701, country: "England"          },
-    { name: "Bradford",        lat: 53.7960,  lng:  -1.7594, country: "England"          },
-    { name: "Coventry",        lat: 52.4068,  lng:  -1.5197, country: "England"          },
-    { name: "Leicester",       lat: 52.6369,  lng:  -1.1398, country: "England"          },
-    { name: "Nottingham",      lat: 52.9548,  lng:  -1.1581, country: "England"          },
-    { name: "Hull",            lat: 53.7676,  lng:  -0.3274, country: "England"          },
-    { name: "Wolverhampton",   lat: 52.5862,  lng:  -2.1285, country: "England"          },
-    { name: "Plymouth",        lat: 50.3755,  lng:  -4.1427, country: "England"          },
-    { name: "Stoke-on-Trent",  lat: 53.0027,  lng:  -2.1794, country: "England"          },
+    { name: "London",               lat: 51.5074,  lng:  -0.1278, country: "England"          }, //  1
+    { name: "Edinburgh",            lat: 55.9533,  lng:  -3.1883, country: "Scotland"         }, //  2
+    { name: "Dublin",               lat: 53.3498,  lng:  -6.2603, country: "Ireland"          }, //  3
+    { name: "Oxford",               lat: 51.7520,  lng:  -1.2577, country: "England"          }, //  4
+    { name: "Bath",                 lat: 51.3811,  lng:  -2.3590, country: "England"          }, //  5
+    { name: "Cambridge",            lat: 52.2053,  lng:   0.1218, country: "England"          }, //  6
+    { name: "Liverpool",            lat: 53.4084,  lng:  -2.9916, country: "England"          }, //  7
+    { name: "Stratford-upon-Avon",  lat: 52.1919,  lng:  -1.7083, country: "England"          }, //  8
+    { name: "Canterbury",           lat: 51.2802,  lng:   1.0789, country: "England"          }, //  9
+    { name: "York",                 lat: 53.9590,  lng:  -1.0815, country: "England"          }, // 10
+    { name: "Manchester",           lat: 53.4808,  lng:  -2.2426, country: "England"          }, // 11
+    { name: "Windsor",              lat: 51.4839,  lng:  -0.6044, country: "England"          }, // 12
+    { name: "Glasgow",              lat: 55.8642,  lng:  -4.2518, country: "Scotland"         }, // 13
+    { name: "Bristol",              lat: 51.4545,  lng:  -2.5879, country: "England"          }, // 14
+    { name: "Cardiff",              lat: 51.4816,  lng:  -3.1791, country: "Wales"            }, // 15
+    { name: "Belfast",              lat: 54.5973,  lng:  -5.9301, country: "Northern Ireland" }, // 16
+    { name: "Nottingham",           lat: 52.9548,  lng:  -1.1581, country: "England"          }, // 17
+    { name: "St Andrews",           lat: 56.3398,  lng:  -2.7967, country: "Scotland"         }, // 18
+    { name: "Birmingham",           lat: 52.4862,  lng:  -1.8904, country: "England"          }, // 19
+    { name: "Leeds",                lat: 53.8008,  lng:  -1.5491, country: "England"          }, // 20
   ],
   oceania: [
     { name: "Sydney",          lat: -33.8688, lng:  151.2093, country: "Australia"   },
@@ -1310,6 +1310,14 @@ const cityFacts = {
   "Wolverhampton":  ["Wolverhampton Wanderers were among the twelve founding clubs of the Football League in 1888 — one of the oldest professional football structures on Earth. Several founding clubs no longer exist."],
   "Plymouth":       ["Francis Drake was vice admiral of the fleet that defeated the Spanish Armada in 1588. He reportedly finished a game of bowls on Plymouth Hoe before sailing — England's defining image of cool nerve."],
   "Stoke-on-Trent": ["Reginald Mitchell, born near Stoke in 1895, designed the Spitfire — the fighter that helped win the Battle of Britain. He died of cancer in 1937 and never saw it fly in combat."],
+  "Oxford":              ["Roger Bannister broke the 4-minute mile on Oxford's track on May 6, 1954 — a barrier doctors said was physically impossible. He was an Oxford medical student who ran the historic race during his lunch break."],
+  "Cambridge":           ["Newton developed calculus, discovered gravity, and formulated optics all during Cambridge's 1665 plague closure — when the university sent students home. Most of modern physics emerged from two idle years."],
+  "Bath":                ["Bath's hot spring flows at 46°C — fed by rain that fell during the last Ice Age and took 10,000 years to filter underground and emerge. The Romans built their sacred baths around it in 70 AD."],
+  "Stratford-upon-Avon": ["Shakespeare was born here in 1564 and died here in 1616. He spent his career in London but retired to Stratford — and when he wrote his will, he left his wife Anne his 'second-best bed.'"],
+  "Canterbury":          ["Thomas Becket was murdered in his own cathedral in 1170, likely on Henry II's orders. His shrine became Europe's most visited medieval pilgrimage site — the journey Chaucer immortalized in the Canterbury Tales."],
+  "York":                ["Vikings captured York in 866 AD, renamed it Jorvik, and ruled it for 90 years. A 1976 excavation found a perfectly preserved Viking street beneath a city center shopping site — the best in Europe."],
+  "Windsor":             ["Windsor Castle has been in continuous royal use for nearly 1,000 years — the longest-occupied royal residence on Earth. More British monarchs have lived and died here than in any other building."],
+  "St Andrews":          ["St Andrews is the birthplace of golf — the Royal and Ancient (est. 1754) wrote the rules used worldwide. The 18-hole format started here when a committee reduced the course from 22 holes to 18."],
 
   // ── Australia & NZ ──
   "Sydney":         ["The Sydney Opera House was designed by Danish architect Jørn Utzon, who resigned mid-construction after a dispute and never returned to see the building he had dreamed into existence."],
