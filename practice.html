@@ -807,26 +807,26 @@ const allCities = {
     { name: "Thunder Bay",    lat: 48.3809, lng:  -89.2477 },
   ],
   india: [
-    { name: "Mumbai",         lat: 19.0760,  lng:  72.8777 }, // 1  ~12.4M
-    { name: "Delhi",          lat: 28.6139,  lng:  77.2090 }, // 2  ~11.0M
-    { name: "Bengaluru",      lat: 12.9716,  lng:  77.5946 }, // 3  ~8.4M
-    { name: "Hyderabad",      lat: 17.3850,  lng:  78.4867 }, // 4  ~6.8M
-    { name: "Ahmedabad",      lat: 23.0225,  lng:  72.5714 }, // 5  ~5.5M
-    { name: "Chennai",        lat: 13.0827,  lng:  80.2707 }, // 6  ~7.1M
-    { name: "Kolkata",        lat: 22.5726,  lng:  88.3639 }, // 7  ~4.5M
-    { name: "Surat",          lat: 21.1702,  lng:  72.8311 }, // 8  ~4.5M
-    { name: "Pune",           lat: 18.5204,  lng:  73.8567 }, // 9  ~3.1M
-    { name: "Jaipur",         lat: 26.9124,  lng:  75.7873 }, // 10 ~3.0M
-    { name: "Lucknow",        lat: 26.8467,  lng:  80.9462 }, // 11 ~2.8M
-    { name: "Kanpur",         lat: 26.4499,  lng:  80.3319 }, // 12 ~2.7M
-    { name: "Nagpur",         lat: 21.1458,  lng:  79.0882 }, // 13 ~2.4M
-    { name: "Indore",         lat: 22.7196,  lng:  75.8577 }, // 14 ~1.9M
-    { name: "Thane",          lat: 19.2183,  lng:  72.9781 }, // 15 ~1.8M
-    { name: "Bhopal",         lat: 23.2599,  lng:  77.4126 }, // 16 ~1.8M
-    { name: "Visakhapatnam",  lat: 17.6868,  lng:  83.2185 }, // 17 ~1.7M
-    { name: "Patna",          lat: 25.5941,  lng:  85.1376 }, // 18 ~1.6M
-    { name: "Vadodara",       lat: 22.3072,  lng:  73.1812 }, // 19 ~1.6M
-    { name: "Ghaziabad",      lat: 28.6692,  lng:  77.4538 }, // 20 ~1.6M
+    { name: "Mumbai",      lat: 19.0760, lng:  72.8777 },
+    { name: "Delhi",       lat: 28.6139, lng:  77.2090 },
+    { name: "Agra",        lat: 27.1767, lng:  78.0081 },
+    { name: "Varanasi",    lat: 25.3176, lng:  82.9739 },
+    { name: "Jaipur",      lat: 26.9124, lng:  75.7873 },
+    { name: "Kolkata",     lat: 22.5726, lng:  88.3639 },
+    { name: "Amritsar",    lat: 31.6340, lng:  74.8723 },
+    { name: "Chennai",     lat: 13.0827, lng:  80.2707 },
+    { name: "Bengaluru",   lat: 12.9716, lng:  77.5946 },
+    { name: "Hyderabad",   lat: 17.3850, lng:  78.4867 },
+    { name: "Ahmedabad",   lat: 23.0225, lng:  72.5714 },
+    { name: "Udaipur",     lat: 24.5854, lng:  73.7125 },
+    { name: "Mysuru",      lat: 12.2958, lng:  76.6394 },
+    { name: "Rishikesh",   lat: 30.0869, lng:  78.2676 },
+    { name: "Bhopal",      lat: 23.2599, lng:  77.4126 },
+    { name: "Pune",        lat: 18.5204, lng:  73.8567 },
+    { name: "Lucknow",     lat: 26.8467, lng:  80.9462 },
+    { name: "Darjeeling",  lat: 27.0410, lng:  88.2663 },
+    { name: "Surat",       lat: 21.1702, lng:  72.8311 },
+    { name: "Chandigarh",  lat: 30.7333, lng:  76.7794 },
   ],
 
   usa: [
@@ -1143,6 +1143,14 @@ const cityFacts = {
   "Patna": ["Patna was the ancient Pataliputra — capital of Ashoka's Maurya Empire in the 3rd century BC and the largest city on Earth at the time. The city now struggling with poverty and flooding was once the capital of the ancient world."],
   "Vadodara": ["Vadodara's Maharaja Sayaji Rao III personally funded B.R. Ambedkar's education abroad — enabling the man who wrote India's constitution to earn his degrees. One ruler's patronage shaped a nation's founding document."],
   "Ghaziabad": ["Ghaziabad grew from a small town to 1.6 million in 30 years — driven entirely by people priced out of Delhi. It is the quintessential Indian boomtown: built by proximity to another city, not by any identity of its own."],
+  "Agra":       ["Shah Jahan built the Taj Mahal in Agra as a tomb for his wife Mumtaz Mahal, who died in childbirth in 1631. He was later imprisoned by his own son in a fort with a direct view of the mausoleum."],
+  "Varanasi":   ["Varanasi has been continuously inhabited for over 3,000 years — older than Rome, Beijing, or Athens. Mark Twain called it 'older than history, older than tradition, older even than legend.'"],
+  "Amritsar":   ["The 1919 Jallianwala Bagh Massacre in Amritsar — British troops fired on 20,000 unarmed civilians, killing hundreds — so outraged Rabindranath Tagore that he renounced his British knighthood in protest."],
+  "Udaipur":    ["Maharana Pratap — the Rajput warrior king who refused to submit to Mughal Emperor Akbar — ruled from Udaipur. He is the only major Rajput king who never surrendered, fighting Akbar his entire life."],
+  "Mysuru":     ["Tipu Sultan — the 'Tiger of Mysore' who allied with Napoleon and nearly expelled the British from India — was killed defending Mysuru in 1799. His death secured British dominance of the subcontinent."],
+  "Rishikesh":  ["The Beatles came to Rishikesh in 1968 to study with Maharishi Mahesh Yogi. In three months on the Ganges, they wrote over 40 songs — the most prolific creative period of their careers."],
+  "Darjeeling": ["Darjeeling tea holds geographical indication status, like champagne — only tea grown on these Himalayan slopes above 2,000 meters can legally carry the name. The terrain itself is the ingredient."],
+  "Chandigarh": ["Le Corbusier designed Chandigarh from scratch in the 1950s after Partition gave Punjab's original capital, Lahore, to Pakistan. It is the only major city on Earth conceived entirely by one architect."],
 
   // ── USA ──
   "Montgomery": ["Rosa Parks refused to give up her seat on a Montgomery bus in December 1955, sparking the 381-day boycott that launched the Civil Rights Movement and made Martin Luther King Jr. a national figure."],
