@@ -1887,8 +1887,8 @@ function getCountryGlobeColor(key) {
   for (let i = 0; i < diffs.length; i++) {
     if (results[`${key}_${diffs[i]}`]) highest = i;
   }
-  if (highest === -1) return '#af0932';            // unlocked, not yet passed
-  const tierColors = ['#b82e00', '#8a6100', '#17663a', '#005985']; // Easy→Medium→Hard→Very Hard
+  if (highest === -1) return '#2B2833';            // unlocked, not yet passed
+  const tierColors = ['#b82e00', '#8a6100', '#17673A', '#005985']; // Easy→Medium→Hard→Very Hard
   return tierColors[Math.min(highest, tierColors.length - 1)];
 }
 
