@@ -763,26 +763,26 @@ const allCities = {
     { name: "Pskov",            lat: 57.8194, lng:  28.3316 },
   ],
   germany: [
-    { name: "Berlin",      lat: 52.5200,  lng: 13.4050 }, // 1  ~3.7M
-    { name: "Hamburg",     lat: 53.5511,  lng:  9.9937 }, // 2  ~1.8M
-    { name: "München",     lat: 48.1351,  lng: 11.5820 }, // 3  ~1.5M
-    { name: "Köln",        lat: 50.9333,  lng:  6.9503 }, // 4  ~1.1M
-    { name: "Frankfurt",   lat: 50.1109,  lng:  8.6821 }, // 5  ~750K
-    { name: "Stuttgart",   lat: 48.7758,  lng:  9.1829 }, // 6  ~635K
-    { name: "Düsseldorf",  lat: 51.2217,  lng:  6.7762 }, // 7  ~620K
-    { name: "Leipzig",     lat: 51.3397,  lng: 12.3731 }, // 8  ~600K
-    { name: "Dortmund",    lat: 51.5136,  lng:  7.4653 }, // 9  ~590K
-    { name: "Bremen",      lat: 53.0793,  lng:  8.8017 }, // 10 ~565K
-    { name: "Dresden",     lat: 51.0504,  lng: 13.7373 }, // 11 ~555K
-    { name: "Hannover",    lat: 52.3759,  lng:  9.7320 }, // 12 ~540K
-    { name: "Nürnberg",    lat: 49.4521,  lng: 11.0767 }, // 13 ~515K
-    { name: "Bonn",        lat: 50.7374,  lng:  7.0982 }, // 14 ~330K
-    { name: "Münster",     lat: 51.9607,  lng:  7.6261 }, // 15 ~315K
-    { name: "Karlsruhe",   lat: 49.0069,  lng:  8.4037 }, // 16 ~310K
-    { name: "Augsburg",    lat: 48.3705,  lng: 10.8978 }, // 17 ~296K
-    { name: "Kiel",        lat: 54.3233,  lng: 10.1228 }, // 18 ~246K
-    { name: "Freiburg",    lat: 47.9990,  lng:  7.8421 }, // 19 ~230K
-    { name: "Rostock",     lat: 54.0887,  lng: 12.1400 }, // 20 ~210K
+    { name: "Berlin",                    lat: 52.5200,  lng: 13.4050 }, //  1
+    { name: "München",                   lat: 48.1351,  lng: 11.5820 }, //  2
+    { name: "Hamburg",                   lat: 53.5511,  lng:  9.9937 }, //  3
+    { name: "Köln",                      lat: 50.9333,  lng:  6.9503 }, //  4
+    { name: "Frankfurt",                 lat: 50.1109,  lng:  8.6821 }, //  5
+    { name: "Dresden",                   lat: 51.0504,  lng: 13.7373 }, //  6
+    { name: "Nürnberg",                  lat: 49.4521,  lng: 11.0767 }, //  7
+    { name: "Heidelberg",                lat: 49.3988,  lng:  8.6724 }, //  8
+    { name: "Potsdam",                   lat: 52.3906,  lng: 13.0645 }, //  9
+    { name: "Weimar",                    lat: 50.9795,  lng: 11.3235 }, // 10
+    { name: "Bonn",                      lat: 50.7374,  lng:  7.0982 }, // 11
+    { name: "Trier",                     lat: 49.7596,  lng:  6.6441 }, // 12
+    { name: "Leipzig",                   lat: 51.3397,  lng: 12.3731 }, // 13
+    { name: "Stuttgart",                 lat: 48.7758,  lng:  9.1829 }, // 14
+    { name: "Lübeck",                    lat: 53.8655,  lng: 10.6866 }, // 15
+    { name: "Augsburg",                  lat: 48.3705,  lng: 10.8978 }, // 16
+    { name: "Bamberg",                   lat: 49.8988,  lng: 10.9028 }, // 17
+    { name: "Bremen",                    lat: 53.0793,  lng:  8.8017 }, // 18
+    { name: "Rothenburg ob der Tauber",  lat: 49.3774,  lng: 10.1778 }, // 19
+    { name: "Düsseldorf",               lat: 51.2217,  lng:  6.7762 }, // 20
   ],
   canada: [
     { name: "Toronto",        lat: 43.6532, lng:  -79.3832 },
@@ -1045,6 +1045,13 @@ const cityFacts = {
   "Kiel": ["In October 1918, sailors in Kiel refused a suicidal final battle order against the British Navy — triggering the German Revolution that toppled the Kaiser and ended WWI. A mutiny here ended the war."],
   "Freiburg": ["Freiburg's Bächle — stone water channels threading every medieval street — were built in the 12th century. Local tradition says if you accidentally step in one, you will marry a person from Freiburg."],
   "Rostock": ["Rostock's university was founded in 1419 — before the Reformation, the printing press, and Columbus. When Columbus reached America in 1492, Rostock had been a university city for 73 years already."],
+  "Heidelberg": ["Heidelberg's university, founded in 1386, was already 100 years old when Columbus reached America — and still ranks among Europe's greatest. Mark Twain called it 'the most beautiful old town in Germany.'"],
+  "Potsdam": ["At the 1945 Potsdam Conference, Truman told Stalin that America had 'a new weapon of unprecedented destructive force.' Stalin showed no surprise — he already knew, through spies inside the Manhattan Project."],
+  "Weimar": ["In 1919, Weimar gave Germany its first democratic constitution — and Walter Gropius founded the Bauhaus here the same year. Buchenwald concentration camp opened 8 km outside the city eighteen years later."],
+  "Trier": ["Karl Marx was born in Trier in 1818. His ideas, adopted by states governing over a billion people at their Cold War peak, began in the oldest city in Germany — founded by the Romans in 17 BC."],
+  "Lübeck": ["Thomas Mann set 'Buddenbrooks' (Nobel Prize, 1929) in Lübeck's merchant streets where he grew up. The city's medieval Holstentor gate appeared on every German 50 Pfennig coin until the euro arrived."],
+  "Bamberg": ["Bamberg was never bombed in WWII, leaving its 1,000-year-old island town completely intact. It is one of the only major German cities whose medieval architecture survived the war in its original form."],
+  "Rothenburg ob der Tauber": ["During the Thirty Years' War, the town was saved when its mayor drank a 3.25-liter tankard of wine in a single gulp on a bet. Rothenburg still re-enacts the 'Master Draught' every year."],
 
   // ── Russia ──
   "Moscow": ["Napoleon marched into Moscow in 1812 to find it abandoned and burning — set ablaze by its own citizens. He waited 5 weeks for a surrender that never came, then retreated into winter. Moscow burned itself."],
