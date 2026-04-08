@@ -960,26 +960,26 @@ const allCities = {
     { name: "Leeds",                lat: 53.8008,  lng:  -1.5491, country: "England"          }, // 20
   ],
   oceania: [
-    { name: "Sydney",          lat: -33.8688, lng:  151.2093, country: "Australia"   },
-    { name: "Melbourne",       lat: -37.8136, lng:  144.9631, country: "Australia"   },
-    { name: "Auckland",        lat: -36.8509, lng:  174.7645, country: "New Zealand" },
-    { name: "Brisbane",        lat: -27.4698, lng:  153.0251, country: "Australia"   },
-    { name: "Perth",           lat: -31.9505, lng:  115.8605, country: "Australia"   },
-    { name: "Adelaide",        lat: -34.9285, lng:  138.6007, country: "Australia"   },
-    { name: "Wellington",      lat: -41.2866, lng:  174.7756, country: "New Zealand" },
-    { name: "Christchurch",    lat: -43.5321, lng:  172.6362, country: "New Zealand" },
-    { name: "Gold Coast",      lat: -28.0167, lng:  153.4000, country: "Australia"   },
-    { name: "Canberra",        lat: -35.2809, lng:  149.1300, country: "Australia"   },
-    { name: "Newcastle",       lat: -32.9283, lng:  151.7817, country: "Australia"   },
-    { name: "Wollongong",      lat: -34.4278, lng:  150.8931, country: "Australia"   },
-    { name: "Geelong",         lat: -38.1499, lng:  144.3617, country: "Australia"   },
-    { name: "Hobart",          lat: -42.8821, lng:  147.3272, country: "Australia"   },
-    { name: "Hamilton (NZ)",   lat: -37.7870, lng:  175.2793, country: "New Zealand" },
-    { name: "Townsville",      lat: -19.2590, lng:  146.8169, country: "Australia"   },
-    { name: "Tauranga",        lat: -37.6878, lng:  176.1651, country: "New Zealand" },
-    { name: "Cairns",          lat: -16.9186, lng:  145.7781, country: "Australia"   },
-    { name: "Darwin",          lat: -12.4634, lng:  130.8456, country: "Australia"   },
-    { name: "Dunedin",         lat: -45.8788, lng:  170.5028, country: "New Zealand" },
+    { name: "Sydney",        lat: -33.8688, lng:  151.2093, country: "Australia"   }, //  1
+    { name: "Melbourne",     lat: -37.8136, lng:  144.9631, country: "Australia"   }, //  2
+    { name: "Auckland",      lat: -36.8509, lng:  174.7645, country: "New Zealand" }, //  3
+    { name: "Queenstown",    lat: -45.0312, lng:  168.6626, country: "New Zealand" }, //  4
+    { name: "Brisbane",      lat: -27.4698, lng:  153.0251, country: "Australia"   }, //  5
+    { name: "Perth",         lat: -31.9505, lng:  115.8605, country: "Australia"   }, //  6
+    { name: "Wellington",    lat: -41.2866, lng:  174.7756, country: "New Zealand" }, //  7
+    { name: "Cairns",        lat: -16.9186, lng:  145.7781, country: "Australia"   }, //  8
+    { name: "Alice Springs", lat: -23.6980, lng:  133.8807, country: "Australia"   }, //  9
+    { name: "Rotorua",       lat: -38.1368, lng:  176.2497, country: "New Zealand" }, // 10
+    { name: "Adelaide",      lat: -34.9285, lng:  138.6007, country: "Australia"   }, // 11
+    { name: "Christchurch",  lat: -43.5321, lng:  172.6362, country: "New Zealand" }, // 12
+    { name: "Gold Coast",    lat: -28.0167, lng:  153.4000, country: "Australia"   }, // 13
+    { name: "Canberra",      lat: -35.2809, lng:  149.1300, country: "Australia"   }, // 14
+    { name: "Darwin",        lat: -12.4634, lng:  130.8456, country: "Australia"   }, // 15
+    { name: "Hobart",        lat: -42.8821, lng:  147.3272, country: "Australia"   }, // 16
+    { name: "Byron Bay",     lat: -28.6474, lng:  153.6020, country: "Australia"   }, // 17
+    { name: "Dunedin",       lat: -45.8788, lng:  170.5028, country: "New Zealand" }, // 18
+    { name: "Broome",        lat: -17.9614, lng:  122.2359, country: "Australia"   }, // 19
+    { name: "Ballarat",      lat: -37.5622, lng:  143.8503, country: "Australia"   }, // 20
   ],
 };
 
@@ -1340,6 +1340,12 @@ const cityFacts = {
   "Cairns":         ["The Great Barrier Reef begins 30 minutes by boat from Cairns. More tourists visit this reef system annually than visit the entire continent of Antarctica in a decade."],
   "Darwin":         ["Japan dropped more bombs on Darwin on February 19, 1942 than fell on Pearl Harbor. The attack killed over 230 people — and was covered up by the Australian government for months."],
   "Dunedin":        ["Dunedin's Baldwin Street is one of the world's steepest residential roads at a 35-degree gradient. Locals celebrate with an annual event rolling 30,000 candy-coated chocolates down it."],
+  "Queenstown":    ["Bungee jumping was invented in Queenstown in 1988 when A.J. Hackett — who first tested it by jumping illegally off the Eiffel Tower — opened the world's first commercial bungee site on the Kawarau Bridge."],
+  "Alice Springs": ["Alice Springs is the gateway to Uluru. The Anangu, who have lived in this desert for 30,000 years, campaigned for decades before Australia permanently banned climbing the sacred rock in 2019."],
+  "Rotorua":       ["Rotorua's streets smell of sulfur from the geothermal fields beneath. In 1886, Mount Tarawera erupted and buried the nearby village of Te Wairoa — New Zealand's 'Pompeii' — killing over 150 people."],
+  "Byron Bay":     ["Byron Bay marks the easternmost point of mainland Australia. Once a sleepy whaling town, it transformed in the 1970s when surfers, artists, and musicians made it the country's counterculture capital."],
+  "Broome":        ["In the early 1900s, Broome supplied 80% of the world's mother-of-pearl. At its peak, 400 pearling luggers operated from this remote coast, crewed by Aboriginal, Japanese, and Malay divers."],
+  "Ballarat":      ["Ballarat's 1854 Eureka Stockade was Australia's only armed rebellion — miners fighting the colonial government over licenses. It lasted 20 minutes but is considered the birth of Australian democracy."],
 
 }
 
