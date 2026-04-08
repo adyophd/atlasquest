@@ -785,26 +785,26 @@ const allCities = {
     { name: "Rostock",     lat: 54.0887,  lng: 12.1400 }, // 20 ~210K
   ],
   canada: [
-    { name: "Toronto",      lat: 43.6532,  lng: -79.3832 }, // 1  ~2.79M
-    { name: "Montréal",     lat: 45.5017,  lng: -73.5673 }, // 2  ~2.12M
-    { name: "Calgary",      lat: 51.0447,  lng: -114.0719}, // 3  ~1.34M
-    { name: "Ottawa",       lat: 45.4215,  lng: -75.6972 }, // 4  ~1.02M
-    { name: "Edmonton",     lat: 53.5461,  lng: -113.4938}, // 5  ~1.01M
-    { name: "Winnipeg",     lat: 49.8951,  lng: -97.1384 }, // 6  ~0.75M
-    { name: "Mississauga",  lat: 43.5890,  lng: -79.6441 }, // 7  ~0.72M
-    { name: "Vancouver",    lat: 49.2827,  lng: -123.1207}, // 8  ~0.66M
-    { name: "Brampton",     lat: 43.7315,  lng: -79.7624 }, // 9  ~0.66M
-    { name: "Hamilton (ON)", lat: 43.2557,  lng: -79.8711 }, // 10 ~0.57M
-    { name: "Surrey",       lat: 49.1913,  lng: -122.8490}, // 11 ~0.57M
-    { name: "Québec City",  lat: 46.8139,  lng: -71.2080 }, // 12 ~0.55M
-    { name: "Laval",        lat: 45.5662,  lng: -73.6952 }, // 13 ~0.44M
-    { name: "Halifax",      lat: 44.6488,  lng: -63.5752 }, // 14 ~0.44M
-    { name: "London (ON)",   lat: 42.9849,  lng: -81.2453 }, // 15 ~0.42M
-    { name: "Markham",      lat: 43.8561,  lng: -79.3370 }, // 16 ~0.34M
-    { name: "Vaughan",      lat: 43.8361,  lng: -79.4985 }, // 17 ~0.32M
-    { name: "Gatineau",     lat: 45.4765,  lng: -75.7013 }, // 18 ~0.29M
-    { name: "Burnaby",      lat: 49.2488,  lng: -122.9805}, // 19 ~0.25M
-    { name: "Longueuil",      lat: 45.5312,  lng: -73.5185 }, // 20 ~0.24M
+    { name: "Toronto",        lat: 43.6532, lng:  -79.3832 },
+    { name: "Vancouver",      lat: 49.2827, lng: -123.1207 },
+    { name: "Montréal",       lat: 45.5017, lng:  -73.5673 },
+    { name: "Québec City",    lat: 46.8139, lng:  -71.2080 },
+    { name: "Ottawa",         lat: 45.4215, lng:  -75.6972 },
+    { name: "Niagara Falls",  lat: 43.0962, lng:  -79.0377 },
+    { name: "Calgary",        lat: 51.0447, lng: -114.0719 },
+    { name: "Banff",          lat: 51.1784, lng: -115.5708 },
+    { name: "Halifax",        lat: 44.6488, lng:  -63.5752 },
+    { name: "Victoria",       lat: 48.4284, lng: -123.3656 },
+    { name: "Whistler",       lat: 50.1163, lng: -122.9574 },
+    { name: "Edmonton",       lat: 53.5461, lng: -113.4938 },
+    { name: "Winnipeg",       lat: 49.8951, lng:  -97.1384 },
+    { name: "St. John's",     lat: 47.5615, lng:  -52.7126 },
+    { name: "Charlottetown",  lat: 46.2382, lng:  -63.1311 },
+    { name: "Kingston",       lat: 44.2312, lng:  -76.4860 },
+    { name: "Hamilton (ON)",  lat: 43.2557, lng:  -79.8711 },
+    { name: "Saskatoon",      lat: 52.1332, lng: -106.6700 },
+    { name: "Regina",         lat: 50.4452, lng: -104.6189 },
+    { name: "Thunder Bay",    lat: 48.3809, lng:  -89.2477 },
   ],
   india: [
     { name: "Mumbai",         lat: 19.0760,  lng:  72.8777 }, // 1  ~12.4M
@@ -1099,6 +1099,16 @@ const cityFacts = {
   "Winnipeg": ["Winnie-the-Pooh is named after Winnipeg. A soldier brought a bear cub named Winnie to England in WWI; A.A. Milne's son loved it at the zoo. The world's most beloved bear takes its name from this city."],
   "Mississauga": ["A 1979 train derailment forced 218,000 Mississauga residents to evacuate — the largest peacetime evacuation in North American history at the time. It was completed with zero fatalities."],
   "Vancouver": ["Greenpeace was founded in Vancouver in 1971 — a small group sailing to protest US nuclear testing in Alaska. It became the world's most influential environmental organization. The modern environmental movement was born here."],
+  "Niagara Falls": ["Annie Edson Taylor — a 63-year-old schoolteacher — became the first person to survive going over Niagara Falls in a barrel, in 1901. She hoped to secure her financial future. She made almost no money from it."],
+  "Banff": ["Banff became Canada's first national park in 1885 after railway workers discovered a hot spring and tried to claim it for profit. The government seized it instead, founding the national parks system."],
+  "Victoria": ["Emily Carr — born in Victoria — spent years painting BC's forests and Indigenous villages in a style so visionary it was rejected for decades before Canada recognized her as its greatest female artist."],
+  "Whistler": ["Whistler hosted the alpine and sliding events of the 2010 Vancouver Winter Olympics. Its mountains record more snowfall than any other ski resort in North America — an average of 11 meters per year."],
+  "St. John's": ["Signal Hill in St. John's is where Guglielmo Marconi received the first transatlantic wireless telegraph message in 1901 — a single Morse code letter 'S' sent from England, 3,500 kilometers away."],
+  "Charlottetown": ["Anne of Green Gables — set near Charlottetown — became so beloved in Japan that thousands of Japanese tourists visit annually. The island receives more visitors per capita than anywhere else in Canada."],
+  "Kingston": ["Sir John A. Macdonald — Canada's first Prime Minister — was born in Scotland but made his career in Kingston, where he practiced law and launched the political career that confederated Canada in 1867."],
+  "Saskatoon": ["Joni Mitchell grew up in Saskatoon and learned to play ukulele in a hospital bed while recovering from polio at age nine. She became arguably the most influential singer-songwriter of the 20th century."],
+  "Regina": ["The RCMP — Canada's national police force, famous worldwide for their red serge uniforms and Musical Ride — established their training academy in Regina in 1885. Every Mountie in history trained here."],
+  "Thunder Bay": ["Terry Fox stopped his cross-Canada cancer run near Thunder Bay in 1980 — 5,373 kilometers on a prosthetic leg. He died nine months later. His Marathon of Hope now raises over $800 million globally."],
   "Brampton": ["Over 60% of Brampton's residents were born outside Canada — among the highest foreign-born proportions of any major city on Earth. It receives more new immigrants per year than many entire countries."],
   "Hamilton (ON)": ["Hamilton has over 100 waterfalls within city limits — more than any other city in the world — because the Niagara Escarpment cuts directly through it. Most Canadians don't know their 'Steel City' is the waterfall capital of Earth."],
   "Surrey": ["The Peace Arch on Surrey's US border, built in 1921, straddles both countries simultaneously — half in Canada, half in the United States — a physical monument to the longest undefended border in the world."],
