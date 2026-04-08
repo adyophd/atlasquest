@@ -64,8 +64,15 @@ A+ <40, A <80, A- <120, B+ <160, B <200, B- <240, C+ <280, C <320, C- <360, D+ <
   - Max 200 characters
   - Prefer a fact about a highly famous person associated with the city; only use a different type of fact if no such person exists
   - Surprising, memorable, and consistent in tone across all cities
-  - **Facts must be mutually coherent — no two facts may make contradictory claims.** Before writing any comparative claim (e.g. "the only," "the smallest," "the second-least"), verify it doesn't conflict with another city's fact. Known violation to fix: Pierre (SD) and Augusta (ME) both currently claim to be the second-least-populous state capital — only one can be true (Pierre at ~14k is smaller; Augusta at ~19k is third).
+  - **Facts must be mutually coherent — no two facts may make contradictory claims.** Before writing any comparative claim (e.g. "the only," "the smallest," "the second-least"), verify it doesn't conflict with another city's fact.
   - **Famous person coverage is currently inconsistent.** When the full fact set is next revised, audit each fact: if a city is associated with a famous person and the current fact doesn't mention one, replace it.
+
+- **City selection rules (enforce strictly when adding or changing any country's city list):**
+  - Each standard country has exactly 20 cities, ordered by **cultural significance / international fame** (most famous first)
+  - "Cultural significance" means how widely recognized the city is globally — consider historical importance, tourism, pop culture presence, and name recognition among educated non-natives
+  - The Easy (top 5), Medium (top 10), Hard (top 15), and Very Hard (top 20) difficulties are derived by slicing this ordered list — so ordering matters
+  - **Do not overwrite an existing country's city list without explicit user instruction.** When adding a new country, confirm the list with the user before committing.
+  - Some countries use a different structure (e.g. USA uses state capitals and largest cities, not a top-20 by fame list) — check existing data before assuming the standard 20-city format applies
 - Portland disambiguated as "Portland (ME)" and "Portland (OR)" in USA data
 - Inspect button on quiz feedback collapses the modal so the map is visible with guess/answer markers still showing
 - `adamyoungphd.com` is decommissioned — serves a blank page via a separate Netlify site (adamyoungphd-decommissioned)
