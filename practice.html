@@ -697,26 +697,26 @@
 // ── City data ──
 const allCities = {
   france: [
-    { name: "Paris",            lat: 48.8566,  lng:  2.3522 },
-    { name: "Marseille",        lat: 43.2965,  lng:  5.3698 },
-    { name: "Lyon",             lat: 45.7640,  lng:  4.8357 },
-    { name: "Toulouse",         lat: 43.6047,  lng:  1.4442 },
-    { name: "Nice",             lat: 43.7102,  lng:  7.2620 },
-    { name: "Nantes",           lat: 47.2184,  lng: -1.5536 },
-    { name: "Montpellier",      lat: 43.6119,  lng:  3.8772 },
-    { name: "Strasbourg",       lat: 48.5734,  lng:  7.7521 },
-    { name: "Bordeaux",         lat: 44.8378,  lng: -0.5792 },
-    { name: "Lille",            lat: 50.6292,  lng:  3.0573 },
-    { name: "Rennes",           lat: 48.1173,  lng: -1.6778 },
-    { name: "Reims",            lat: 49.2583,  lng:  4.0317 },
-    { name: "Le Havre",         lat: 49.4944,  lng:  0.1079 },
-    { name: "Saint-Étienne",    lat: 45.4397,  lng:  4.3872 },
-    { name: "Toulon",           lat: 43.1242,  lng:  5.9280 },
-    { name: "Grenoble",         lat: 45.1885,  lng:  5.7245 },
-    { name: "Dijon",            lat: 47.3220,  lng:  5.0415 },
-    { name: "Angers",           lat: 47.4784,  lng: -0.5632 },
-    { name: "Nîmes",            lat: 43.8367,  lng:  4.3601 },
-    { name: "Clermont-Ferrand", lat: 45.7772,  lng:  3.0870 },
+    { name: "Paris",             lat: 48.8566,  lng:  2.3522 }, //  1
+    { name: "Versailles",        lat: 48.8049,  lng:  2.1204 }, //  2
+    { name: "Nice",              lat: 43.7102,  lng:  7.2620 }, //  3
+    { name: "Cannes",            lat: 43.5528,  lng:  7.0174 }, //  4
+    { name: "Marseille",         lat: 43.2965,  lng:  5.3698 }, //  5
+    { name: "Lyon",              lat: 45.7640,  lng:  4.8357 }, //  6
+    { name: "Bordeaux",          lat: 44.8378,  lng: -0.5792 }, //  7
+    { name: "Avignon",           lat: 43.9493,  lng:  4.8055 }, //  8
+    { name: "Mont-Saint-Michel", lat: 48.6360,  lng: -1.5115 }, //  9
+    { name: "Strasbourg",        lat: 48.5734,  lng:  7.7521 }, // 10
+    { name: "Carcassonne",       lat: 43.2130,  lng:  2.3491 }, // 11
+    { name: "Reims",             lat: 49.2583,  lng:  4.0317 }, // 12
+    { name: "Lourdes",           lat: 43.0967,  lng: -0.0447 }, // 13
+    { name: "Toulouse",          lat: 43.6047,  lng:  1.4442 }, // 14
+    { name: "Chamonix",          lat: 45.9237,  lng:  6.8694 }, // 15
+    { name: "Dijon",             lat: 47.3220,  lng:  5.0415 }, // 16
+    { name: "Nîmes",             lat: 43.8367,  lng:  4.3601 }, // 17
+    { name: "Arles",             lat: 43.6768,  lng:  4.6278 }, // 18
+    { name: "Orléans",           lat: 47.9029,  lng:  1.9039 }, // 19
+    { name: "Chartres",          lat: 48.4469,  lng:  1.4886 }, // 20
   ],
   japan: [
     { name: "Tokyo",      lat: 35.6762,  lng: 139.6503 }, // 1  universal recognition
@@ -1023,6 +1023,16 @@ const cityFacts = {
   "Angers": ["Angers Castle contains the Apocalypse Tapestry — 103 meters long, completed around 1382, depicting the Book of Revelation. It is the largest surviving medieval tapestry on Earth."],
   "Nîmes": ["'Denim' comes from 'de Nîmes' — fabric from this city. Exported to Genoa and America, it became the material of blue jeans. The fashion that defines casual American dress was named after a French town."],
   "Clermont-Ferrand": ["The First Crusade — two centuries of holy war between Christian Europe and the Muslim world — was launched with a single speech by Pope Urban II in Clermont-Ferrand in 1095."],
+  "Versailles": ["Louis XIV moved his court to Versailles to keep 20,000 nobles, servants, and guards under his eye — away from Paris. One courtier's only recorded job was handing the king his shirt each morning."],
+  "Cannes": ["The Cannes Film Festival was founded in 1946 because the French refused to let Mussolini control the 1939 Venice Film Festival. Rather than participate under fascist influence, France created its own rival."],
+  "Avignon": ["For 68 years (1309–77), the Pope lived in Avignon rather than Rome after a French king effectively took the papacy hostage. Seven successive popes ruled all of Christendom from this southern French city."],
+  "Mont-Saint-Michel": ["Mont-Saint-Michel sits on a tidal island cut off from the mainland twice daily by Europe's fastest-rising tides. Medieval pilgrims who misjudged the sea were swallowed by the bay — giving it the name 'St. Michael in Peril of the Sea.'"],
+  "Carcassonne": ["By the 19th century, Carcassonne's medieval walls were so neglected that the French government ordered the city demolished. The architect Viollet-le-Duc saved it — and in doing so invented modern historic preservation."],
+  "Lourdes": ["In 1858, a 14-year-old girl named Bernadette reported 18 visions of the Virgin Mary in a grotto near Lourdes. The town has since become the world's second most-visited Catholic pilgrimage site, after the Vatican."],
+  "Chamonix": ["The first Winter Olympics were held here in 1924. Chamonix already had a 138-year history as the birthplace of alpinism — Mont Blanc was first summited in 1786 by two men who departed from this valley."],
+  "Arles": ["Van Gogh moved to Arles in 1888 and painted over 200 works in 14 months — 'The Night Café,' 'Starry Night over the Rhône,' 'Bedroom in Arles.' It was here that he cut off part of his own ear."],
+  "Orléans": ["At age 17, Joan of Arc broke the English siege of Orléans in 1429, turning the Hundred Years' War. She had never fought a battle before. Two years later she was captured, tried as a heretic, and burned at the stake."],
+  "Chartres": ["Chartres Cathedral was built in just 26 years (1194–1220) — remarkably fast for Gothic construction. Its 176 original stained-glass windows, including the famed 'Chartres blue,' survive largely intact after 800 years."],
 
   // ── Germany ──
   "Berlin": ["Einstein lived in Berlin from 1914–1933 and published General Relativity here. When the Nazis rose to power, he was on a US lecture tour and never returned — abandoning his Berlin apartment forever."],
