@@ -1522,7 +1522,7 @@ function showPendingGuess(lat, lng) {
 }
 
 function distScore(dist) {
-  return Math.max(0, Math.round(100 * Math.exp(-0.0005 * Math.max(0, dist - 20))));
+  return Math.max(0, Math.round(100 * Math.exp(-0.0012 * Math.max(0, dist - 20))));
 }
 
 function distGrade(dist) {
