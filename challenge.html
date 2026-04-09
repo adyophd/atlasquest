@@ -93,11 +93,11 @@
       font-size: 2.8rem; font-weight: 800; line-height: 1;
       margin-bottom: 6px; letter-spacing: 1px;
     }
-    #feedback-grade.grade-a { color: #7effa0; }
-    #feedback-grade.grade-b { color: #b8f542; }
-    #feedback-grade.grade-c { color: #f5c842; }
-    #feedback-grade.grade-d { color: #ff9a3c; }
-    #feedback-grade.grade-f { color: #ff6b6b; }
+    .score-great { color: #7effa0; }
+    .score-good  { color: #b8f542; }
+    .score-ok    { color: #f5c842; }
+    .score-poor  { color: #ff9a3c; }
+    .score-bad   { color: #ff6b6b; }
     #feedback-detail { font-size: 0.95rem; color: #bbb; margin-bottom: 16px; }
     #feedback-btns { display: flex; gap: 10px; justify-content: center; }
     #next-btn {
@@ -188,11 +188,11 @@
     #end-grade {
       font-size: 5rem; font-weight: 800; line-height: 1; letter-spacing: 2px;
     }
-    #end-grade.grade-a { color: #7effa0; }
-    #end-grade.grade-b { color: #b8f542; }
-    #end-grade.grade-c { color: #f5c842; }
-    #end-grade.grade-d { color: #ff9a3c; }
-    #end-grade.grade-f { color: #ff6b6b; }
+    #end-grade.score-great { color: #7effa0; }
+    #end-grade.score-good  { color: #b8f542; }
+    #end-grade.score-ok    { color: #f5c842; }
+    #end-grade.score-poor  { color: #ff9a3c; }
+    #end-grade.score-bad   { color: #ff6b6b; }
     #end-dist { font-size: 0.9rem; color: #888; letter-spacing: 1px; }
     #end-message { font-size: 1rem; color: #ccc; }
     #end-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
@@ -606,20 +606,16 @@ function haversineMiles(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function distGrade(dist) {
-  if (dist <  40) return { label: 'A+', cls: 'grade-a' };
-  if (dist <  80) return { label: 'A',  cls: 'grade-a' };
-  if (dist < 120) return { label: 'A-', cls: 'grade-a' };
-  if (dist < 160) return { label: 'B+', cls: 'grade-b' };
-  if (dist < 200) return { label: 'B',  cls: 'grade-b' };
-  if (dist < 240) return { label: 'B-', cls: 'grade-b' };
-  if (dist < 280) return { label: 'C+', cls: 'grade-c' };
-  if (dist < 320) return { label: 'C',  cls: 'grade-c' };
-  if (dist < 360) return { label: 'C-', cls: 'grade-c' };
-  if (dist < 400) return { label: 'D+', cls: 'grade-d' };
-  if (dist < 440) return { label: 'D',  cls: 'grade-d' };
-  if (dist < 480) return { label: 'D-', cls: 'grade-d' };
-  return { label: 'F', cls: 'grade-f' };
+function distScore(dist) {
+  return Math.max(0, Math.round(100 * Math.exp(-0.000348 * dist)));
+}
+
+function scoreClass(s) {
+  if (s >= 90) return 'score-great';
+  if (s >= 70) return 'score-good';
+  if (s >= 50) return 'score-ok';
+  if (s >= 30) return 'score-poor';
+  return 'score-bad';
 }
 
 // ── Seeded PRNG (mulberry32) ──
@@ -748,7 +744,7 @@ let quizIndex          = 0;
 let quizTotalDist      = 0;
 let quizBestCity       = null; // { name, dist }
 let quizWorstCity      = null; // { name, dist }
-let quizCityGrades     = [];   // grade labels in play order
+let quizCityScores     = [];   // numeric scores in play order
 let quizAnswered       = false;
 let quizGuessMarker    = null;
 let quizAnswerMarker   = null;
@@ -787,8 +783,8 @@ function showQuizQuestion() {
   document.getElementById('q-total').textContent     = challengeCities.length;
   document.getElementById('feedback-banner').style.display  = 'none';
   document.getElementById('feedback-overlay').style.display = 'none';
-  document.getElementById('feedback-grade').textContent     = '';
-  document.getElementById('feedback-grade').className       = '';
+  document.getElementById('feedback-grade').textContent = '';
+  document.getElementById('feedback-grade').className   = '';
 
   const nextBtn = document.getElementById('next-btn');
   nextBtn.textContent = quizIndex + 1 < challengeCities.length ? 'Next →' : 'Finish';
@@ -815,7 +811,7 @@ function handleQuizClick(guessLat, guessLng) {
   quizTotalDist += dist;
   if (!quizBestCity  || dist < quizBestCity.dist)  quizBestCity  = { name: city.name, dist };
   if (!quizWorstCity || dist > quizWorstCity.dist) quizWorstCity = { name: city.name, dist };
-  quizCityGrades.push(distGrade(dist).label);
+  quizCityScores.push(distScore(dist));
 
   // Normalize to the map copy closest to the city so visuals don't wrap the long way
   let normGuessLng = guessLng;
@@ -877,15 +873,15 @@ function handleQuizClick(guessLat, guessLng) {
   });
 
   const distDisplay = dist < 10 ? dist.toFixed(1) : Math.round(dist);
-  const grade = distGrade(dist);
+  const pts = distScore(dist);
   const banner = document.getElementById('feedback-banner');
   banner.className = 'inspect-mode';
   document.getElementById('feedback-result').textContent = city.state
     ? `${city.name}, ${city.state}, ${city.country}`
     : `${city.name}, ${city.country}`;
   const gradeEl = document.getElementById('feedback-grade');
-  gradeEl.textContent = grade.label;
-  gradeEl.className   = grade.cls;
+  gradeEl.textContent = pts;
+  gradeEl.className   = scoreClass(pts);
   document.getElementById('feedback-detail').textContent = `${distDisplay} miles off`;
   banner.style.display  = 'block';
 }
@@ -896,7 +892,7 @@ function getTodayKey() {
 }
 function saveChallenge() {
   localStorage.setItem(getTodayKey(), JSON.stringify({
-    grades:    quizCityGrades,
+    scores:    quizCityScores,
     bestCity:  quizBestCity,
     worstCity: quizWorstCity,
     totalDist: quizTotalDist,
@@ -917,16 +913,18 @@ function showEndScreen(fromStorage = false) {
 
   if (!fromStorage) saveChallenge();
 
-  const avg   = quizTotalDist / challengeCities.length;
-  const grade = distGrade(avg);
+  const avg      = quizTotalDist / challengeCities.length;
+  const avgScore = quizCityScores.length
+    ? Math.round(quizCityScores.reduce((a, b) => a + b, 0) / quizCityScores.length)
+    : distScore(avg);
 
-  document.getElementById('end-grade').textContent  = grade.label;
-  document.getElementById('end-grade').className    = grade.cls;
+  document.getElementById('end-grade').textContent  = avgScore;
+  document.getElementById('end-grade').className    = scoreClass(avgScore);
   document.getElementById('end-dist').textContent   = `${Math.round(avg)} mi average · ${challengeCities.length} cities`;
   document.getElementById('end-message').textContent =
-    avg <  30 ? 'Incredible — you know the world!' :
-    avg <  80 ? 'Great geography skills!' :
-    avg < 150 ? 'Not bad — keep exploring!' : 'Keep practicing!';
+    avgScore >= 98 ? 'Incredible — you know the world!' :
+    avgScore >= 90 ? 'Great geography skills!' :
+    avgScore >= 75 ? 'Not bad — keep exploring!' : 'Keep practicing!';
 
   document.getElementById('end-screen').style.display = 'flex';
   document.getElementById('end-screen').scrollTop = 0;
@@ -952,26 +950,20 @@ document.getElementById('confirm-yes-btn').addEventListener('click', () => {
 document.getElementById('confirm-back-btn').addEventListener('click', clearPending);
 
 document.getElementById('share-btn').addEventListener('click', async () => {
-  const grade  = document.getElementById('end-grade').textContent;
+  const score  = parseInt(document.getElementById('end-grade').textContent, 10);
   const distEl = document.getElementById('end-dist').textContent; // "78 mi average · 5 cities"
   const miAvg  = distEl.split(' mi')[0];
 
-  const gradeEmoji = {
-    'A+': '💯', 'A': '🚀', 'A-': '🧠',
-    'B+': '💪', 'B': '🤌', 'B-': '🤙',
-    'C+': '🥸', 'C': '🥱', 'C-': '🥴',
-    'D+': '👹', 'D': '💩', 'D-': '🤡',
-    'F': '💀'
-  }[grade] || '🗺️';
+  const scoreEmoji = score >= 90 ? '💯' : score >= 70 ? '🧠' : score >= 50 ? '🙂' : score >= 30 ? '😅' : '💀';
 
-  const citySquare = g => {
-    if (g === 'F')                          return '🟥';
-    if (g === 'D+' || g === 'D' || g === 'D-') return '🟧';
-    if (g === 'C+' || g === 'C' || g === 'C-') return '🟨';
-    if (g === 'B+' || g === 'B' || g === 'B-') return '🟩';
-    return '✅'; // A-, A, A+
+  const citySquare = s => {
+    if (s >= 90) return '✅';
+    if (s >= 70) return '🟩';
+    if (s >= 50) return '🟨';
+    if (s >= 30) return '🟧';
+    return '🟥';
   };
-  const squares = quizCityGrades.map(citySquare).join('');
+  const squares = quizCityScores.map(citySquare).join('');
 
   const etParts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' }).formatToParts(new Date());
   const etMonthShort = etParts.find(p => p.type === 'month').value;
@@ -979,7 +971,7 @@ document.getElementById('share-btn').addEventListener('click', async () => {
   const etDay   = etParts.find(p => p.type === 'day').value;
   const etDate  = `${etMonth} ${etDay}`;
 
-  const text = `AtlasQuest.io - ${etDate}\nAvg: ${miAvg} miles - ${grade} ${gradeEmoji}\n${squares}`;
+  const text = `AtlasQuest.io - ${etDate}\nScore: ${score} ${scoreEmoji}\n${squares}`;
   const url    = 'https://atlasquest.io/challenge.html';
 
   if (navigator.share) {
@@ -1010,7 +1002,7 @@ map.on('click', function(e) {
 // ── Start ──
 const _todayResult = loadTodayResult();
 if (_todayResult) {
-  quizCityGrades = _todayResult.grades;
+  quizCityScores = _todayResult.scores || [];
   quizBestCity   = _todayResult.bestCity;
   quizWorstCity  = _todayResult.worstCity;
   quizTotalDist  = _todayResult.totalDist;
