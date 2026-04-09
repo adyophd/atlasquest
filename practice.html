@@ -1895,8 +1895,8 @@ function getCountryGlobeColor(key) {
   for (let i = 0; i < diffs.length; i++) {
     if (results[`${key}_${diffs[i]}`]) highest = i;
   }
-  if (highest === -1) return '#2B2833';            // unlocked, not yet passed
-  const tierColors = ['#b82e00', '#8a6100', '#17673A', '#005985']; // Easy→Medium→Hard→Very Hard
+  if (highest === -1) return '#243558';            // unlocked, not yet passed (fill same as unavailable)
+  const tierColors = ['#4a4a4a', '#CD7F32', '#C0C0C0', '#FFD700']; // Iron→Bronze→Silver→Gold
   return tierColors[Math.min(highest, tierColors.length - 1)];
 }
 
@@ -1986,7 +1986,7 @@ function getCountryGlow(key) {
         ctx.shadowBlur = 0;
       } else if (key) {
         ctx.fillStyle  = getCountryGlobeColor(key);
-        ctx.shadowColor = '#005985';
+        ctx.shadowColor = '#FFD700';
         ctx.shadowBlur  = getCountryGlow(key);
       } else {
         ctx.fillStyle  = '#243558';
@@ -1994,6 +1994,12 @@ function getCountryGlow(key) {
       }
       ctx.fill();
       ctx.shadowBlur = 0; // always reset — prevents bleed into borders pass
+      // White outline for available-but-unplayed countries
+      if (key && key !== hoveredKey && getCountryGlobeColor(key) === '#243558') {
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+      }
     }
 
     // Borders
