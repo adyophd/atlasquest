@@ -632,7 +632,7 @@
     <div id="prompt-label">Tap the map to place your guess</div>
     <div id="city-prompt">—</div>
   </div>
-  <div id="progress">Question <span id="q-num">1</span> of <span id="q-total">20</span> &nbsp;|&nbsp; Avg: <span id="score">—</span></div>
+  <div id="progress">Question <span id="q-num">1</span> of <span id="q-total">20</span> &nbsp;|&nbsp; Score: <span id="score">—</span></div>
 </div>
 
 <div id="map"></div>
@@ -1444,6 +1444,7 @@ function hideInfoPanel() {
 let quizQueue         = [];
 let quizIndex         = 0;
 let quizTotalDist     = 0;
+let quizTotalScore    = 0;
 let quizAnswered      = false;
 let quizGuessMarker    = null;
 let quizAnswerMarker   = null;
@@ -1482,7 +1483,8 @@ function startQuiz() {
   clearQuizOverlays();
   quizQueue     = shuffle(cities.map((_, i) => i));
   quizIndex     = 0;
-  quizTotalDist = 0;
+  quizTotalDist  = 0;
+  quizTotalScore = 0;
   quizAnswered  = false;
   document.getElementById('end-screen').style.display = 'none';
   showQuizQuestion();
@@ -1501,7 +1503,7 @@ function showQuizQuestion() {
   document.getElementById('q-num').textContent       = quizIndex + 1;
   document.getElementById('q-total').textContent     = quizQueue.length;
   document.getElementById('score').textContent       = quizIndex > 0
-    ? Math.round(quizTotalDist / quizIndex) + ' mi' : '—';
+    ? Math.round(quizTotalScore / quizIndex) : '—';
 
   document.getElementById('feedback-banner').style.display  = 'none';
   document.getElementById('feedback-overlay').style.display = 'none';
@@ -1517,6 +1519,10 @@ function showPendingGuess(lat, lng) {
     radius: 10, color: '#fff', fillColor: '#60b4ff', fillOpacity: 0.85, weight: 2.5
   }).addTo(map);
   document.getElementById('confirm-banner').style.display = 'block';
+}
+
+function distScore(dist) {
+  return Math.max(0, Math.round(100 * Math.exp(-0.0005 * Math.max(0, dist - 20))));
 }
 
 function distGrade(dist) {
@@ -1546,7 +1552,8 @@ function handleQuizClick(guessLat, guessLng) {
   const ci   = quizQueue[quizIndex];
   const city = cities[ci];
   const dist = haversineMiles(guessLat, guessLng, city.lat, city.lng);
-  quizTotalDist += dist;
+  quizTotalDist  += dist;
+  quizTotalScore += distScore(dist);
 
   // Normalize to the map copy closest to the city so visuals don't wrap the long way
   let normGuessLng = guessLng;
@@ -1610,8 +1617,7 @@ function handleQuizClick(guessLat, guessLng) {
   });
 
   // Update running average
-  const avg = quizTotalDist / (quizIndex + 1);
-  document.getElementById('score').textContent = Math.round(avg) + ' mi';
+  document.getElementById('score').textContent = Math.round(quizTotalScore / (quizIndex + 1));
 
   // Feedback banner
   const distDisplay = dist < 10 ? dist.toFixed(1) : Math.round(dist);
@@ -1634,12 +1640,13 @@ function getScores() {
   catch { return []; }
 }
 
-function saveScoreEntry(name, avgDist, country) {
+function saveScoreEntry(name, avgDist, avgScore, country) {
   const scores = getScores();
   const ts = Date.now();
   scores.push({
     name: name.trim() || 'Anonymous',
     avgDist: Math.round(avgDist),
+    avgScore,
     country,
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     ts,
@@ -1651,7 +1658,7 @@ function saveScoreEntry(name, avgDist, country) {
 function renderLeaderboard(country, highlightTs) {
   const sorted = getScores()
     .filter(s => s.country === country)
-    .sort((a, b) => a.avgDist - b.avgDist)
+    .sort((a, b) => (b.avgScore ?? 0) - (a.avgScore ?? 0))
     .slice(0, 15);
 
   const rows = sorted.length
@@ -1659,13 +1666,13 @@ function renderLeaderboard(country, highlightTs) {
         <tr ${s.ts === highlightTs ? 'class="lb-new"' : ''}>
           <td>${i + 1}</td>
           <td>${s.name}</td>
-          <td>${s.avgDist} mi</td>
+          <td>${s.avgScore ?? '—'}</td>
           <td>${s.date}</td>
         </tr>`).join('')
     : '<tr><td colspan="4" style="color:#444;padding:12px">No scores yet</td></tr>';
 
   document.getElementById('scores-table').innerHTML =
-    `<tr><th>#</th><th>Name</th><th>Avg</th><th>Date</th></tr>${rows}`;
+    `<tr><th>#</th><th>Name</th><th>Score</th><th>Date</th></tr>${rows}`;
   document.getElementById('leaderboard').style.display = 'block';
 }
 
@@ -1674,13 +1681,14 @@ function showEndScreen() {
   document.getElementById('feedback-overlay').style.display = 'none';
   clearQuizOverlays();
 
-  const avg = quizTotalDist / quizQueue.length;
+  const avg      = quizTotalDist / quizQueue.length;
+  const avgScore = Math.round(quizTotalScore / quizQueue.length);
   saveBestGrade(currentCountry, currentDifficulty, distGrade(avg).label);
-  document.getElementById('final-score').textContent = Math.round(avg) + ' mi';
+  document.getElementById('final-score').textContent = avgScore;
   document.getElementById('final-label').textContent =
-    avg < 30  ? 'Incredible — perfect geography!' :
-    avg < 80  ? 'Great geography skills!' :
-    avg < 150 ? 'Not bad — keep exploring!' : 'Keep practicing!';
+    avgScore >= 98 ? 'Incredible — perfect geography!' :
+    avgScore >= 90 ? 'Great geography skills!' :
+    avgScore >= 75 ? 'Not bad — keep exploring!' : 'Keep practicing!';
 
   document.getElementById('player-name').value = '';
   document.getElementById('save-score-btn').disabled = false;
@@ -2134,9 +2142,10 @@ document.getElementById('play-again-btn').addEventListener('click', () => {
 });
 
 document.getElementById('save-score-btn').addEventListener('click', () => {
-  const name = document.getElementById('player-name').value;
-  const avg  = quizTotalDist / quizQueue.length;
-  const ts   = saveScoreEntry(name, avg, currentCountry);
+  const name     = document.getElementById('player-name').value;
+  const avg      = quizTotalDist / quizQueue.length;
+  const avgScore = Math.round(quizTotalScore / quizQueue.length);
+  const ts       = saveScoreEntry(name, avg, avgScore, currentCountry);
   document.getElementById('save-score-btn').disabled = true;
   document.getElementById('name-entry').style.display = 'none';
   renderLeaderboard(currentCountry, ts);
