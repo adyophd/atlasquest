@@ -673,19 +673,11 @@ document.getElementById('confirm-back-btn').addEventListener('click', clearPendi
 
 document.getElementById('share-btn').addEventListener('click', async () => {
   const score  = parseInt(document.getElementById('end-grade').textContent, 10);
-  const distEl = document.getElementById('end-dist').textContent; // "78 mi average · 5 cities"
-  const miAvg  = distEl.split(' mi')[0];
 
-  const scoreEmoji = score >= 97 ? '🗿' : score >= 93 ? '🚀' : score >= 90 ? '🧠' : score >= 87 ? '💪' : score >= 83 ? '🤌' : score >= 80 ? '🤙' : score >= 77 ? '🥸' : score >= 73 ? '🥱' : score >= 70 ? '🥴' : score >= 67 ? '👹' : score >= 63 ? '💩' : score >= 60 ? '🤡' : '💀';
+  const gradeEmoji = s => s >= 97 ? '🗿' : s >= 93 ? '🚀' : s >= 90 ? '🧠' : s >= 87 ? '💪' : s >= 83 ? '🤌' : s >= 80 ? '🤙' : s >= 77 ? '🥸' : s >= 73 ? '🥱' : s >= 70 ? '🥴' : s >= 67 ? '👹' : s >= 63 ? '💩' : s >= 60 ? '🤡' : '💀';
 
-  const citySquare = s => {
-    if (s >= 90) return '✅';
-    if (s >= 70) return '🟩';
-    if (s >= 50) return '🟨';
-    if (s >= 30) return '🟧';
-    return '🟥';
-  };
-  const squares = quizCityScores.map(citySquare).join('');
+  const cityLine = quizCityScores.map(s => `${s} ${gradeEmoji(s)}`).join('  ');
+  const finalScore = score * 10;
 
   const etParts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' }).formatToParts(new Date());
   const etMonthShort = etParts.find(p => p.type === 'month').value;
@@ -693,7 +685,7 @@ document.getElementById('share-btn').addEventListener('click', async () => {
   const etDay   = etParts.find(p => p.type === 'day').value;
   const etDate  = `${etMonth} ${etDay}`;
 
-  const text = `AtlasQuest.io - ${etDate}\nScore: ${score} ${scoreEmoji}\n${squares}`;
+  const text = `AtlasQuest.io - ${etDate}\n${cityLine}\nFinal score: ${finalScore}`;
   const url    = 'https://atlasquest.io/challenge.html';
 
   if (navigator.share) {
