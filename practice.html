@@ -1256,8 +1256,9 @@ function handleQuizClick(guessLat, guessLng) {
   const ci   = quizQueue[quizIndex];
   const city = cities[ci];
   const dist = haversineMiles(guessLat, guessLng, city.lat, city.lng);
+  const pts  = distScore(dist);
   quizTotalDist  += dist;
-  quizTotalScore += distScore(dist);
+  quizTotalScore += pts;
 
   // Normalize to the map copy closest to the city so visuals don't wrap the long way
   let normGuessLng = guessLng;
