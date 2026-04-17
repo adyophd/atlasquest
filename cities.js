@@ -316,4 +316,31 @@ const allCities = {
     { name: "Broome",        lat: -17.9614, lng:  122.2359, country: "Australia"   }, // 19
     { name: "Ballarat",      lat: -37.5622, lng:  143.8503, country: "Australia"   }, // 20
   ],
+  southeast_asia: [
+    { name: "Bangkok",             lat:  13.7563, lng: 100.5018, country: "Thailand"    }, //  1
+    { name: "Singapore",           lat:   1.3521, lng: 103.8198, country: "Singapore"   }, //  2
+    { name: "Denpasar, Bali",      lat:  -8.6705, lng: 115.2126, country: "Indonesia"   }, //  3
+    { name: "Hanoi",               lat:  21.0285, lng: 105.8542, country: "Vietnam"     }, //  4
+    { name: "Ho Chi Minh City",    lat:  10.8231, lng: 106.6297, country: "Vietnam"     }, //  5
+    { name: "Kuala Lumpur",        lat:   3.1390, lng: 101.6869, country: "Malaysia"    }, //  6
+    { name: "Siem Reap",           lat:  13.3671, lng: 103.8448, country: "Cambodia"    }, //  7
+    { name: "Chiang Mai",          lat:  18.7883, lng:  98.9853, country: "Thailand"    }, //  8
+    { name: "Phuket",              lat:   7.8804, lng:  98.3923, country: "Thailand"    }, //  9
+    { name: "Jakarta",             lat:  -6.2088, lng: 106.8456, country: "Indonesia"   }, // 10
+    { name: "Manila",              lat:  14.5995, lng: 120.9842, country: "Philippines" }, // 11
+    { name: "Luang Prabang",       lat:  19.8845, lng: 102.1348, country: "Laos"        }, // 12
+    { name: "Yangon",              lat:  16.8661, lng:  96.1951, country: "Myanmar"     }, // 13
+    { name: "Hoi An",              lat:  15.8800, lng: 108.3380, country: "Vietnam"     }, // 14
+    { name: "Phnom Penh",          lat:  11.5564, lng: 104.9282, country: "Cambodia"    }, // 15
+    { name: "Penang",              lat:   5.4141, lng: 100.3288, country: "Malaysia"    }, // 16
+    { name: "Vientiane",           lat:  17.9757, lng: 102.6331, country: "Laos"        }, // 17
+    { name: "Cebu",                lat:  10.3157, lng: 123.8854, country: "Philippines" }, // 18
+    { name: "Surabaya",            lat:  -7.2575, lng: 112.7521, country: "Indonesia"   }, // 19
+    { name: "Da Nang",             lat:  16.0544, lng: 108.2022, country: "Vietnam"     }, // 20
+    { name: "Naypyidaw",           lat:  19.7633, lng:  96.0785, country: "Myanmar"     }, // 21
+    { name: "Bandar Seri Begawan", lat:   4.9031, lng: 114.9398, country: "Brunei"      }, // 22
+    { name: "Medan",               lat:   3.5952, lng:  98.6722, country: "Indonesia"   }, // 23
+    { name: "Dili",                lat:  -8.5569, lng: 125.5789, country: "Timor-Leste" }, // 24
+    { name: "Davao",               lat:   7.1907, lng: 125.4553, country: "Philippines" }, // 25
+  ],
 };

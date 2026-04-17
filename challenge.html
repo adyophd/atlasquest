@@ -372,12 +372,12 @@ function getDailyEasternSeed() {
 const countryLabels = {
   france: 'France', germany: 'Germany', russia: 'Russia',
   japan: 'Japan', canada: 'Canada', india: 'India', usa: 'USA', china: 'China',
-  british_isles: 'British Isles', oceania: 'Australia & NZ', south_america: 'South America',
+  british_isles: 'British Isles', oceania: 'Australia & NZ', south_america: 'South America', southeast_asia: 'Southeast Asia',
 };
 
 function buildTieredPools() {
   const pools = { easyUSA: [], easyWorld: [], medium: [], hard: [], veryHard: [] };
-  ['france','germany','russia','japan','canada','india','china','british_isles','oceania','south_america'].forEach(country => {
+  ['france','germany','russia','japan','canada','india','china','british_isles','oceania','south_america','southeast_asia'].forEach(country => {
     allCities[country].forEach((city, idx) => {
       const tier = idx < 5 ? 'easyWorld' : idx < 10 ? 'medium' : idx < 15 ? 'hard' : 'veryHard';
       pools[tier].push({ name: city.name, country: city.country || countryLabels[country], lat: city.lat, lng: city.lng });

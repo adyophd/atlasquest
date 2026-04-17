@@ -702,6 +702,7 @@ const mapSettings = {
   british_isles:  { center: [54.0,  -3.0],  zoom: 5, label: 'BRITISH ISLES'  },
   oceania:        { center: [-27.0, 148.0], zoom: 3, label: 'AUSTRALIA & NZ' },
   south_america:  { center: [-15.0, -58.0], zoom: 3, label: 'SOUTH AMERICA'  },
+  southeast_asia: { center: [  5.0, 115.0], zoom: 4, label: 'SOUTHEAST ASIA' },
 };
 
 // ── City facts (learn mode info panel) ──
@@ -1081,6 +1082,33 @@ const cityFacts = {
   "Asunción":       ["Paraguay's War of the Triple Alliance (1864–1870) killed 60–70% of the population — the highest proportional wartime death toll in any modern conflict. Women outnumbered men 4-to-1 in the aftermath."],
   "Georgetown":     ["Georgetown is the only English-speaking capital in South America. Colonized by Britain rather than Spain or Portugal, Guyana is culturally closer to the Caribbean than to its South American neighbors."],
   "Paramaribo":     ["Paramaribo is the only Dutch-speaking capital in South America. Suriname was a Dutch colony until 1975 — its wooden colonial architecture earned the historic center a UNESCO World Heritage listing."],
+
+  // ── Southeast Asia ──
+  "Bangkok":             ["Bangkok holds the world's longest official city name — a 169-character ceremonial Thai title. Locals call it 'Krung Thep,' meaning City of Angels, though the full name takes over 30 seconds to recite."],
+  "Singapore":           ["Lee Kuan Yew, born here in 1923, transformed Singapore from a third-world colonial port into one of the world's richest nations in under 30 years — with no oil, no land, and no natural resources."],
+  "Denpasar, Bali":      ["German artist Walter Spies moved to Bali in 1927, choreographed the Kecak dance for Western tourists, and nearly single-handedly invented the romantic myth of Bali as an exotic paradise island."],
+  "Hanoi":               ["Ho Chi Minh refused to live in the Governor's Palace after liberation, choosing a simple wooden stilt house in its garden. The palace stands unused today; his modest home became a national shrine."],
+  "Ho Chi Minh City":    ["Graham Greene stayed at the Hotel Majestic here in 1952 and wrote 'The Quiet American' — his most politically charged novel. The hotel still serves the cocktail he ordered at the rooftop bar."],
+  "Kuala Lumpur":        ["The Petronas Towers, designed by César Pelli, were the world's tallest buildings from 1998 to 2004. At 1,483 feet, they beat the Sears Tower only by adding a decorative spire — a disputed victory."],
+  "Siem Reap":           ["French naturalist Henri Mouhot published his account of Angkor Wat in 1863, writing it surpassed 'anything left to us by Greece or Rome.' He died of fever in Laos before the article reached Europe."],
+  "Chiang Mai":          ["Chiang Mai was capital of the Lanna Kingdom from 1296 until Burmese forces captured it in 1558. It remained under Burmese rule for 200 years — longer than the United States has existed."],
+  "Phuket":              ["The limestone karsts of Phang Nga Bay — 'James Bond Island' — starred in 'The Man with the Golden Gun' (1974), making Phuket's seascape one of cinema's most recognizable tropical backdrops."],
+  "Jakarta":             ["Indonesia's founding president Sukarno proclaimed independence on this city's Pegangsaan East street in 1945, reading a 40-word declaration before just 500 people after Japan's sudden surrender."],
+  "Manila":              ["José Rizal was executed by Spanish firing squad in Luneta Park here in 1896. His final poem — folded into an oil lamp hidden in his shoe — was smuggled out by his sister after his death."],
+  "Luang Prabang":       ["French explorer Francis Garnier mapped the Mekong River from this royal capital in 1866, believing it would open China to trade. The river proved too shallow for steamboats; the mission failed."],
+  "Yangon":              ["Aung San Suu Kyi spent 15 of 21 years under house arrest here. She turned down the chance to leave Myanmar in 1989 — forfeiting the chance to be with her dying husband — to remain with her people."],
+  "Hoi An":              ["Hoi An was the busiest trading port in Southeast Asia in the 1600s, with Japanese, Chinese, and Dutch merchants living in separate quarters. Its ancient streets have barely changed since."],
+  "Phnom Penh":          ["When Pol Pot's Khmer Rouge captured this city in 1975, they evacuated the entire population of two million people on foot within 72 hours — one of history's largest forced urban evacuations."],
+  "Penang":              ["Francis Light founded this port in 1786, reportedly firing silver coins from a cannon into the jungle to motivate workers. Whether true or not, the story is so vivid that Penang still celebrates it."],
+  "Vientiane":           ["Siamese forces razed Vientiane in 1828 and left it empty for decades. France rebuilt it from ruins in the 1890s — one of history's rare cases of a capital city being entirely destroyed and restarted."],
+  "Cebu":                ["Ferdinand Magellan landed here in 1521 and was killed by warrior Lapu-Lapu — making Lapu-Lapu the first person in history to repel a European colonial force in Asia."],
+  "Surabaya":            ["Indonesia's founding president Sukarno was born here in 1901. His name fused 'Sura' (shark) and 'Baya' (crocodile) — the two creatures locked in combat on the city's coat of arms."],
+  "Da Nang":             ["The first US combat troops of the Vietnam War waded ashore here on March 8, 1965 — greeted not by enemy fire but by Vietnamese women placing flower garlands around their necks."],
+  "Naypyidaw":           ["Myanmar's junta relocated the capital here overnight in 2005, reportedly on an astrologer's advice. The new city has 20-lane highways with almost no traffic and a population smaller than most towns."],
+  "Bandar Seri Begawan": ["Sultan Hassanal Bolkiah owns a palace here with 1,788 rooms — the world's largest residential palace. His private car collection once exceeded 7,000 vehicles, the largest ever assembled."],
+  "Medan":               ["Dutch merchant Jacob Nienhuys established Sumatra's Deli tobacco plantation near here in 1863. The leaf became the world's most prized cigar wrapper, making this region richer than any Dutch colony."],
+  "Dili":                ["Xanana Gusmão led the resistance against Indonesian occupation, was imprisoned for seven years, then became Timor-Leste's first president in 2002 — the world's newest nation at the time."],
+  "Davao":               ["Rodrigo Duterte served as mayor here for 22 years before becoming Philippine president in 2016. He tested his anti-crime campaign in Davao first, later scaling it to the entire nation."],
 
 }
 
@@ -1484,7 +1512,7 @@ function updateModeNav() {
 }
 
 // ── Country selection ──
-const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳', british_isles: '🇬🇧', oceania: '🇦🇺', south_america: '🌎' };
+const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳', british_isles: '🇬🇧', oceania: '🇦🇺', south_america: '🌎', southeast_asia: '🌏' };
 
 function startCountry(country) {
   currentCountry = country;
@@ -1525,6 +1553,28 @@ function startCountry(country) {
         <span class="diff-btn-name">Durísimo</span>
         <span class="diff-btn-desc">All 25 cities</span>
       </button>`;
+  } else if (country === 'southeast_asia') {
+    diffButtons.innerHTML = `
+      <button class="diff-btn" data-difficulty="easy">
+        <span class="diff-btn-name">Easy</span>
+        <span class="diff-btn-desc">Top 5 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="medium">
+        <span class="diff-btn-name">Medium</span>
+        <span class="diff-btn-desc">Top 10 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="hard">
+        <span class="diff-btn-name">Hard</span>
+        <span class="diff-btn-desc">Top 15 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="veryhard">
+        <span class="diff-btn-name">Very Hard</span>
+        <span class="diff-btn-desc">Top 20 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="susahpayah">
+        <span class="diff-btn-name">Susah Payah</span>
+        <span class="diff-btn-desc">All 25 cities</span>
+      </button>`;
   } else {
     diffButtons.innerHTML = `
       <button class="diff-btn" data-difficulty="easy">
@@ -1559,7 +1609,7 @@ function startDifficulty(difficulty) {
   } else if (difficulty === 'capitals_plus') {
     cities = allCities[currentCountry].slice();
   } else {
-    const count = { easy: 5, medium: 10, hard: 15, veryhard: 20, durisimo: 25 }[difficulty];
+    const count = { easy: 5, medium: 10, hard: 15, veryhard: 20, durisimo: 25, susahpayah: 25 }[difficulty];
     cities = allCities[currentCountry].slice(0, count);
   }
 
@@ -1615,7 +1665,8 @@ const DIFF_ORDER = {
   china:         ['easy','medium','hard','veryhard'],
   british_isles: ['easy','medium','hard','veryhard'],
   oceania:       ['easy','medium','hard','veryhard'],
-  south_america: ['easy','medium','hard','veryhard','durisimo'],
+  south_america:  ['easy','medium','hard','veryhard','durisimo'],
+  southeast_asia: ['easy','medium','hard','veryhard','susahpayah'],
   usa:           ['capitals','capitals_plus'],
 };
 
@@ -1671,17 +1722,21 @@ function getCountryGlow(key) {
     604: 'south_america', 152: 'south_america', 862: 'south_america',
     218: 'south_america',  68: 'south_america', 600: 'south_america',
     858: 'south_america', 328: 'south_america', 740: 'south_america',
+    764: 'southeast_asia', 704: 'southeast_asia', 360: 'southeast_asia',
+    458: 'southeast_asia', 608: 'southeast_asia', 104: 'southeast_asia',
+    116: 'southeast_asia', 418: 'southeast_asia', 702: 'southeast_asia',
+     96: 'southeast_asia', 626: 'southeast_asia',
   };
   const KEY_LABELS = {
     france: 'France', germany: 'Germany', russia: 'Russia', japan: 'Japan',
     canada: 'Canada', india: 'India', usa: 'United States', china: 'China',
     british_isles: 'British Isles', oceania: 'Australia & NZ',
-    south_america: 'South America'
+    south_america: 'South America', southeast_asia: 'Southeast Asia'
   };
   const KEY_FLAGS = {
     france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵',
     canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳',
-    british_isles: '🇬🇧', oceania: '🇦🇺', south_america: '🌎'
+    british_isles: '🇬🇧', oceania: '🇦🇺', south_america: '🌎', southeast_asia: '🌏'
   };
 
   function setLabel(key) {
