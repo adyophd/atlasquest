@@ -516,6 +516,8 @@ function showPendingGuess(lat, lng) {
 }
 
 function handleQuizClick(guessLat, guessLng) {
+  guessSound.currentTime = 0;
+  guessSound.play().catch(() => {});
   if (quizAnswered) return;
   quizAnswered = true;
 
@@ -645,6 +647,9 @@ function showEndScreen(fromStorage = false) {
   document.getElementById('end-screen').style.display = 'flex';
   document.getElementById('end-screen').scrollTop = 0;
 }
+
+// ── Audio ──
+const guessSound = new Audio('mixkit-game-click-1114.wav');
 
 // ── Event listeners ──
 document.getElementById('next-btn').addEventListener('click', () => {

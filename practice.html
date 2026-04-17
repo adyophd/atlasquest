@@ -1908,8 +1908,13 @@ document.getElementById('player-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('save-score-btn').click();
 });
 
+// ── Audio ──
+const guessSound = new Audio('mixkit-game-click-1114.wav');
+
 // ── Quiz: confirm / back ──
 document.getElementById('confirm-yes-btn').addEventListener('click', () => {
+  guessSound.currentTime = 0;
+  guessSound.play().catch(() => {});
   if (!quizPendingCoords) return;
   const { lat, lng } = quizPendingCoords;
   quizPendingCoords = null;
