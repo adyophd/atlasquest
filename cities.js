@@ -223,6 +223,33 @@ const allCities = {
     { name: "Seattle",       lat: 47.6062,  lng: -122.3321, state: "Washington" },
     { name: "Milwaukee",     lat: 43.0389,  lng: -87.9065,  state: "Wisconsin" },
   ],
+  south_america: [
+    { name: "Rio de Janeiro", lat: -22.9068, lng: -43.1729, country: "Brazil"    }, //  1
+    { name: "Buenos Aires",   lat: -34.6037, lng: -58.3816, country: "Argentina" }, //  2
+    { name: "Cusco",          lat: -13.5319, lng: -71.9675, country: "Peru"       }, //  3
+    { name: "São Paulo",      lat: -23.5505, lng: -46.6333, country: "Brazil"    }, //  4
+    { name: "Cartagena",      lat:  10.3910, lng: -75.4794, country: "Colombia"  }, //  5
+    { name: "Lima",           lat: -12.0464, lng: -77.0428, country: "Peru"       }, //  6
+    { name: "Medellín",       lat:   6.2442, lng: -75.5812, country: "Colombia"  }, //  7
+    { name: "Bogotá",         lat:   4.7110, lng: -74.0721, country: "Colombia"  }, //  8
+    { name: "Santiago",       lat: -33.4489, lng: -70.6693, country: "Chile"     }, //  9
+    { name: "Montevideo",     lat: -34.9011, lng: -56.1645, country: "Uruguay"   }, // 10
+    { name: "Ushuaia",        lat: -54.8019, lng: -68.3030, country: "Argentina" }, // 11
+    { name: "Manaus",         lat:  -3.1190, lng: -60.0217, country: "Brazil"    }, // 12
+    { name: "Brasília",       lat: -15.7801, lng: -47.9292, country: "Brazil"    }, // 13
+    { name: "La Paz",         lat: -16.5000, lng: -68.1193, country: "Bolivia"   }, // 14
+    { name: "Salvador",       lat: -12.9714, lng: -38.5014, country: "Brazil"    }, // 15
+    { name: "Valparaíso",     lat: -33.0472, lng: -71.6127, country: "Chile"     }, // 16
+    { name: "Quito",          lat:  -0.1807, lng: -78.4678, country: "Ecuador"   }, // 17
+    { name: "Caracas",        lat:  10.4806, lng: -66.9036, country: "Venezuela" }, // 18
+    { name: "Mendoza",        lat: -32.8908, lng: -68.8272, country: "Argentina" }, // 19
+    { name: "Cali",           lat:   3.4516, lng: -76.5320, country: "Colombia"  }, // 20
+    { name: "Bariloche",      lat: -41.1335, lng: -71.3103, country: "Argentina" }, // 21
+    { name: "Potosí",         lat: -19.5836, lng: -65.7531, country: "Bolivia"   }, // 22
+    { name: "Asunción",       lat: -25.2867, lng: -57.6470, country: "Paraguay"  }, // 23
+    { name: "Georgetown",     lat:   6.8013, lng: -58.1553, country: "Guyana"    }, // 24
+    { name: "Paramaribo",     lat:   5.8520, lng: -55.2038, country: "Suriname"  }, // 25
+  ],
   china: [
     { name: "Beijing",   lat: 39.9042, lng: 116.4074 },
     { name: "Shanghai",  lat: 31.2304, lng: 121.4737 },

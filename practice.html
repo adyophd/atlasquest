@@ -706,6 +706,7 @@ const mapSettings = {
   china:          { center: [35.0, 104.0],  zoom: 4, label: 'CHINA'          },
   british_isles:  { center: [54.0,  -3.0],  zoom: 5, label: 'BRITISH ISLES'  },
   oceania:        { center: [-27.0, 148.0], zoom: 3, label: 'AUSTRALIA & NZ' },
+  south_america:  { center: [-15.0, -58.0], zoom: 3, label: 'SOUTH AMERICA'  },
 };
 
 // ── City facts (learn mode info panel) ──
@@ -1058,6 +1059,33 @@ const cityFacts = {
   "Byron Bay":     ["Byron Bay marks the easternmost point of mainland Australia. Once a sleepy whaling town, it transformed in the 1970s when surfers, artists, and musicians made it the country's counterculture capital."],
   "Broome":        ["In the early 1900s, Broome supplied 80% of the world's mother-of-pearl. At its peak, 400 pearling luggers operated from this remote coast, crewed by Aboriginal, Japanese, and Malay divers."],
   "Ballarat":      ["Ballarat's 1854 Eureka Stockade was Australia's only armed rebellion — miners fighting the colonial government over licenses. It lasted 20 minutes but is considered the birth of Australian democracy."],
+
+  // ── South America ──
+  "Rio de Janeiro": ["Tom Jobim composed 'The Girl from Ipanema' in Rio in 1962 — it became the second most recorded pop song in history, behind only 'Yesterday.'"],
+  "Buenos Aires":   ["Jorge Luis Borges — who invented modern magical realism through labyrinths and infinite libraries — was born, lived, and died in Buenos Aires, never winning the Nobel Prize he deserved."],
+  "Cusco":          ["Cusco was the capital of the Inca Empire — the largest pre-Columbian empire in history, stretching 4,300 miles. The Spanish built their cathedral directly atop the Inca sun temple's foundations."],
+  "São Paulo":      ["Ayrton Senna — Formula 1's most beloved driver, three-time world champion — was born in São Paulo. When he died in a 1994 crash, Brazil declared three days of national mourning."],
+  "Cartagena":      ["Gabriel García Márquez set Love in the Time of Cholera in Cartagena and later moved there. He wrote that the city's crumbling walls and Caribbean heat were the only place he could think."],
+  "Lima":           ["Mario Vargas Llosa — who won the Nobel Prize in Literature in 2010 — grew up in Lima and set most of his novels there. He ran for president of Peru in 1990 and lost to Alberto Fujimori."],
+  "Medellín":       ["Pablo Escobar — the Medellín Cartel's kingpin and history's wealthiest criminal — was so powerful he offered to pay Colombia's entire national debt in exchange for a no-extradition guarantee."],
+  "Bogotá":         ["Bogotá's Ciclovía shuts 75 miles of city streets to cars every Sunday for cyclists and pedestrians. Started in 1976, it became the global model adopted by over 400 cities worldwide."],
+  "Santiago":       ["Pablo Neruda won the Nobel Prize in Literature in 1971. Twelve days after Pinochet's coup destroyed his Santiago home in 1973, Neruda died — his death remains controversial to this day."],
+  "Montevideo":     ["José Mujica — Uruguay's president 2010–2015 — donated 90% of his salary to charity and lived on his farm rather than the presidential palace, calling it 'ridiculous' to live otherwise."],
+  "Ushuaia":        ["Ushuaia is the world's southernmost city, closer to Antarctica than to Buenos Aires. Tierra del Fuego — 'Land of Fire' — was named by Magellan for the indigenous fires he spotted offshore."],
+  "Manaus":         ["The Teatro Amazonas was built in Manaus at the 1896 rubber boom's peak — marble from Italy, steel from England. Werner Herzog used it as a symbol of colonial madness in Fitzcarraldo."],
+  "Brasília":       ["Oscar Niemeyer designed Brasília's entire government district in three years. Built from nothing in 41 months, it earned UNESCO World Heritage status 25 years before most cities were even nominated."],
+  "La Paz":         ["La Paz is the world's highest-altitude capital at 11,975 feet. The air is so thin that visiting athletes gasp and fires barely sustain — so the city built the world's largest urban cable car network."],
+  "Salvador":       ["Jorge Amado — whose novels Gabriela and Dona Flor made Brazil's African-influenced Bahian culture famous worldwide — was born near Salvador and set all his major works in its streets."],
+  "Valparaíso":     ["Valparaíso's 42 hills are covered in murals by artists from every continent — an open-air gallery so vast it takes days to walk. UNESCO declared the historic quarter a World Heritage Site in 2003."],
+  "Quito":          ["Quito was among the first cities declared a UNESCO World Heritage Site in 1978. Its colonial center is the largest and best-preserved in Latin America, streets unchanged since the 16th century."],
+  "Caracas":        ["Simón Bolívar — who freed six South American nations from Spanish rule — was born in Caracas in 1783. Bolivia is the only country ever named after a living person at the time of its founding."],
+  "Mendoza":        ["General San Martín launched his famous Andes crossing from Mendoza in 1817 — 5,000 soldiers over 13,000-foot passes to liberate Chile. Military historians compare it to Hannibal crossing the Alps."],
+  "Cali":           ["Cali is the world capital of salsa dancing — where the dance is not entertainment but a way of life. The Cali style, with rapid intricate footwork, is taught separately from every other form of salsa."],
+  "Bariloche":      ["Bariloche is Argentina's chocolate capital — its artisanal shops were founded by Swiss and German immigrants who arrived in the early 1900s and recreated their Alpine tradition in Patagonia's mountains."],
+  "Potosí":         ["Potosí's silver mines funded the Spanish Empire for 200 years. 'Worth a Potosí' — used by Cervantes in Don Quixote — became a Spanish idiom for limitless wealth. The city once rivaled London in size."],
+  "Asunción":       ["Paraguay's War of the Triple Alliance (1864–1870) killed 60–70% of the population — the highest proportional wartime death toll in any modern conflict. Women outnumbered men 4-to-1 in the aftermath."],
+  "Georgetown":     ["Georgetown is the only English-speaking capital in South America. Colonized by Britain rather than Spain or Portugal, Guyana is culturally closer to the Caribbean than to its South American neighbors."],
+  "Paramaribo":     ["Paramaribo is the only Dutch-speaking capital in South America. Suriname was a Dutch colony until 1975 — its wooden colonial architecture earned the historic center a UNESCO World Heritage listing."],
 
 }
 
@@ -1461,7 +1489,7 @@ function updateModeNav() {
 }
 
 // ── Country selection ──
-const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳', british_isles: '🇬🇧', oceania: '🇦🇺' };
+const countryFlags = { france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵', canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳', british_isles: '🇬🇧', oceania: '🇦🇺', south_america: '🌎' };
 
 function startCountry(country) {
   currentCountry = country;
@@ -1479,6 +1507,28 @@ function startCountry(country) {
       <button class="diff-btn" data-difficulty="capitals_plus">
         <span class="diff-btn-name">Capitals Plus</span>
         <span class="diff-btn-desc">Capitals + largest cities</span>
+      </button>`;
+  } else if (country === 'south_america') {
+    diffButtons.innerHTML = `
+      <button class="diff-btn" data-difficulty="easy">
+        <span class="diff-btn-name">Easy</span>
+        <span class="diff-btn-desc">Top 5 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="medium">
+        <span class="diff-btn-name">Medium</span>
+        <span class="diff-btn-desc">Top 10 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="hard">
+        <span class="diff-btn-name">Hard</span>
+        <span class="diff-btn-desc">Top 15 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="veryhard">
+        <span class="diff-btn-name">Very Hard</span>
+        <span class="diff-btn-desc">Top 20 cities</span>
+      </button>
+      <button class="diff-btn" data-difficulty="durisimo">
+        <span class="diff-btn-name">Durísimo</span>
+        <span class="diff-btn-desc">All 25 cities</span>
       </button>`;
   } else {
     diffButtons.innerHTML = `
@@ -1514,7 +1564,7 @@ function startDifficulty(difficulty) {
   } else if (difficulty === 'capitals_plus') {
     cities = allCities[currentCountry].slice();
   } else {
-    const count = { easy: 5, medium: 10, hard: 15, veryhard: 20 }[difficulty];
+    const count = { easy: 5, medium: 10, hard: 15, veryhard: 20, durisimo: 25 }[difficulty];
     cities = allCities[currentCountry].slice(0, count);
   }
 
