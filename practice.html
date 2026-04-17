@@ -1620,6 +1620,7 @@ const DIFF_ORDER = {
   china:         ['easy','medium','hard','veryhard'],
   british_isles: ['easy','medium','hard','veryhard'],
   oceania:       ['easy','medium','hard','veryhard'],
+  south_america: ['easy','medium','hard','veryhard','durisimo'],
   usa:           ['capitals','capitals_plus'],
 };
 
@@ -1670,17 +1671,22 @@ function getCountryGlow(key) {
     250: 'france', 276: 'germany', 643: 'russia', 392: 'japan',
     124: 'canada', 356: 'india',  840: 'usa',    156: 'china',
     826: 'british_isles', 372: 'british_isles',
-     36: 'oceania',       554: 'oceania'
+     36: 'oceania',       554: 'oceania',
+     76: 'south_america',  32: 'south_america', 170: 'south_america',
+    604: 'south_america', 152: 'south_america', 862: 'south_america',
+    218: 'south_america',  68: 'south_america', 600: 'south_america',
+    858: 'south_america', 328: 'south_america', 740: 'south_america',
   };
   const KEY_LABELS = {
     france: 'France', germany: 'Germany', russia: 'Russia', japan: 'Japan',
     canada: 'Canada', india: 'India', usa: 'United States', china: 'China',
-    british_isles: 'British Isles', oceania: 'Australia & NZ'
+    british_isles: 'British Isles', oceania: 'Australia & NZ',
+    south_america: 'South America'
   };
   const KEY_FLAGS = {
     france: '🇫🇷', germany: '🇩🇪', russia: '🇷🇺', japan: '🇯🇵',
     canada: '🇨🇦', india: '🇮🇳', usa: '🇺🇸', china: '🇨🇳',
-    british_isles: '🇬🇧', oceania: '🇦🇺'
+    british_isles: '🇬🇧', oceania: '🇦🇺', south_america: '🌎'
   };
 
   function setLabel(key) {
