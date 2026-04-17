@@ -674,9 +674,9 @@ document.getElementById('confirm-back-btn').addEventListener('click', clearPendi
 document.getElementById('share-btn').addEventListener('click', async () => {
   const score  = parseInt(document.getElementById('end-grade').textContent, 10);
 
-  const gradeEmoji = s => s >= 97 ? '🗿' : s >= 93 ? '🚀' : s >= 90 ? '🧠' : s >= 87 ? '💪' : s >= 83 ? '🤌' : s >= 80 ? '🤙' : s >= 77 ? '🥸' : s >= 73 ? '🥱' : s >= 70 ? '🥴' : s >= 67 ? '👹' : s >= 63 ? '💩' : s >= 60 ? '🤡' : '💀';
+  const gradeEmoji = s => s === 100 ? '🗿' : s >= 93 ? '🚀' : s >= 90 ? '🧠' : s >= 87 ? '💪' : s >= 83 ? '🤌' : s >= 80 ? '🤙' : s >= 77 ? '🥸' : s >= 73 ? '🥱' : s >= 70 ? '🥴' : s >= 67 ? '👹' : s >= 63 ? '💩' : s >= 60 ? '🤡' : '💀';
 
-  const cityLine = quizCityScores.map(s => `${s} ${gradeEmoji(s)}`).join('  ');
+  const cityLine = quizCityScores.map(s => `${s} ${gradeEmoji(s)}`).join(' ');
   const finalScore = score * 10;
 
   const etParts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' }).formatToParts(new Date());
