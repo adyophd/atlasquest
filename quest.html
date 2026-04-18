@@ -498,14 +498,14 @@ function showScreen(name) {
     document.getElementById('map').classList.add('quiz-mode');
     document.getElementById('back-to-globe-btn').style.display = 'block';
     document.getElementById('region-name-header').textContent  = QUEST_REGIONS[activeRegion].name;
-    setTimeout(() => leafletMap.invalidateSize(), 40);
+    setTimeout(() => { leafletMap.invalidateSize(); fitMapToRegion(activeRegion); }, 40);
   } else if (name === 'learn') {
     document.getElementById('learn-hint').style.display        = 'block';
     document.getElementById('map').style.display               = 'block';
     document.getElementById('learn-counter').style.display     = 'block';
     document.getElementById('back-to-globe-btn').style.display = 'block';
     document.getElementById('region-name-header').textContent  = QUEST_REGIONS[activeRegion].name;
-    setTimeout(() => leafletMap.invalidateSize(), 40);
+    setTimeout(() => { leafletMap.invalidateSize(); fitMapToRegion(activeRegion); }, 40);
   } else if (name === 'result') {
     document.getElementById('result-screen').style.display     = 'flex';
   } else if (name === 'travel') {
@@ -607,7 +607,6 @@ function startQuiz(key) {
 
   clearQuizOverlays();
   leafletMap.closePopup();
-  fitMapToRegion(key);
   showScreen('quiz');
   showQuizQuestion();
 }
@@ -820,7 +819,6 @@ function startLearnMode() {
     learnMarkers.push(m);
   });
 
-  fitMapToRegion(activeRegion);
   showScreen('learn');
   updateRetryBtn(nonMastered);
 }
@@ -932,9 +930,10 @@ document.getElementById('back-to-globe-btn').addEventListener('click', () => {
 
 // ── Globe ──
 let globeRotation = [98, -38, 0]; // centered on continental US
+let globeZoom = 1.0;
 
 function drawGlobe()     { globeRedraw && globeRedraw(); }
-function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
+function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; globeZoom = 3.0; }
 
 (function initGlobe() {
   const canvas   = document.getElementById('globe-canvas');
@@ -990,7 +989,7 @@ function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
     canvas.width = canvas.height = s;
     canvas.style.width = canvas.style.height = s + 'px';
     if (projection) {
-      projection.scale(s / 2.1).translate([s / 2, s / 2]);
+      projection.scale(s / 2.1 * globeZoom).translate([s / 2, s / 2]);
       path = d3.geoPath(projection, ctx);
     }
   }
@@ -998,7 +997,7 @@ function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
   function setupProjection() {
     const s = canvas.width;
     projection = d3.geoOrthographic()
-      .scale(s / 2.1)
+      .scale(s / 2.1 * globeZoom)
       .translate([s / 2, s / 2])
       .clipAngle(90)
       .rotate(globeRotation);
@@ -1007,7 +1006,7 @@ function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
 
   function draw() {
     if (!projection || !usData) return;
-    projection.rotate(globeRotation);
+    projection.rotate(globeRotation).scale(canvas.width / 2.1 * globeZoom);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Ocean
@@ -1094,7 +1093,7 @@ function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
     const [x, y] = canvasCoords(e.clientX, e.clientY);
     if (dragging) {
       const dx = e.clientX - dragStart[0], dy = e.clientY - dragStart[1];
-      globeRotation = [rotStart[0] + dx * 0.3, Math.max(-90, Math.min(90, rotStart[1] - dy * 0.3)), 0];
+      globeRotation = [rotStart[0] + dx * 0.3 / globeZoom, Math.max(-90, Math.min(90, rotStart[1] - dy * 0.3 / globeZoom)), 0];
       lastInteract = performance.now();
     } else {
       const key = findRegionAt(x, y);
@@ -1129,36 +1128,69 @@ function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
     dragging = false; hoveredKey = null; setLabel(null);
   });
 
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 0.88 : 1.14;
+    globeZoom = Math.max(1.0, Math.min(8.0, globeZoom * factor));
+    lastInteract = performance.now();
+  }, { passive: false });
+
   // Touch
   let touchOrigin = null, touchRotOrigin = null;
+  let pinchStartDist = null, pinchStartZoom = null;
+
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
-    const t = e.touches[0];
-    touchOrigin = touchRotOrigin = null;
-    touchOrigin = [t.clientX, t.clientY];
-    touchRotOrigin = [...globeRotation];
     lastInteract = performance.now();
+    if (e.touches.length === 2) {
+      const dx = e.touches[1].clientX - e.touches[0].clientX;
+      const dy = e.touches[1].clientY - e.touches[0].clientY;
+      pinchStartDist = Math.hypot(dx, dy);
+      pinchStartZoom = globeZoom;
+      touchOrigin = null;
+    } else {
+      const t = e.touches[0];
+      touchOrigin = [t.clientX, t.clientY];
+      touchRotOrigin = [...globeRotation];
+      pinchStartDist = null;
+    }
   }, { passive: false });
 
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
-    if (!touchOrigin) return;
-    const t = e.touches[0];
-    const dx = t.clientX - touchOrigin[0], dy = t.clientY - touchOrigin[1];
-    globeRotation = [touchRotOrigin[0] + dx * 0.3, Math.max(-90, Math.min(90, touchRotOrigin[1] - dy * 0.3)), 0];
     lastInteract = performance.now();
+    if (e.touches.length === 2 && pinchStartDist !== null) {
+      const dx = e.touches[1].clientX - e.touches[0].clientX;
+      const dy = e.touches[1].clientY - e.touches[0].clientY;
+      const dist = Math.hypot(dx, dy);
+      globeZoom = Math.max(1.0, Math.min(8.0, pinchStartZoom * (dist / pinchStartDist)));
+    } else if (e.touches.length === 1 && touchOrigin) {
+      const t = e.touches[0];
+      const dx = t.clientX - touchOrigin[0], dy = t.clientY - touchOrigin[1];
+      globeRotation = [touchRotOrigin[0] + dx * 0.3 / globeZoom, Math.max(-90, Math.min(90, touchRotOrigin[1] - dy * 0.3 / globeZoom)), 0];
+    }
   }, { passive: false });
 
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
-    if (!touchOrigin) return;
-    const t = e.changedTouches[0];
-    const dx = Math.abs(t.clientX - touchOrigin[0]), dy = Math.abs(t.clientY - touchOrigin[1]);
-    if (dx < 8 && dy < 8) {
-      const [x, y] = canvasCoords(t.clientX, t.clientY);
-      onRegionClick(findRegionAt(x, y));
+    if (e.touches.length === 0) {
+      if (touchOrigin && pinchStartDist === null) {
+        const t = e.changedTouches[0];
+        const dx = Math.abs(t.clientX - touchOrigin[0]), dy = Math.abs(t.clientY - touchOrigin[1]);
+        if (dx < 8 && dy < 8) {
+          const [x, y] = canvasCoords(t.clientX, t.clientY);
+          onRegionClick(findRegionAt(x, y));
+        }
+      }
+      touchOrigin = null;
+      pinchStartDist = null;
+    } else if (e.touches.length === 1) {
+      // Transition from pinch → single drag
+      pinchStartDist = null;
+      const t = e.touches[0];
+      touchOrigin = [t.clientX, t.clientY];
+      touchRotOrigin = [...globeRotation];
     }
-    touchOrigin = null;
   }, { passive: false });
 
   window.addEventListener('resize', () => { resize(); draw(); });
@@ -1182,6 +1214,14 @@ function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
         feature: f,
         stateId: String(f.id).padStart(2, '0'),
       }));
+      // Center globe on last completed region (or start region) at intermediate zoom
+      const completedKeys = Object.keys(questProgress.completed);
+      const focusKey = completedKeys.length > 0 ? completedKeys[completedKeys.length - 1] : QUEST_START;
+      const focusRegion = QUEST_REGIONS[focusKey];
+      const cLat = focusRegion.cities.reduce((s, c) => s + c.lat, 0) / focusRegion.cities.length;
+      const cLng = focusRegion.cities.reduce((s, c) => s + c.lng, 0) / focusRegion.cities.length;
+      globeRotation = [-cLng, -cLat, 0];
+      globeZoom = 3.0;
       resize();
       setupProjection();
       requestAnimationFrame(animate);
