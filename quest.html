@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AtlasQuest — Quest</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+    * { -webkit-tap-highlight-color: transparent; }
+    button { touch-action: manipulation; }
+
+    /* ── Header ── */
+    #header {
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.55);
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 100;
+    }
+    #game-brand { color: #f5c842; font-weight: 700; letter-spacing: 3px; font-size: 1rem; text-decoration: none; }
+    #region-name-header { font-size: 0.85rem; color: #aaa; letter-spacing: 1px; flex: 1; text-align: center; }
+    #back-to-globe-btn {
+      display: none; background: transparent; border: 1px solid #444; border-radius: 6px;
+      color: #888; padding: 6px 14px; font-size: 0.82rem; cursor: pointer;
+      font-family: inherit; letter-spacing: 0.5px; white-space: nowrap;
+    }
+    #back-to-globe-btn:hover { border-color: #aaa; color: #ccc; }
+
+    /* ── Globe screen ── */
+    #globe-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px;
+      min-height: 0;
+    }
+    #globe-canvas { display: block; border-radius: 50%; cursor: grab; touch-action: none; }
+    #globe-canvas:active { cursor: grabbing; }
+    #globe-region-label { min-height: 44px; text-align: center; }
+    #globe-region-name { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #f5c842; text-transform: uppercase; }
+    #globe-region-states { font-size: 0.72rem; color: #666; margin-top: 3px; letter-spacing: 1px; }
+    #globe-hint { font-size: 0.68rem; color: #3a3a5a; letter-spacing: 1px; text-transform: uppercase; }
+
+    /* ── Quiz bar ── */
+    #quiz-bar {
+      display: none; padding: 8px 20px; background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid #2a2a4a; text-align: center; flex-shrink: 0;
+    }
+    #prompt-box {
+      display: inline-block; background: rgba(245,200,66,0.1);
+      border: 1.5px solid #f5c842; border-radius: 10px; padding: 6px 28px;
+    }
+    #prompt-label { font-size: 0.65rem; color: #aaa; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1px; }
+    #city-prompt { font-size: 1.5rem; font-weight: 700; color: #f5c842; letter-spacing: 2px; }
+    #progress { margin-top: 6px; font-size: 0.75rem; color: #666; }
+    #progress span { color: #bbb; font-weight: bold; }
+
+    /* ── Learn hint ── */
+    #learn-hint {
+      display: none; text-align: center; padding: 5px; font-size: 0.75rem;
+      color: #555; background: rgba(0,0,0,0.3); border-bottom: 1px solid #222; flex-shrink: 0;
+    }
+
+    /* ── Map ── */
+    #map { flex: 1; display: none; min-height: 0; }
+    #map.quiz-mode { cursor: crosshair; }
+    #map .leaflet-container { touch-action: pan-x pan-y; }
+    .leaflet-tile-pane { -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .leaflet-tile { box-shadow: none !important; outline: 1px solid transparent !important; }
+    .leaflet-popup-content-wrapper {
+      background: #1a1a2e; border: 1.5px solid #f5c842; border-radius: 8px;
+      color: #f5c842; font-size: 0.95rem; font-weight: bold;
+      letter-spacing: 1px; box-shadow: 0 0 14px rgba(245,200,66,0.3);
+    }
+    .leaflet-popup-tip { background: #f5c842; }
+    .leaflet-popup-close-button { display: none; }
+
+    /* ── Confirm banner ── */
+    #confirm-banner {
+      display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; background: #1a1a2e; border: 2px solid #60b4ff;
+      border-radius: 14px; padding: 20px 36px; text-align: center;
+      min-width: 290px; box-shadow: 0 4px 24px rgba(0,0,0,0.6); pointer-events: all;
+    }
+    #confirm-question { font-size: 1.3rem; font-weight: bold; color: #60b4ff; margin-bottom: 16px; }
+    #confirm-btns { display: flex; gap: 12px; justify-content: center; }
+    #confirm-back-btn {
+      background: transparent; border: 1.5px solid #555; border-radius: 8px;
+      color: #999; padding: 11px 26px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    #confirm-back-btn:hover { border-color: #aaa; color: #ccc; }
+    #confirm-yes-btn {
+      background: #60b4ff; border: none; border-radius: 8px; color: #1a1a2e;
+      padding: 11px 26px; font-size: 1rem; font-weight: bold; cursor: pointer; font-family: inherit;
+    }
+    #confirm-yes-btn:hover { background: #88caff; }
+
+    /* ── Feedback ── */
+    #feedback-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); z-index: 8000; pointer-events: none;
+    }
+    #feedback-banner {
+      display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; background: #1a1a2e; border-radius: 14px; padding: 20px 36px;
+      text-align: center; min-width: 290px; box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    }
+    #feedback-banner.inspect-mode {
+      bottom: 24px; left: 50%; right: auto; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px; padding: 16px 36px; min-width: 220px;
+    }
+    #feedback-banner.inspect-mode #feedback-result { display: none; }
+    #feedback-banner.inspect-mode #feedback-grade { font-size: 2.6rem; margin: 0; }
+    #feedback-banner.inspect-mode #feedback-detail { margin-bottom: 8px; }
+    #feedback-banner.inspect-mode #feedback-btns { margin: 0; width: 100%; }
+    #feedback-banner.inspect-mode #next-btn { padding: 10px 0; font-size: 0.95rem; width: 100%; }
+    #feedback-result { font-size: 1.4rem; font-weight: bold; margin-bottom: 6px; }
+    #feedback-grade { font-size: 2.8rem; font-weight: 800; line-height: 1; margin-bottom: 6px; letter-spacing: 1px; }
+    .score-great { color: #7effa0; }
+    .score-good  { color: #b8f542; }
+    .score-ok    { color: #f5c842; }
+    .score-poor  { color: #ff9a3c; }
+    .score-bad   { color: #ff6b6b; }
+    #feedback-detail { font-size: 0.95rem; color: #bbb; margin-bottom: 16px; }
+    #feedback-btns { display: flex; gap: 10px; justify-content: center; }
+    #next-btn {
+      background: #f5c842; color: #1a1a2e; border: none; border-radius: 8px;
+      padding: 12px 30px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 1px; pointer-events: all;
+    }
+    #next-btn:hover { background: #ffe066; }
+
+    /* ── Learn mode counter ── */
+    #learn-counter {
+      display: none; position: fixed; bottom: 20px; left: 20px; z-index: 9999;
+      background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 8px;
+      padding: 11px 18px; font-size: 1rem; color: #aaa;
+    }
+    #learn-counter span { color: #7effa0; font-weight: bold; }
+
+    /* ── Retry Quiz button ── */
+    #retry-quiz-btn {
+      display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+      background: #f5c842; color: #1a1a2e; border: none; border-radius: 8px;
+      padding: 12px 22px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 1px; box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+    #retry-quiz-btn:hover { background: #ffe066; }
+
+    /* ── Info panel ── */
+    #info-panel {
+      display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; background: #1a1a2e; border: 1.5px solid #7effa0;
+      border-radius: 14px; padding: 16px 20px 14px;
+      width: calc(100% - 40px); max-width: 500px; box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+    }
+    #info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    #info-city-title { font-size: 0.72rem; letter-spacing: 2px; color: #7effa0; text-transform: uppercase; font-weight: 700; }
+    #info-close-btn { background: none; border: none; color: #555; font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 0 2px; font-family: inherit; }
+    #info-close-btn:hover { color: #aaa; }
+    #info-card-text { font-size: 0.88rem; color: #ccc; line-height: 1.6; min-height: 64px; }
+
+    /* ── Stars ── */
+    .star-wrap { cursor: pointer; font-size: 22px; line-height: 1; transition: transform 0.15s; user-select: none; display: inline-block; }
+    .star-wrap:hover { transform: scale(1.35); }
+    .star-wrap.no-hover:hover { transform: none; cursor: default; }
+    .s-default  { color: #f5c842; filter: drop-shadow(0 0 5px rgba(245,200,66,0.8)); }
+    .s-revealed { color: #7effa0; filter: drop-shadow(0 0 7px rgba(126,255,160,0.9)); }
+    .s-answer   { color: #7effa0; filter: drop-shadow(0 0 8px rgba(126,255,160,1)); animation: pulse 0.6s ease-in-out infinite alternate; }
+    .s-mastered { color: #ffd700; filter: drop-shadow(0 0 8px rgba(255,215,0,0.9)); }
+    @keyframes pulse {
+      from { filter: drop-shadow(0 0 6px rgba(126,255,160,0.6)); }
+      to   { filter: drop-shadow(0 0 18px rgba(126,255,160,1)); }
+    }
+    .quiz-dist-label { background: transparent !important; border: none !important; overflow: visible; }
+
+    /* ── Result screen ── */
+    #result-screen {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 10000; background: rgba(10,10,30,0.96);
+      flex-direction: column; align-items: center; justify-content: flex-start;
+      overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 16px;
+    }
+    #result-inner {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px; text-align: center; width: 100%; max-width: 400px;
+      margin: auto; padding: 32px 0;
+    }
+    #result-region-label { font-size: 0.72rem; letter-spacing: 3px; color: #555; text-transform: uppercase; }
+    #result-medal { font-size: 3.5rem; line-height: 1; }
+    #result-medal-name { font-size: 1.6rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; }
+    #result-medal-name.gold   { color: #ffd700; text-shadow: 0 0 16px rgba(255,215,0,0.5); }
+    #result-medal-name.silver { color: #d0d0d0; }
+    #result-medal-name.bronze { color: #cd7f32; }
+    #result-medal-name.fail   { color: #ff6b6b; }
+    #result-fail-msg { font-size: 0.9rem; color: #ff6b6b; }
+    #result-city-list { width: 100%; border-top: 1px solid #2a2a3e; }
+    .result-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 4px; border-bottom: 1px solid #1e1e2e; font-size: 0.92rem;
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-city-name { color: #ccc; text-align: left; }
+    .result-city-score { font-weight: 700; min-width: 50px; text-align: right; }
+    .result-city-score.pass { color: #7effa0; }
+    .result-city-score.fail { color: #ff6b6b; }
+    #result-btn {
+      background: #f5c842; color: #1a1a2e; border: none; border-radius: 8px;
+      padding: 14px 36px; font-size: 1rem; font-weight: bold; cursor: pointer;
+      letter-spacing: 1px; font-family: inherit; margin-top: 4px;
+    }
+    #result-btn:hover { background: #ffe066; }
+    #result-btn-secondary {
+      background: transparent; color: #555; border: 1.5px solid #2a2a3e;
+      border-radius: 8px; padding: 8px 24px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; letter-spacing: 1px; font-family: inherit;
+    }
+    #result-btn-secondary:hover { border-color: #666; color: #aaa; }
+
+    /* ── Travel screen ── */
+    #travel-screen {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 10000; background: rgba(10,10,30,0.96);
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px; gap: 28px;
+    }
+    #travel-title { font-size: 0.8rem; letter-spacing: 4px; color: #555; text-transform: uppercase; }
+    #travel-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 560px; }
+    .travel-card {
+      background: rgba(255,255,255,0.04); border: 1.5px solid #333; border-radius: 14px;
+      padding: 22px 20px; cursor: pointer; flex: 1; min-width: 140px; max-width: 180px;
+      text-align: center; transition: border-color 0.15s, background 0.15s;
+    }
+    .travel-card:hover { border-color: #f5c842; background: rgba(245,200,66,0.07); }
+    .travel-card-icon { font-size: 2rem; margin-bottom: 10px; }
+    .travel-card-type { font-size: 0.65rem; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
+    .travel-card-dest { font-size: 0.95rem; font-weight: 700; color: #eee; letter-spacing: 0.5px; }
+    .travel-card-dest.mystery { color: #444; font-style: italic; }
+    #travel-back-btn {
+      background: transparent; border: none; color: #444; font-size: 0.82rem;
+      letter-spacing: 1px; cursor: pointer; font-family: inherit; text-transform: uppercase;
+    }
+    #travel-back-btn:hover { color: #888; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      /* Header */
+      #header { padding: 8px 12px; gap: 8px; }
+      #game-brand { letter-spacing: 2px; font-size: 0.92rem; }
+      #region-name-header { font-size: 0.75rem; letter-spacing: 0.5px; }
+      #back-to-globe-btn { padding: 5px 10px; font-size: 0.75rem; }
+
+      /* Globe screen */
+      #globe-screen { gap: 6px; padding: 10px 12px; }
+      #globe-hint { font-size: 0.62rem; }
+
+      /* Quiz bar */
+      #quiz-bar { padding: 7px 12px; }
+      #prompt-box { padding: 5px 16px; }
+      #city-prompt { font-size: 1.25rem; }
+      #progress { font-size: 0.7rem; margin-top: 4px; }
+
+      /* Stars — larger touch targets */
+      .star-wrap { font-size: 30px; }
+
+      /* Banners */
+      #confirm-banner, #feedback-banner {
+        width: calc(100% - 32px); min-width: unset; padding: 16px 16px;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      }
+      #confirm-question { font-size: 1.1rem; }
+      #feedback-grade { font-size: 2.4rem; }
+
+      /* Info panel */
+      #info-panel {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        width: calc(100% - 32px);
+        padding: 14px 16px 12px;
+      }
+      #info-card-text { font-size: 0.82rem; }
+
+      /* Learn overlays */
+      #learn-counter {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        font-size: 0.78rem; padding: 9px 14px;
+      }
+      #retry-quiz-btn {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        padding: 10px 16px; font-size: 0.82rem;
+      }
+
+      /* Result screen */
+      #result-inner { gap: 10px; padding-top: 20px; padding-bottom: max(24px, env(safe-area-inset-bottom, 24px)); }
+      #result-medal { font-size: 2.8rem; }
+      #result-medal-name { font-size: 1.25rem; letter-spacing: 2px; }
+      .result-row { font-size: 0.85rem; padding: 8px 2px; }
+      #result-btn { padding: 13px 28px; font-size: 0.95rem; }
+
+      /* Travel screen — scrollable column on mobile */
+      #travel-screen {
+        justify-content: flex-start;
+        overflow-y: auto; -webkit-overflow-scrolling: touch;
+        padding-top: max(32px, env(safe-area-inset-top, 32px));
+        padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+        padding-left: 16px; padding-right: 16px;
+        gap: 20px;
+      }
+      #travel-cards {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 280px;
+      }
+      .travel-card {
+        width: 100%; max-width: 100%; min-width: unset;
+        padding: 16px 20px;
+        display: flex; align-items: center; gap: 16px; text-align: left;
+        flex: none;
+      }
+      .travel-card-icon { font-size: 1.6rem; margin-bottom: 0; flex-shrink: 0; }
+      .travel-card-type { margin-bottom: 2px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <a id="game-brand" href="index.html">AtlasQuest</a>
+  <span id="region-name-header"></span>
+  <button id="back-to-globe-btn">← Globe</button>
+</div>
+
+<!-- Globe screen -->
+<div id="globe-screen">
+  <canvas id="globe-canvas"></canvas>
+  <div id="globe-region-label">
+    <div id="globe-region-name"></div>
+    <div id="globe-region-states"></div>
+  </div>
+  <div id="globe-hint">Tap a highlighted region to begin</div>
+</div>
+
+<!-- Quiz prompt bar (above map) -->
+<div id="quiz-bar">
+  <div id="prompt-box">
+    <div id="prompt-label">Tap the map to place your guess</div>
+    <div id="city-prompt">—</div>
+  </div>
+  <div id="progress">City <span id="q-num">1</span> of <span id="q-total">7</span></div>
+</div>
+
+<!-- Learn hint bar (above map) -->
+<div id="learn-hint">Tap a star to reveal the city and learn why it's there</div>
+
+<!-- Leaflet map (quiz + learn) -->
+<div id="map"></div>
+
+<!-- Confirm banner -->
+<div id="confirm-banner">
+  <div id="confirm-question">Final Answer?</div>
+  <div id="confirm-btns">
+    <button id="confirm-back-btn">← Back</button>
+    <button id="confirm-yes-btn">Yes ✓</button>
+  </div>
+</div>
+
+<!-- Quiz feedback -->
+<div id="feedback-overlay"></div>
+<div id="feedback-banner">
+  <div id="feedback-result"></div>
+  <div id="feedback-grade"></div>
+  <div id="feedback-detail"></div>
+  <div id="feedback-btns">
+    <button id="next-btn">Next →</button>
+  </div>
+</div>
+
+<!-- Learn mode overlays -->
+<div id="learn-counter">Revealed: <span id="rev-count">0</span> / <span id="city-total">7</span></div>
+<button id="retry-quiz-btn">Retry Quiz →</button>
+
+<!-- City info panel -->
+<div id="info-panel">
+  <div id="info-header">
+    <span id="info-city-title"></span>
+    <button id="info-close-btn">&#x2715;</button>
+  </div>
+  <div id="info-card-text"></div>
+</div>
+
+<!-- Result screen (fixed overlay) -->
+<div id="result-screen">
+  <div id="result-inner">
+    <div id="result-region-label"></div>
+    <div id="result-medal"></div>
+    <div id="result-medal-name"></div>
+    <div id="result-fail-msg"></div>
+    <div id="result-city-list"></div>
+    <button id="result-btn"></button>
+    <button id="result-btn-secondary"></button>
+  </div>
+</div>
+
+<!-- Travel screen (fixed overlay) -->
+<div id="travel-screen">
+  <div id="travel-title">Where to next?</div>
+  <div id="travel-cards"></div>
+  <button id="travel-back-btn">← Stay on globe</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="quest-data.js"></script>
+<script>
+// ── Progress ──
+const PROGRESS_KEY = 'atlasquest_quest_progress';
+
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || { completed: {}, mastered_cities: {} }; }
+  catch { return { completed: {}, mastered_cities: {} }; }
+}
+
+function saveProgress(p) {
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+}
+
+// ── Medal helpers ──
+const MEDAL_RANK = { bronze: 1, silver: 2, gold: 3 };
+
+function computeMedal(scores) {
+  const min = Math.min(...scores);
+  if (min >= 90) return 'gold';
+  if (min >= 80) return 'silver';
+  if (min >= 70) return 'bronze';
+  return null;
+}
+
+function medalEmoji(medal) {
+  return { bronze: '🥉', silver: '🥈', gold: '🥇' }[medal] || '';
+}
+
+// ── Region availability ──
+function isRegionAvailable(key, progress) {
+  if (key === QUEST_START) return true;
+  if (progress.completed[key] !== undefined) return true; // re-quiz
+  const region = QUEST_REGIONS[key];
+  if (!region) return false;
+  return region.adjacent.some(adj => progress.completed[adj] !== undefined);
+}
+
+// ── State ──
+let questScreen = 'globe';
+let activeRegion = null;
+let quizCities = [];
+let quizIndex = 0;
+let quizScores = [];
+let questProgress = loadProgress();
+
+// ── Screen manager ──
+function showScreen(name) {
+  questScreen = name;
+
+  document.getElementById('globe-screen').style.display        = 'none';
+  document.getElementById('quiz-bar').style.display            = 'none';
+  document.getElementById('learn-hint').style.display          = 'none';
+  document.getElementById('map').style.display                 = 'none';
+  document.getElementById('result-screen').style.display       = 'none';
+  document.getElementById('travel-screen').style.display       = 'none';
+  document.getElementById('feedback-banner').style.display     = 'none';
+  document.getElementById('feedback-overlay').style.display    = 'none';
+  document.getElementById('confirm-banner').style.display      = 'none';
+  document.getElementById('info-panel').style.display          = 'none';
+  document.getElementById('learn-counter').style.display       = 'none';
+  document.getElementById('retry-quiz-btn').style.display      = 'none';
+  document.getElementById('back-to-globe-btn').style.display   = 'none';
+  document.getElementById('region-name-header').textContent    = '';
+  document.getElementById('map').classList.remove('quiz-mode');
+
+  if (name === 'globe') {
+    document.getElementById('globe-screen').style.display = 'flex';
+    drawGlobe();
+  } else if (name === 'quiz') {
+    document.getElementById('quiz-bar').style.display          = 'block';
+    document.getElementById('map').style.display               = 'block';
+    document.getElementById('map').classList.add('quiz-mode');
+    document.getElementById('back-to-globe-btn').style.display = 'block';
+    document.getElementById('region-name-header').textContent  = QUEST_REGIONS[activeRegion].name;
+    setTimeout(() => leafletMap.invalidateSize(), 40);
+  } else if (name === 'learn') {
+    document.getElementById('learn-hint').style.display        = 'block';
+    document.getElementById('map').style.display               = 'block';
+    document.getElementById('learn-counter').style.display     = 'block';
+    document.getElementById('back-to-globe-btn').style.display = 'block';
+    document.getElementById('region-name-header').textContent  = QUEST_REGIONS[activeRegion].name;
+    setTimeout(() => leafletMap.invalidateSize(), 40);
+  } else if (name === 'result') {
+    document.getElementById('result-screen').style.display     = 'flex';
+  } else if (name === 'travel') {
+    document.getElementById('travel-screen').style.display     = 'flex';
+  }
+}
+
+// ── Utilities ──
+function haversineMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function distScore(dist) {
+  return Math.max(0, Math.round(100 * Math.exp(-0.000348 * dist)));
+}
+
+function scoreClass(s) {
+  if (s >= 90) return 'score-great';
+  if (s >= 70) return 'score-good';
+  if (s >= 50) return 'score-ok';
+  if (s >= 30) return 'score-poor';
+  return 'score-bad';
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ── Leaflet map ──
+const leafletMap = L.map('map', { center: [38, -96], zoom: 4, zoomControl: true });
+L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { attribution: 'Tiles &copy; Esri', maxZoom: 19, detectRetina: true }
+).addTo(leafletMap);
+
+function makeStarIcon(style) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="star-wrap no-hover s-${style}">&#9733;</div>`,
+    iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -18],
+  });
+}
+
+// ── Quiz ──
+let quizPendingMarker  = null;
+let quizPendingCoords  = null;
+let quizAnswerMarker   = null;
+let quizGuessMarker    = null;
+let quizLine           = null;
+let quizDistLabel      = null;
+let distLabelHandler   = null;
+let quizAnswered       = false;
+
+function clearQuizOverlays() {
+  if (quizPendingMarker)  { leafletMap.removeLayer(quizPendingMarker);  quizPendingMarker  = null; }
+  if (quizAnswerMarker)   { leafletMap.removeLayer(quizAnswerMarker);   quizAnswerMarker   = null; }
+  if (quizGuessMarker)    { leafletMap.removeLayer(quizGuessMarker);    quizGuessMarker    = null; }
+  if (quizLine)           { leafletMap.removeLayer(quizLine);           quizLine           = null; }
+  if (distLabelHandler)   { leafletMap.off('moveend', distLabelHandler); distLabelHandler  = null; }
+  if (quizDistLabel)      { leafletMap.removeLayer(quizDistLabel);      quizDistLabel      = null; }
+  quizPendingCoords = null;
+  document.getElementById('confirm-banner').style.display  = 'none';
+  document.getElementById('feedback-overlay').style.display = 'none';
+  document.getElementById('feedback-banner').style.display  = 'none';
+}
+
+function fitMapToRegion(key) {
+  const cities = QUEST_REGIONS[key].cities;
+  const lats = cities.map(c => c.lat), lngs = cities.map(c => c.lng);
+  leafletMap.fitBounds(
+    [[Math.min(...lats) - 0.8, Math.min(...lngs) - 0.8],
+     [Math.max(...lats) + 0.8, Math.max(...lngs) + 0.8]],
+    { padding: [40, 40] }
+  );
+}
+
+function startQuiz(key) {
+  activeRegion = key;
+  const region = QUEST_REGIONS[key];
+  const mastered = new Set(questProgress.mastered_cities[key] || []);
+
+  let pool = region.cities.filter(c => !mastered.has(c.name));
+  if (pool.length === 0) pool = region.cities.slice(); // all mastered: use all
+  quizCities = shuffle(pool);
+  quizIndex  = 0;
+  quizScores = [];
+  quizAnswered = false;
+
+  clearQuizOverlays();
+  leafletMap.closePopup();
+  fitMapToRegion(key);
+  showScreen('quiz');
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  quizAnswered = false;
+  clearQuizOverlays();
+  leafletMap.closePopup();
+  const city = quizCities[quizIndex];
+  document.getElementById('city-prompt').textContent = `${city.name}, ${city.state}`;
+  document.getElementById('q-num').textContent       = quizIndex + 1;
+  document.getElementById('q-total').textContent     = quizCities.length;
+}
+
+leafletMap.on('click', e => {
+  if (questScreen !== 'quiz' || quizAnswered) return;
+  showPendingGuess(e.latlng.lat, e.latlng.lng);
+});
+
+function showPendingGuess(lat, lng) {
+  if (quizPendingMarker) leafletMap.removeLayer(quizPendingMarker);
+  quizPendingCoords = { lat, lng };
+  quizPendingMarker = L.circleMarker([lat, lng], {
+    radius: 10, color: '#fff', fillColor: '#60b4ff', fillOpacity: 0.85, weight: 2.5
+  }).addTo(leafletMap);
+  document.getElementById('confirm-banner').style.display = 'block';
+}
+
+document.getElementById('confirm-back-btn').addEventListener('click', () => {
+  if (quizPendingMarker) { leafletMap.removeLayer(quizPendingMarker); quizPendingMarker = null; }
+  quizPendingCoords = null;
+  document.getElementById('confirm-banner').style.display = 'none';
+});
+
+document.getElementById('confirm-yes-btn').addEventListener('click', () => {
+  if (quizPendingCoords) handleQuizAnswer(quizPendingCoords.lat, quizPendingCoords.lng);
+});
+
+function handleQuizAnswer(guessLat, guessLng) {
+  quizAnswered = true;
+  if (quizPendingMarker) { leafletMap.removeLayer(quizPendingMarker); quizPendingMarker = null; }
+  document.getElementById('confirm-banner').style.display = 'none';
+
+  const city = quizCities[quizIndex];
+  const dist = haversineMiles(guessLat, guessLng, city.lat, city.lng);
+  const pts  = distScore(dist);
+  quizScores.push(pts);
+
+  // Track mastery (≥95)
+  if (pts >= 95) {
+    if (!questProgress.mastered_cities[activeRegion]) questProgress.mastered_cities[activeRegion] = [];
+    if (!questProgress.mastered_cities[activeRegion].includes(city.name)) {
+      questProgress.mastered_cities[activeRegion].push(city.name);
+      saveProgress(questProgress);
+    }
+  }
+
+  let normGuessLng = guessLng;
+  while (normGuessLng - city.lng > 180)  normGuessLng -= 360;
+  while (normGuessLng - city.lng < -180) normGuessLng += 360;
+
+  quizAnswerMarker = L.marker([city.lat, city.lng], { icon: makeStarIcon('answer') }).addTo(leafletMap);
+  quizAnswerMarker.bindPopup(`<div style="padding:2px 10px">${city.name}</div>`, { closeButton: false, autoClose: false }).openPopup();
+
+  quizLine = L.polyline([[guessLat, normGuessLng], [city.lat, city.lng]], {
+    color: '#aaa', weight: 1.5, dashArray: '6,5', opacity: 0.6
+  }).addTo(leafletMap);
+
+  quizGuessMarker = L.marker([guessLat, normGuessLng], { icon: L.divIcon({
+    className: '',
+    html: '<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,107,107,0.85);border:2px solid #ff6b6b;box-sizing:border-box;"></div>',
+    iconSize: [28, 28], iconAnchor: [14, 14],
+  }) }).addTo(leafletMap);
+
+  const distText = dist < 10 ? dist.toFixed(1) : Math.round(dist);
+  const isTopGrade = dist < 40;
+  const placeDistLabel = () => {
+    distLabelHandler = null;
+    const pA = leafletMap.latLngToContainerPoint([guessLat, normGuessLng]);
+    const pB = leafletMap.latLngToContainerPoint([city.lat, city.lng]);
+    const mx = (pA.x + pB.x) / 2, my = (pA.y + pB.y) / 2;
+    const dx = pB.x - pA.x, dy = pB.y - pA.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const DODGE = 42;
+    let ox = len > 0 ? (-dy / len) * DODGE : DODGE;
+    let oy = len > 0 ? ( dx / len) * DODGE : 0;
+    if (oy > 0) { ox = -ox; oy = -oy; }
+    const ll = leafletMap.containerPointToLatLng(L.point(mx + ox, my + oy));
+    quizDistLabel = L.marker(ll, {
+      icon: L.divIcon({
+        className: 'quiz-dist-label',
+        html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:11px;line-height:1.4;padding:4px 9px;border-radius:6px;white-space:nowrap;text-align:center;">Distance:<br>${distText} mi</div>`,
+        iconSize: null, iconAnchor: [39, 20],
+      })
+    }).addTo(leafletMap);
+  };
+
+  requestAnimationFrame(() => {
+    if (isTopGrade) {
+      placeDistLabel();
+    } else {
+      const c = leafletMap.getContainer();
+      leafletMap.flyToBounds(
+        L.latLngBounds([guessLat, normGuessLng], [city.lat, city.lng]),
+        { padding: [c.offsetWidth / 6, c.offsetHeight / 6], maxZoom: 12 }
+      );
+      distLabelHandler = placeDistLabel;
+      leafletMap.once('moveend', distLabelHandler);
+    }
+  });
+
+  const banner = document.getElementById('feedback-banner');
+  banner.className = 'inspect-mode';
+  document.getElementById('feedback-result').textContent = city.name;
+  const gradeEl = document.getElementById('feedback-grade');
+  gradeEl.textContent = pts;
+  gradeEl.className   = scoreClass(pts);
+  document.getElementById('feedback-detail').textContent = `${distText} miles off`;
+  banner.style.display = 'flex';
+}
+
+document.getElementById('next-btn').addEventListener('click', () => {
+  clearQuizOverlays();
+  leafletMap.closePopup();
+  quizIndex++;
+  if (quizIndex < quizCities.length) {
+    showQuizQuestion();
+  } else {
+    showResultScreen();
+  }
+});
+
+// ── Result screen ──
+function showResultScreen() {
+  const region = QUEST_REGIONS[activeRegion];
+  const medal  = computeMedal(quizScores);
+
+  document.getElementById('result-region-label').textContent = region.name.toUpperCase();
+
+  if (medal) {
+    // Update progress if this is a new or better medal
+    const existing = questProgress.completed[activeRegion];
+    if (!existing || MEDAL_RANK[medal] > MEDAL_RANK[existing]) {
+      questProgress.completed[activeRegion] = medal;
+      saveProgress(questProgress);
+    }
+    document.getElementById('result-medal').textContent     = medalEmoji(medal);
+    const nameEl = document.getElementById('result-medal-name');
+    nameEl.textContent = medal.charAt(0).toUpperCase() + medal.slice(1);
+    nameEl.className   = medal;
+    document.getElementById('result-fail-msg').textContent  = '';
+    document.getElementById('result-btn').textContent       = 'Travel →';
+    document.getElementById('result-btn').onclick           = showTravelScreen;
+    document.getElementById('result-btn-secondary').textContent = '← Globe';
+    document.getElementById('result-btn-secondary').onclick = () => showScreen('globe');
+  } else {
+    document.getElementById('result-medal').textContent     = '✗';
+    const nameEl = document.getElementById('result-medal-name');
+    nameEl.textContent = 'Failed';
+    nameEl.className   = 'fail';
+    const failN = quizScores.filter(s => s < 70).length;
+    document.getElementById('result-fail-msg').textContent  = `${failN} cit${failN === 1 ? 'y' : 'ies'} below 70`;
+    document.getElementById('result-btn').textContent       = 'Review Cities';
+    document.getElementById('result-btn').onclick           = startLearnMode;
+    document.getElementById('result-btn-secondary').textContent = '← Globe';
+    document.getElementById('result-btn-secondary').onclick = () => showScreen('globe');
+  }
+
+  // City score list
+  document.getElementById('result-city-list').innerHTML = quizCities.map((city, i) => {
+    const s = quizScores[i], pass = s >= 70;
+    return `<div class="result-row">
+      <span class="result-city-name">${city.name}</span>
+      <span class="result-city-score ${pass ? 'pass' : 'fail'}">${s} ${pass ? '✓' : '✗'}</span>
+    </div>`;
+  }).join('');
+
+  showScreen('result');
+}
+
+// ── Learn mode ──
+let learnMarkers = [];
+let learnRevealed = new Set();
+
+function startLearnMode() {
+  const region  = QUEST_REGIONS[activeRegion];
+  const mastered = new Set(questProgress.mastered_cities[activeRegion] || []);
+  learnRevealed = new Set();
+
+  learnMarkers.forEach(m => leafletMap.removeLayer(m));
+  learnMarkers = [];
+  leafletMap.closePopup();
+
+  const nonMastered = region.cities.filter(c => !mastered.has(c.name));
+  const masteredArr = region.cities.filter(c =>  mastered.has(c.name));
+
+  document.getElementById('city-total').textContent = nonMastered.length;
+  document.getElementById('rev-count').textContent  = 0;
+
+  nonMastered.forEach(city => {
+    const m = L.marker([city.lat, city.lng], { icon: makeStarIcon('default') }).addTo(leafletMap);
+    m.bindPopup(`<div style="padding:2px 10px">${city.name}</div>`, { closeButton: false, autoClose: false });
+    m.on('click', () => onLearnClick(city, m, nonMastered));
+    learnMarkers.push(m);
+  });
+
+  masteredArr.forEach(city => {
+    const m = L.marker([city.lat, city.lng], { icon: makeStarIcon('mastered') }).addTo(leafletMap);
+    m.bindPopup(`<div style="padding:2px 10px">${city.name} ⭐</div>`, { closeButton: false, autoClose: false });
+    learnMarkers.push(m);
+  });
+
+  fitMapToRegion(activeRegion);
+  showScreen('learn');
+  updateRetryBtn(nonMastered);
+}
+
+function onLearnClick(city, marker, nonMastered) {
+  if (questScreen !== 'learn') return;
+  learnRevealed.add(city.name);
+  marker.setIcon(makeStarIcon('revealed'));
+  document.getElementById('rev-count').textContent = learnRevealed.size;
+  showInfoPanel(city);
+  updateRetryBtn(nonMastered);
+}
+
+function updateRetryBtn(nonMastered) {
+  const allDone = nonMastered.length === 0 || nonMastered.every(c => learnRevealed.has(c.name));
+  if (questScreen === 'learn') {
+    document.getElementById('retry-quiz-btn').style.display = allDone ? 'block' : 'none';
+  }
+}
+
+function showInfoPanel(city) {
+  document.getElementById('info-city-title').textContent = city.name;
+  document.getElementById('info-card-text').textContent  = city.fact;
+  document.getElementById('learn-counter').style.display = 'none';
+  document.getElementById('retry-quiz-btn').style.display = 'none';
+  document.getElementById('info-panel').style.display    = 'block';
+}
+
+document.getElementById('info-close-btn').addEventListener('click', () => {
+  document.getElementById('info-panel').style.display = 'none';
+  if (questScreen === 'learn') {
+    document.getElementById('learn-counter').style.display = 'block';
+    const region   = QUEST_REGIONS[activeRegion];
+    const mastered = new Set(questProgress.mastered_cities[activeRegion] || []);
+    updateRetryBtn(region.cities.filter(c => !mastered.has(c.name)));
+  }
+});
+
+document.getElementById('retry-quiz-btn').addEventListener('click', () => {
+  learnMarkers.forEach(m => leafletMap.removeLayer(m));
+  learnMarkers = [];
+  startQuiz(activeRegion);
+});
+
+// ── Travel screen ──
+function showTravelScreen() {
+  const region   = QUEST_REGIONS[activeRegion];
+  const adjacent = region.adjacent;
+
+  const cardsEl = document.getElementById('travel-cards');
+  cardsEl.innerHTML = '';
+
+  // Train: one card per adjacent region
+  adjacent.forEach(adjKey => {
+    if (!QUEST_REGIONS[adjKey]) return;
+    const adjName = QUEST_REGIONS[adjKey].name;
+    const card = document.createElement('div');
+    card.className = 'travel-card';
+    card.innerHTML = `<div class="travel-card-icon">🚂</div>
+      <div class="travel-card-type">Train</div>
+      <div class="travel-card-dest">${adjName}</div>`;
+    card.addEventListener('click', () => travelTo(adjKey));
+    cardsEl.appendChild(card);
+  });
+
+  // Plane: random non-adjacent, non-active, non-completed region
+  const planePool = Object.keys(QUEST_REGIONS).filter(k =>
+    k !== activeRegion &&
+    !adjacent.includes(k) &&
+    !questProgress.completed[k]
+  );
+
+  if (planePool.length > 0) {
+    const card = document.createElement('div');
+    card.className = 'travel-card';
+    card.innerHTML = `<div class="travel-card-icon">✈️</div>
+      <div class="travel-card-type">Plane</div>
+      <div class="travel-card-dest mystery">??? surprise!</div>`;
+    card.addEventListener('click', () => {
+      const dest = planePool[Math.floor(Math.random() * planePool.length)];
+      travelTo(dest);
+    });
+    cardsEl.appendChild(card);
+  }
+
+  showScreen('travel');
+}
+
+function travelTo(regionKey) {
+  activeRegion = regionKey;
+  // Center globe on destination region
+  const region = QUEST_REGIONS[regionKey];
+  const centerLat = region.cities.reduce((s, c) => s + c.lat, 0) / region.cities.length;
+  const centerLng = region.cities.reduce((s, c) => s + c.lng, 0) / region.cities.length;
+  globeCenterOn(-centerLng, -centerLat);
+  showScreen('globe');
+}
+
+document.getElementById('travel-back-btn').addEventListener('click', () => showScreen('globe'));
+
+// ── Back to globe ──
+document.getElementById('back-to-globe-btn').addEventListener('click', () => {
+  learnMarkers.forEach(m => leafletMap.removeLayer(m));
+  learnMarkers = [];
+  clearQuizOverlays();
+  leafletMap.closePopup();
+  showScreen('globe');
+});
+
+// ── Globe ──
+let globeRotation = [98, -38, 0]; // centered on continental US
+
+function drawGlobe()     { globeRedraw && globeRedraw(); }
+function globeCenterOn(lng, lat) { globeRotation = [lng, lat, 0]; }
+
+(function initGlobe() {
+  const canvas   = document.getElementById('globe-canvas');
+  const ctx      = canvas.getContext('2d');
+  const lblName  = document.getElementById('globe-region-name');
+  const lblState = document.getElementById('globe-region-states');
+
+  const STATE_TO_REGION = {
+    "23":"northern_new_england","33":"northern_new_england","50":"northern_new_england",
+    "25":"southern_new_england","44":"southern_new_england","09":"southern_new_england",
+    "36":"new_york",
+    "34":"mid_atlantic","42":"mid_atlantic","10":"mid_atlantic",
+    "24":"chesapeake","11":"chesapeake","51":"chesapeake",
+    "54":"appalachia","21":"appalachia","47":"appalachia",
+    "37":"carolinas","45":"carolinas",
+    "13":"deep_south","12":"deep_south",
+    "01":"gulf_coast","28":"gulf_coast","22":"gulf_coast",
+    "05":"arkansas_missouri","29":"arkansas_missouri",
+    "39":"ohio_valley","18":"ohio_valley",
+    "17":"great_lakes","55":"great_lakes","26":"great_lakes",
+    "27":"upper_midwest","19":"upper_midwest",
+    "38":"northern_plains","46":"northern_plains","31":"northern_plains",
+    "20":"southern_plains","40":"southern_plains",
+    "48":"texas",
+    "35":"desert_southwest","04":"desert_southwest",
+    "08":"rocky_mountain","49":"rocky_mountain","32":"rocky_mountain",
+    "30":"northern_rockies","16":"northern_rockies","56":"northern_rockies",
+    "53":"pacific_northwest","41":"pacific_northwest",
+    "06":"california",
+    "15":"hawaii",
+    "02":"alaska",
+  };
+
+  const MEDAL_COLORS = { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700' };
+
+  let usData       = null;
+  let stateFeats   = [];
+  let dragging     = false;
+  let dragStart    = null, rotStart = null;
+  let lastInteract = -Infinity;
+  let hoveredKey   = null;
+  let projection, path;
+
+  function globeSize() {
+    const el = document.getElementById('globe-screen');
+    // Reserve ~90px below canvas for region label + hint text
+    const maxH = Math.max(el.clientHeight - 90, 160);
+    return Math.min(el.clientWidth * 0.88, maxH, 500);
+  }
+
+  function resize() {
+    const s = globeSize();
+    canvas.width = canvas.height = s;
+    canvas.style.width = canvas.style.height = s + 'px';
+    if (projection) {
+      projection.scale(s / 2.1).translate([s / 2, s / 2]);
+      path = d3.geoPath(projection, ctx);
+    }
+  }
+
+  function setupProjection() {
+    const s = canvas.width;
+    projection = d3.geoOrthographic()
+      .scale(s / 2.1)
+      .translate([s / 2, s / 2])
+      .clipAngle(90)
+      .rotate(globeRotation);
+    path = d3.geoPath(projection, ctx);
+  }
+
+  function draw() {
+    if (!projection || !usData) return;
+    projection.rotate(globeRotation);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Ocean
+    ctx.beginPath(); path({ type: 'Sphere' });
+    ctx.fillStyle = '#0d1b3e'; ctx.fill();
+
+    // Group features by category for layered drawing
+    const prog = questProgress;
+    const groups = { locked: [], available: [], completed: [], hovered: [] };
+    for (const { feature, stateId } of stateFeats) {
+      const key = STATE_TO_REGION[stateId];
+      if (!key) { groups.locked.push({ feature, key: null }); continue; }
+      const isComp  = prog.completed[key] !== undefined;
+      const isAvail = isRegionAvailable(key, prog);
+      const cat = key === hoveredKey ? 'hovered' : isComp ? 'completed' : isAvail ? 'available' : 'locked';
+      groups[cat].push({ feature, key });
+    }
+
+    for (const cat of ['locked', 'completed', 'available', 'hovered']) {
+      for (const { feature, key } of groups[cat]) {
+        ctx.beginPath(); path(feature);
+        if (cat === 'hovered') {
+          ctx.fillStyle = '#ffffff';
+        } else if (cat === 'completed') {
+          const medal = prog.completed[key];
+          ctx.fillStyle  = MEDAL_COLORS[medal];
+          ctx.shadowColor = medal === 'gold' ? '#ffd700' : 'transparent';
+          ctx.shadowBlur  = medal === 'gold' ? 14 : 0;
+        } else if (cat === 'available') {
+          ctx.fillStyle = '#4a90d9';
+        } else {
+          ctx.fillStyle = '#243558';
+        }
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // State borders
+    ctx.beginPath();
+    for (const { feature } of stateFeats) path(feature);
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+    // Sphere ring
+    ctx.beginPath(); path({ type: 'Sphere' });
+    ctx.strokeStyle = '#1a3060'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+
+  window.globeRedraw = draw;
+
+  function canvasCoords(cx, cy) {
+    const r = canvas.getBoundingClientRect();
+    return [(cx - r.left) * (canvas.width / r.width), (cy - r.top) * (canvas.height / r.height)];
+  }
+
+  function findRegionAt(x, y) {
+    const coords = projection.invert([x, y]);
+    if (!coords || isNaN(coords[0])) return null;
+    for (const { feature, stateId } of stateFeats) {
+      if (d3.geoContains(feature, coords)) return STATE_TO_REGION[stateId] || null;
+    }
+    return null;
+  }
+
+  function setLabel(key) {
+    if (key && QUEST_REGIONS[key]) {
+      const r = QUEST_REGIONS[key];
+      lblName.textContent  = r.name;
+      lblState.textContent = r.states.join(' · ');
+    } else {
+      lblName.textContent  = '';
+      lblState.textContent = '';
+    }
+  }
+
+  function onRegionClick(key) {
+    if (key && isRegionAvailable(key, questProgress)) {
+      setTimeout(() => startQuiz(key), 120);
+    }
+  }
+
+  // Mouse
+  canvas.addEventListener('mousemove', e => {
+    const [x, y] = canvasCoords(e.clientX, e.clientY);
+    if (dragging) {
+      const dx = e.clientX - dragStart[0], dy = e.clientY - dragStart[1];
+      globeRotation = [rotStart[0] + dx * 0.3, Math.max(-90, Math.min(90, rotStart[1] - dy * 0.3)), 0];
+      lastInteract = performance.now();
+    } else {
+      const key = findRegionAt(x, y);
+      if (key !== hoveredKey) {
+        hoveredKey = key;
+        setLabel(key);
+        canvas.style.cursor = (key && isRegionAvailable(key, questProgress)) ? 'pointer' : 'grab';
+      }
+    }
+  });
+
+  canvas.addEventListener('mousedown', e => {
+    dragging = true;
+    dragStart = [e.clientX, e.clientY];
+    rotStart  = [...globeRotation];
+    lastInteract = performance.now();
+    canvas.style.cursor = 'grabbing';
+  });
+
+  canvas.addEventListener('mouseup', e => {
+    const moved = Math.abs(e.clientX - dragStart[0]) > 5 || Math.abs(e.clientY - dragStart[1]) > 5;
+    dragging = false;
+    lastInteract = performance.now();
+    canvas.style.cursor = 'grab';
+    if (!moved) {
+      const [x, y] = canvasCoords(e.clientX, e.clientY);
+      onRegionClick(findRegionAt(x, y));
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    dragging = false; hoveredKey = null; setLabel(null);
+  });
+
+  // Touch
+  let touchOrigin = null, touchRotOrigin = null;
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    touchOrigin = touchRotOrigin = null;
+    touchOrigin = [t.clientX, t.clientY];
+    touchRotOrigin = [...globeRotation];
+    lastInteract = performance.now();
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!touchOrigin) return;
+    const t = e.touches[0];
+    const dx = t.clientX - touchOrigin[0], dy = t.clientY - touchOrigin[1];
+    globeRotation = [touchRotOrigin[0] + dx * 0.3, Math.max(-90, Math.min(90, touchRotOrigin[1] - dy * 0.3)), 0];
+    lastInteract = performance.now();
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (!touchOrigin) return;
+    const t = e.changedTouches[0];
+    const dx = Math.abs(t.clientX - touchOrigin[0]), dy = Math.abs(t.clientY - touchOrigin[1]);
+    if (dx < 8 && dy < 8) {
+      const [x, y] = canvasCoords(t.clientX, t.clientY);
+      onRegionClick(findRegionAt(x, y));
+    }
+    touchOrigin = null;
+  }, { passive: false });
+
+  window.addEventListener('resize', () => { resize(); draw(); });
+
+  // Animation loop
+  function animate(t) {
+    requestAnimationFrame(animate);
+    if (questScreen !== 'globe') return;
+    if (!dragging && t - lastInteract > 3000) {
+      globeRotation[0] += 0.015;
+    }
+    draw();
+  }
+
+  // Load US atlas
+  fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+    .then(r => r.json())
+    .then(data => {
+      usData = data;
+      stateFeats = topojson.feature(data, data.objects.states).features.map(f => ({
+        feature: f,
+        stateId: String(f.id).padStart(2, '0'),
+      }));
+      resize();
+      setupProjection();
+      requestAnimationFrame(animate);
+    })
+    .catch(err => console.warn('US atlas load failed:', err));
+})();
+
+// ── Init ──
+showScreen('globe');
+</script>
+</body>
+</html>
