@@ -337,4 +337,4 @@ const QUEST_REGIONS = {
 
 };
 
-const QUEST_START = "northern_new_england";
+const QUEST_START = "southern_new_england";
